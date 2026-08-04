@@ -409,6 +409,14 @@ footer{border-top:1px solid var(--border);padding:30px 60px;display:flex;align-i
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+/* ===== LOADING OVERLAY ===== */
+.pay-loading{position:fixed;inset:0;background:rgba(6,6,10,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.pay-loading.open{opacity:1;pointer-events:all}
+.pay-spinner{width:52px;height:52px;border:3px solid rgba(255,107,26,.2);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pay-loading p{font-size:15px;color:var(--g2);letter-spacing:.03em}
+.pay-loading strong{color:#fff}
+
 /* ===== PAYMENT MODAL ===== */
 .pay-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .pay-overlay.open{opacity:1;pointer-events:all}
@@ -827,47 +835,12 @@ footer{border-top:1px solid var(--border);padding:30px 60px;display:flex;align-i
   <div class="fc-copy">© 2024 AutogrowMedia. All rights reserved.</div>
 </footer>
 
-<!-- PAYMENT MODAL -->
-<div class="pay-overlay" id="pay-overlay" role="dialog" aria-modal="true" aria-labelledby="pay-title">
-  <div class="pay-modal">
-    <button class="pay-close" id="pay-close" aria-label="Close payment form">✕</button>
-    <div class="pay-secure">🔒 Secured by Cashfree</div>
-    <h3 id="pay-title">Complete Your Purchase</h3>
-    <div class="pay-amount">₹999</div>
-    <div class="pay-amount-sub">One-time payment · Instant access · 90-day guarantee</div>
-    <form id="pay-form" novalidate autocomplete="on">
-      <div class="pay-field">
-        <label for="pay-name">Full Name</label>
-        <input type="text" id="pay-name" placeholder="Rahul Sharma" autocomplete="name" required>
-      </div>
-      <div class="pay-field">
-        <label for="pay-email">Email Address</label>
-        <input type="email" id="pay-email" placeholder="rahul@gmail.com" autocomplete="email" required>
-      </div>
-      <div class="pay-field">
-        <label for="pay-phone">Phone Number</label>
-        <input type="tel" id="pay-phone" placeholder="9876543210" autocomplete="tel" maxlength="10" required>
-      </div>
-      <button type="submit" class="pay-submit" id="pay-submit">⚡ Pay ₹999 Securely</button>
-      <div class="pay-trust-row">
-        <span>🔒 256-bit SSL</span>
-        <span>🛡️ PCI DSS Compliant</span>
-        <span>✓ Instant Access</span>
-      </div>
-    </form>
-    <div class="pay-error" id="pay-error" role="alert"></div>
-  </div>
-</div>
 
-<!-- SUCCESS OVERLAY -->
-<div class="success-overlay" id="success-overlay" role="dialog" aria-modal="true">
-  <div class="success-modal">
-    <span class="success-icon">🎉</span>
-    <h2>Payment Successful!</h2>
-    <p>Welcome to AutogrowMedia! Your ₹999 package is now active. You'll receive setup instructions on your email shortly.</p>
-    <div class="success-detail" id="success-detail"></div>
-    <a href="#" class="cta-btn" style="text-decoration:none;display:inline-flex">🚀 Connect Instagram & Start</a>
-  </div>
+<!-- LOADING OVERLAY -->
+<div class="pay-loading" id="pay-loading">
+  <div class="pay-spinner"></div>
+  <p><strong>Redirecting to payment...</strong></p>
+  <p>Please wait</p>
 </div>
 
 <!-- FLOATING NOTIFICATION -->
@@ -1034,178 +1007,44 @@ function showFloater(){
 setTimeout(showFloater,2500);
 setInterval(showFloater,8000);
 
-/* ================================================================
-   PAYMENT CONFIG — set these before deploying
-   ================================================================ */
-var PAY_CFG = {
-  supabaseUrl:     'https://qqhqggdfeayvhskzwzhs.supabase.co',
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxaHFnZ2RmZWF5dmhza3p3emhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1OTQwNjAsImV4cCI6MjEwMTE3MDA2MH0.uEWcai0Cn5j2bAQv77QXKTsAhKlZecPUqBlAOtE2ztU',
-  cashfreeMode:    'sandbox'                  // change to 'production' when going live
-};
-
-/* ===== PAYMENT FLOW ===== */
+/* ===== CASHFREE CHECKOUT ===== */
 (function(){
-  'use strict';
+  var cashfree = Cashfree({ mode: 'production' });
 
-  // ── Open modal on the two payment CTA buttons only ───────────────────────
-  ['cta-pay-1','cta-pay-2'].forEach(function(id){
-    var btn=document.getElementById(id);
-    if(btn) btn.addEventListener('click',function(e){
-      e.preventDefault();
-      openModal();
-    });
-  });
-
-  function openModal(){
-    document.getElementById('pay-overlay').classList.add('open');
+  function showLoading(){
+    document.getElementById('pay-loading').classList.add('open');
     document.body.style.overflow='hidden';
-    setTimeout(function(){ document.getElementById('pay-name').focus(); },300);
   }
-
-  function closeModal(){
-    document.getElementById('pay-overlay').classList.remove('open');
+  function hideLoading(){
+    document.getElementById('pay-loading').classList.remove('open');
     document.body.style.overflow='';
-    clearError();
   }
 
-  document.getElementById('pay-close').addEventListener('click', closeModal);
-  document.getElementById('pay-overlay').addEventListener('click',function(e){
-    if(e.target===this) closeModal();
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape') closeModal();
-  });
-
-  // ── Form helpers ──────────────────────────────────────────────────────────
-  function showError(msg){
-    var el=document.getElementById('pay-error');
-    el.textContent=msg;
-    el.classList.add('show');
-  }
-  function clearError(){
-    var el=document.getElementById('pay-error');
-    el.textContent='';
-    el.classList.remove('show');
-  }
-  function setLoading(on){
-    var btn=document.getElementById('pay-submit');
-    btn.disabled=on;
-    btn.textContent=on?'Creating order…':'⚡ Pay ₹999 Securely';
-  }
-  function markError(id){
-    document.getElementById(id).classList.add('input-error');
-  }
-  function clearInputErrors(){
-    ['pay-name','pay-email','pay-phone'].forEach(function(id){
-      document.getElementById(id).classList.remove('input-error');
-    });
-  }
-
-  // ── Form submit ───────────────────────────────────────────────────────────
-  document.getElementById('pay-form').addEventListener('submit',async function(e){
-    e.preventDefault();
-    clearError();
-    clearInputErrors();
-
-    var name  = document.getElementById('pay-name').value.trim();
-    var email = document.getElementById('pay-email').value.trim();
-    var phone = document.getElementById('pay-phone').value.replace(/\D/g,'');
-
-    // Client-side validation
-    if(!name){
-      showError('Please enter your full name.');
-      markError('pay-name');
-      return;
-    }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      showError('Please enter a valid email address.');
-      markError('pay-email');
-      return;
-    }
-    if(!/^[6-9]\d{9}$/.test(phone)){
-      showError('Please enter a valid 10-digit Indian mobile number.');
-      markError('pay-phone');
-      return;
-    }
-
-    setLoading(true);
-
+  async function startPayment(){
+    showLoading();
     try {
-      // Step 1: Create order via Edge Function
-      var createRes = await fetch(PAY_CFG.supabaseUrl+'/functions/v1/payment/create-order',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer '+PAY_CFG.supabaseAnonKey
-        },
-        body:JSON.stringify({customer_name:name, email:email, phone:phone})
-      });
+      var res  = await fetch('/api/create-order', { method:'POST' });
+      var data = await res.json();
 
-      var createData = await createRes.json();
+      if(!data.success) throw new Error(data.error || 'Order creation failed');
 
-      if(!createData.success){
-        showError(createData.error||'Could not create order. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // Step 2: Hand off to Cashfree JS SDK v3
-      var cashfree = Cashfree({ mode: PAY_CFG.cashfreeMode });
       await cashfree.checkout({
-        paymentSessionId: createData.data.payment_session_id,
-        redirectTarget: '_self'  // Redirects to Cashfree's hosted checkout page
+        paymentSessionId: data.payment_session_id,
+        redirectTarget:   '_self'
       });
-      // Page will redirect — no reset needed
+      // Page redirects to Cashfree — no further code needed
 
     } catch(err){
-      console.error('[payment/create]',err);
-      showError('Something went wrong. Please refresh and try again.');
-      setLoading(false);
+      console.error('[payment]', err);
+      hideLoading();
+      alert('Payment could not be started. Please try again.');
     }
-  });
-
-  // ── Handle return from Cashfree ───────────────────────────────────────────
-  // Cashfree redirects to: /?payment=success&order_id=AGM-xxx
-  (async function handleReturn(){
-    var params = new URLSearchParams(window.location.search);
-    var orderId = params.get('order_id');
-
-    if(!orderId) return;
-
-    // Clean URL before doing anything visible
-    window.history.replaceState({},'',window.location.pathname);
-
-    try {
-      var verifyRes = await fetch(
-        PAY_CFG.supabaseUrl+'/functions/v1/payment/verify-payment?order_id='+encodeURIComponent(orderId),
-        { headers:{ 'Authorization':'Bearer '+PAY_CFG.supabaseAnonKey } }
-      );
-
-      var verifyData = await verifyRes.json();
-
-      if(verifyData.success && verifyData.data.status==='PAID'){
-        showSuccess(verifyData.data);
-      }
-      // If FAILED or PENDING: page loads normally, user can retry
-    } catch(e){
-      console.error('[payment/verify]',e);
-    }
-  })();
-
-  // ── Show success overlay ──────────────────────────────────────────────────
-  function showSuccess(data){
-    var when = data.payment_time
-      ? new Date(data.payment_time).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})
-      : 'Just now';
-
-    document.getElementById('success-detail').innerHTML =
-      '<strong>Order ID:</strong> '+data.order_id+'<br>'+
-      '<strong>Amount Paid:</strong> ₹'+Number(data.amount).toLocaleString('en-IN')+'<br>'+
-      '<strong>Payment Time:</strong> '+when;
-
-    document.getElementById('success-overlay').classList.add('open');
-    document.body.style.overflow='hidden';
   }
+
+  ['cta-pay-1','cta-pay-2'].forEach(function(id){
+    var btn = document.getElementById(id);
+    if(btn) btn.addEventListener('click', function(e){ e.preventDefault(); startPayment(); });
+  });
 })();
 </script>
 </body>
