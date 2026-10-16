@@ -1,0 +1,1744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Replora CRM</title>
+<meta name="description" content="WhatsApp AI Agent + Call Follow-up CRM — demo with mock data">
+<style>
+:root{
+  --bg:#f3f5f7;--surface:#fff;--surface2:#f7f9fa;--border:#e2e8ee;--text:#101c2c;--muted:#66758a;
+  --brand:#0f8b7d;--brand-d:#0a6b60;--brand-soft:#e0f4f0;--accent:#25d366;
+  --danger:#dc3f45;--danger-soft:#fdeaea;--warn:#b87405;--warn-soft:#fff3d6;--info:#2f6fe0;--info-soft:#e6efff;
+  --purple:#7c4ddb;--purple-soft:#efe8ff;--ok:#1a8f4d;--ok-soft:#e1f6e9;--gray:#5b6878;--gray-soft:#eceff3;
+  --chat-bg:#ece5dd;--bub-in:#fff;--bub-out:#d9fdd3;--bub-text:#101c2c;
+  --shadow:0 1px 2px rgba(16,28,44,.06),0 4px 16px rgba(16,28,44,.05);--radius:12px;
+  --c1:#0f8b7d;--c2:#2f6fe0;--c3:#d98a06;--c4:#7c4ddb;--c5:#dc3f45;--c6:#5b6878;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c131b;--surface:#131c27;--surface2:#192432;--border:#263446;--text:#e5ecf4;--muted:#8a9bb0;
+  --brand:#2bbfa9;--brand-d:#1fa08c;--brand-soft:#123a35;--danger:#ff6b70;--danger-soft:#3a1a1d;--warn:#f0b13a;--warn-soft:#3a2d10;
+  --info:#6ea0ff;--info-soft:#18284a;--purple:#a98bff;--purple-soft:#2a2044;--ok:#4ed08a;--ok-soft:#10301f;--gray:#9aa8ba;--gray-soft:#202c3b;
+  --chat-bg:#0b141a;--bub-in:#1f2c34;--bub-out:#005c4b;--bub-text:#e9edef;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --c1:#2bbfa9;--c2:#6ea0ff;--c3:#f0b13a;--c4:#a98bff;--c5:#ff6b70;--c6:#9aa8ba}}
+:root[data-theme="dark"]{
+  --bg:#0c131b;--surface:#131c27;--surface2:#192432;--border:#263446;--text:#e5ecf4;--muted:#8a9bb0;
+  --brand:#2bbfa9;--brand-d:#1fa08c;--brand-soft:#123a35;--danger:#ff6b70;--danger-soft:#3a1a1d;--warn:#f0b13a;--warn-soft:#3a2d10;
+  --info:#6ea0ff;--info-soft:#18284a;--purple:#a98bff;--purple-soft:#2a2044;--ok:#4ed08a;--ok-soft:#10301f;--gray:#9aa8ba;--gray-soft:#202c3b;
+  --chat-bg:#0b141a;--bub-in:#1f2c34;--bub-out:#005c4b;--bub-text:#e9edef;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --c1:#2bbfa9;--c2:#6ea0ff;--c3:#f0b13a;--c4:#a98bff;--c5:#ff6b70;--c6:#9aa8ba}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand)}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.i.sm{width:14px;height:14px}
+.muted{color:var(--muted)}.sm-t{font-size:12px}.xs-t{font-size:11px}.b{font-weight:600}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+.row{display:flex;align-items:center;gap:8px}.row.wrap{flex-wrap:wrap}.sp{flex:1}.col{display:flex;flex-direction:column;gap:8px}
+.hide{display:none!important}
+/* layout */
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:30}
+.brand{display:flex;gap:10px;align-items:center;padding:16px 16px 12px}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;display:grid;place-items:center;font-weight:800;font-size:17px}
+.brand b{display:block;font-size:15px;line-height:1.1}.brand small{color:var(--muted);font-size:11px}
+#nav{padding:6px 10px;overflow:auto;flex:1}
+.nav-i{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;background:none;border-radius:9px;color:var(--muted);cursor:pointer;text-align:left;font-weight:500;margin-bottom:2px}
+.nav-i:hover{background:var(--surface2);color:var(--text)}
+.nav-i.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.nav-i .cnt{margin-left:auto;background:var(--danger);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px;font-weight:600}
+.nav-i .cnt.soft{background:var(--gray-soft);color:var(--muted)}
+.side-foot{padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.top h1{font-size:18px;margin:0;white-space:nowrap}
+.menu-btn{display:none}
+.search{position:relative;flex:1;max-width:420px;margin-left:12px}
+.search input[type=search]{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.search .i{position:absolute;left:11px;top:9px;color:var(--muted)}
+.gs-results{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);max-height:320px;overflow:auto;z-index:50}
+.gs-results button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:9px 12px;text-align:left;cursor:pointer}
+.gs-results button:hover{background:var(--surface2)}
+#view{padding:20px 24px 40px;flex:1;min-width:0}
+/* controls */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;white-space:nowrap;line-height:1.2}
+.btn:hover{background:var(--surface2)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}.btn.pri:hover{background:var(--brand-d)}
+.btn.dng{color:var(--danger)}.btn.dng:hover{background:var(--danger-soft)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn.ghost{border-color:transparent;background:none}.btn.ghost:hover{background:var(--surface2)}
+.btn:disabled,.btn.dis{opacity:.5;pointer-events:none}
+.icon-btn{width:34px;height:34px;display:inline-grid;place-items:center;border:1px solid var(--border);background:var(--surface);border-radius:9px;cursor:pointer}
+.icon-btn:hover{background:var(--surface2)}
+input[type=text],input[type=number],input[type=tel],input[type=email],input[type=password],input[type=search],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+textarea{resize:vertical;min-height:70px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+label.f>input,label.f>select,label.f>textarea{font-weight:400;color:var(--text);font-size:14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--brand)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+.card>.hd{display:flex;align-items:center;gap:8px;padding:14px 16px 0;font-weight:700}
+.card>.hd .sub{font-weight:400;color:var(--muted);font-size:12px}
+.card>.bd{padding:14px 16px 16px}
+.page-h{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.page-h h2{margin:0;font-size:20px}
+.kpi{padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.kpi .l{color:var(--muted);font-size:12px;font-weight:600;display:flex;gap:6px;align-items:center}
+.kpi .v{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.clk{cursor:pointer}.kpi.clk:hover{border-color:var(--brand)}
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;white-space:nowrap;background:var(--gray-soft);color:var(--gray)}
+.b-New{background:var(--gray-soft);color:var(--gray)}.b-Inquiry{background:var(--info-soft);color:var(--info)}
+.b-Interested{background:var(--brand-soft);color:var(--brand)}.b-Quotation-Sent{background:var(--purple-soft);color:var(--purple)}
+.b-Callback{background:var(--warn-soft);color:var(--warn)}.b-Needs-Human{background:var(--danger-soft);color:var(--danger)}
+.b-Booked{background:var(--ok-soft);color:var(--ok)}.b-Closed{background:var(--gray-soft);color:var(--muted);text-decoration:line-through}
+.b-ok{background:var(--ok-soft);color:var(--ok)}.b-bad{background:var(--danger-soft);color:var(--danger)}.b-warn{background:var(--warn-soft);color:var(--warn)}.b-info{background:var(--info-soft);color:var(--info)}.b-pur{background:var(--purple-soft);color:var(--purple)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--gray)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;flex:none}
+.av.sm{width:28px;height:28px;font-size:11px}
+/* table */
+.tbl-wrap{overflow:auto}
+table.t{width:100%;border-collapse:collapse}
+table.t th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);position:sticky;top:0}
+table.t th.sortable{cursor:pointer}
+table.t td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t tbody tr.clk{cursor:pointer}table.t tbody tr.clk:hover{background:var(--surface2)}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.tabs{display:flex;gap:4px;background:var(--gray-soft);padding:3px;border-radius:10px;width:fit-content;flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.tabs .n{font-size:11px;color:var(--muted);margin-left:4px}
+.pill{display:inline-flex;gap:6px;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--gray-soft);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--danger-soft);color:var(--danger)}.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:11px;background:var(--gray-soft);color:var(--muted);margin:1px 3px 1px 0}
+.chip.tag{background:var(--info-soft);color:var(--info)}
+.bar{height:8px;border-radius:99px;background:var(--gray-soft);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s}
+.hbar{display:grid;grid-template-columns:110px 1fr 34px;gap:8px;align-items:center;margin:7px 0;font-size:12.5px}
+/* inbox */
+.inbox{display:grid;grid-template-columns:320px minmax(0,1fr) 290px;height:calc(100vh - 118px);min-height:520px;overflow:hidden}
+.inbox.noinfo{grid-template-columns:320px minmax(0,1fr)}
+.inbox>div{min-width:0;min-height:0;display:flex;flex-direction:column}
+.chat-list{border-right:1px solid var(--border)}
+.cl-top{padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.cl-items{overflow:auto;flex:1}
+.cl-i{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start}
+.cl-i:hover{background:var(--surface2)}.cl-i.on{background:var(--brand-soft)}
+.cl-i .nm{font-weight:600;display:flex;gap:6px;align-items:center}
+.cl-i .pv{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-i .tm{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.unread{background:var(--accent);color:#06361d;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;text-align:center}
+.chat{background:var(--surface)}
+.chat-h{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.chat-msgs{flex:1;overflow:auto;padding:14px 5%;background:var(--chat-bg);display:flex;flex-direction:column;gap:3px}
+.dsep{align-self:center;background:var(--surface);color:var(--muted);font-size:11px;padding:3px 10px;border-radius:8px;margin:8px 0;box-shadow:var(--shadow)}
+.bub{max-width:min(78%,520px);padding:6px 9px 4px;border-radius:9px;box-shadow:0 1px 1px rgba(0,0,0,.12);color:var(--bub-text);word-wrap:break-word;overflow-wrap:anywhere;position:relative}
+.bub.in{align-self:flex-start;background:var(--bub-in);border-top-left-radius:2px}
+.bub.out{align-self:flex-end;background:var(--bub-out);border-top-right-radius:2px}
+.bub .who{font-size:11px;font-weight:700;color:var(--brand);display:flex;gap:4px;align-items:center;margin-bottom:1px}
+.bub.in .who{color:var(--purple)}
+.bub .tx{white-space:pre-wrap}
+.bub .meta{display:flex;gap:4px;justify-content:flex-end;align-items:center;font-size:10.5px;color:var(--muted);margin-top:1px}
+.bub .tool{display:inline-flex;gap:3px;align-items:center;font-size:10.5px;background:rgba(0,0,0,.07);border-radius:5px;padding:0 5px;margin:3px 3px 0 0;color:var(--muted)}
+.tick{width:15px;height:11px;stroke-width:2.4}.tick.read{color:#34a7f5}
+.typing{align-self:flex-start;background:var(--bub-in);padding:9px 12px;border-radius:9px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bl 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.composer{border-top:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.composer .line{display:flex;gap:8px;align-items:flex-end}
+.composer textarea{min-height:40px;max-height:120px;resize:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--border);background:var(--surface2);border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text)}
+.chips button:hover{border-color:var(--brand);color:var(--brand)}
+.notice{padding:8px 12px;border-radius:9px;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}.notice.bad{background:var(--danger-soft);color:var(--danger)}.notice.info{background:var(--info-soft);color:var(--info)}.notice.ok{background:var(--ok-soft);color:var(--ok)}
+.info-p{border-left:1px solid var(--border);overflow:auto;padding:14px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 8px;font-size:13px;margin:10px 0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;word-break:break-word}
+/* kanban */
+.kanban{display:flex;gap:12px;overflow:auto;padding-bottom:10px;align-items:flex-start}
+.kcol{flex:0 0 250px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;max-height:calc(100vh - 190px)}
+.kcol.over{outline:2px dashed var(--brand);background:var(--brand-soft)}
+.kcol .kh{padding:10px 12px;font-weight:700;display:flex;gap:6px;align-items:center}
+.kcol .kb{padding:0 8px 8px;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:60px}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:grab;box-shadow:var(--shadow)}
+.kcard.drag{opacity:.4}
+.kcard .nm{font-weight:600}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cal .dh{background:var(--surface2);padding:6px;text-align:center;font-size:11.5px;color:var(--muted);font-weight:600}
+.cal .dc{background:var(--surface);min-height:84px;padding:4px 5px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cal .dc:hover{background:var(--surface2)}
+.cal .dc.out{background:var(--surface2);color:var(--muted)}
+.cal .dc.today .dn{background:var(--brand);color:#fff}
+.cal .dc.sel{outline:2px solid var(--brand);outline-offset:-2px}
+.cal .dc.closed{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 6px,var(--surface) 6px,var(--surface) 12px)}
+.dn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600}
+.ev{font-size:11px;background:var(--brand-soft);color:var(--brand);border-radius:4px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev.x{background:var(--gray-soft);color:var(--muted);text-decoration:line-through}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.slot{padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center;font-size:12.5px;cursor:pointer;background:var(--surface)}
+.slot:hover{border-color:var(--brand)}.slot.sel{background:var(--brand);color:#fff;border-color:var(--brand)}
+.slot.busy{opacity:.4;pointer-events:none;text-decoration:line-through;background:var(--gray-soft)}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(8,14,22,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;animation:fi .15s}
+.ov.drawer{justify-content:flex-end;padding:0}
+@keyframes fi{from{opacity:0}}
+.md{background:var(--surface);border-radius:14px;width:min(560px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.md.wide{width:min(880px,100%)}
+.ov.drawer .md{border-radius:0;height:100vh;max-height:100vh;width:min(520px,100%)}
+.md>.mh{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:16px}
+.md>.mb{padding:16px 18px;overflow:auto;flex:1}
+.md>.mf{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+#toasts{position:fixed;top:70px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:200;width:max-content;max-width:min(420px,calc(100vw - 32px));pointer-events:none}
+.toast{background:var(--text);color:var(--bg);padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:13px;animation:fi .2s;display:flex;gap:8px;align-items:flex-start}
+.toast.err{background:var(--danger);color:#fff}.toast.ok{background:var(--ok);color:#fff}
+/* misc */
+.wa-prev{background:var(--chat-bg);border-radius:12px;padding:14px}
+.wa-prev .bub{max-width:100%;align-self:stretch}
+.wa-prev .hd2{font-weight:700;margin-bottom:3px}
+.wa-prev .ft{color:var(--muted);font-size:12px;margin-top:4px}
+.wa-prev .btns{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.wa-prev .btns span{background:var(--bub-in);color:var(--info);text-align:center;border-radius:8px;padding:7px;font-weight:600;font-size:13px;box-shadow:0 1px 1px rgba(0,0,0,.12)}
+.var{background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 3px}
+pre.json{margin:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;overflow:auto;font-size:12px;max-height:340px;white-space:pre-wrap;word-break:break-word}
+.feed{display:flex;flex-direction:column}
+.feed>div{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.feed>div:last-child{border:0}
+.feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--gray-soft);color:var(--muted)}
+.feed .ic.k-ok{background:var(--ok-soft);color:var(--ok)}.feed .ic.k-bad{background:var(--danger-soft);color:var(--danger)}.feed .ic.k-info{background:var(--info-soft);color:var(--info)}.feed .ic.k-pur{background:var(--purple-soft);color:var(--purple)}.feed .ic.k-warn{background:var(--warn-soft);color:var(--warn)}
+.list-i{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}.list-i:last-child{border:0}
+.scroll-y{max-height:340px;overflow:auto}
+.qline{display:grid;grid-template-columns:minmax(0,1fr) 64px 92px 28px;gap:6px;margin-bottom:6px;align-items:center}
+.sw{position:relative;width:38px;height:22px;flex:none}.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw i{position:absolute;inset:0;background:var(--border);border-radius:99px;transition:.2s;cursor:pointer}
+.sw i:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked+i{background:var(--brand)}.sw input:checked+i:before{transform:translateX(16px)}
+.back-m{display:none}
+@media (max-width:1180px){.inbox{grid-template-columns:300px minmax(0,1fr)}.inbox .info-p{display:none}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s;width:250px;box-shadow:var(--shadow)}
+  .side.open{transform:none}
+  .menu-btn{display:grid}.top{padding:10px 14px}#view{padding:14px 14px 40px}
+  .search{display:none}.g2,.g3{grid-template-columns:1fr}
+  .inbox{grid-template-columns:1fr;height:calc(100vh - 100px)}
+  .inbox .chat{display:none}.inbox.show-chat .chat-list{display:none}.inbox.show-chat .chat{display:flex}
+  .back-m{display:grid}
+  .hide-m{display:none}
+  .kcol{flex-basis:230px}
+  .cal .dc{min-height:60px}.ev{font-size:10px}
+}
+@media (max-width:520px){.g4{grid-template-columns:1fr 1fr}.kpi .v{font-size:22px}.top h1{font-size:16px}.btn{padding:7px 10px}.bub{max-width:90%}.qline{grid-template-columns:minmax(0,1fr) 54px 78px 24px}}
+.inbox.noinfo .info-p{display:none}
+.inbox.noinfo{grid-template-columns:320px minmax(0,1fr)}
+@media (max-width:900px){.inbox.noinfo{grid-template-columns:1fr}}
+
+.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.ev.d{background:var(--gray-soft);color:var(--muted)}
+@media (max-width:900px){.g21{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-kanban" viewBox="0 0 24 24"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></symbol>
+<symbol id="i-tpl" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="i-checks" viewBox="0 0 24 14"><path d="M1 8l4 4L14 2M10 10l2 2L21 2"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M14 9l2 2"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M22 6l-10 7L2 6"/></symbol>
+</defs>
+</svg>
+<div class="app" id="app">
+  <aside class="side" id="side">
+    <div class="brand"><div class="logo">R</div><div><b>Replora CRM</b><small>WhatsApp AI + Call Follow-up</small></div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot"><div class="row"><span class="dot" style="background:var(--accent)"></span><b style="color:var(--text)">Demo mode</b></div><div class="xs-t" style="margin-top:3px">All data is mock &amp; saved in your browser only. Nothing is sent to WhatsApp.</div></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <button class="icon-btn menu-btn" data-act="toggleSide" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="search"><svg class="i"><use href="#i-search"/></svg><input id="gsearch" type="search" placeholder="Search leads by name, phone, service…" autocomplete="off" data-in="gsearch"><div id="gsResults" class="gs-results hide"></div></div>
+      <div class="sp"></div>
+      <button class="btn pri sm" data-act="newChat"><svg class="i sm"><use href="#i-plus"/></svg><span class="hide-m">Simulate WhatsApp message</span></button>
+      <button class="icon-btn" data-act="theme" aria-label="Toggle theme" id="themeBtn"><svg class="i"><use href="#i-moon"/></svg></button>
+    </header>
+    <main id="view"></main>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* ============ CORE UTILS ============ */
+const KEY='replora_crm_demo_v1';
+const MIN=60000,HR=3600000,DAY=86400000;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=(p='id')=>p+'_'+Math.random().toString(36).slice(2,9);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const digits=s=>String(s==null?'':s).replace(/\D/g,'');
+const pad=n=>String(n).padStart(2,'0');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const iso=ms=>new Date(ms).toISOString();
+const money=n=>'Rs '+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0);
+const slug=s=>String(s).replace(/\s+/g,'-');
+const icon=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
+
+let DB=null;
+const UI={tab:'dashboard',typing:null,chat:null,chatFilter:'all',chatMode:'team',chatSearch:'',info:true,
+  leadQ:'',leadStatus:'',leadTag:'',leadSort:'last',leadDir:-1,calY:0,calM:0,calDay:'',
+  qb:null,apiAction:'handoff',callTab:'due',tplShowDeleted:false,tplFilter:'',campTab:'all',sideOpen:false};
+
+/* ---- timezone helpers ---- */
+const TZ=()=>(DB&&DB.config&&DB.config.timezone)||'Asia/Kolkata';
+const _fc={};
+function tzParts(ms,tz){
+  tz=tz||TZ();
+  let f=_fc[tz];
+  if(!f)f=_fc[tz]=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',weekday:'short'});
+  const o={};for(const p of f.formatToParts(new Date(ms)))o[p.type]=p.value;
+  return {y:+o.year,m:+o.month,d:+o.day,h:+o.hour%24,min:+o.minute,s:+o.second,wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday)};
+}
+function fromWall(y,m,d,h,mi,tz){
+  const guess=Date.UTC(y,m-1,d,h,mi);
+  const p=tzParts(guess,tz);
+  const asUtc=Date.UTC(p.y,p.m-1,p.d,p.h,p.min,p.s);
+  return guess-(asUtc-guess);
+}
+const dayKey=ms=>{const p=tzParts(ms);return `${p.y}-${pad(p.m)}-${pad(p.d)}`;};
+function dayAt(offsetDays,h,mi=0){const p=tzParts(Date.now()+offsetDays*DAY);return fromWall(p.y,p.m,p.d,h,mi);}
+const tomorrow11=()=>iso(dayAt(1,11,0));
+function toLocalInput(v){if(!v)return '';const t=Date.parse(v);if(isNaN(t))return '';const p=tzParts(t);return `${p.y}-${pad(p.m)}-${pad(p.d)}T${pad(p.h)}:${pad(p.min)}`;}
+function fromLocalInput(s){if(!s)return '';const m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);if(!m)return '';return iso(fromWall(+m[1],+m[2],+m[3],+m[4],+m[5]));}
+
+/* ---- formatters ---- */
+function fmtDT(v){if(!v)return '—';const d=new Date(v);if(isNaN(d))return '—';return d.toLocaleString('en-IN',{timeZone:TZ(),day:'2-digit',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}
+function fmtTime(v){if(!v)return '';const d=new Date(v);if(isNaN(d))return '';return d.toLocaleTimeString('en-IN',{timeZone:TZ(),hour:'numeric',minute:'2-digit',hour12:true});}
+function fmtDate(v){if(!v)return '—';const d=new Date(v);if(isNaN(d))return '—';return d.toLocaleDateString('en-IN',{timeZone:TZ(),weekday:'short',day:'2-digit',month:'short'});}
+function fmtSlot(ms){return new Date(ms).toLocaleString('en-IN',{timeZone:TZ(),weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}
+function rel(v){
+  if(!v)return '—';const t=typeof v==='number'?v:Date.parse(v);if(isNaN(t))return '—';
+  const diff=t-Date.now(),a=Math.abs(diff),fut=diff>0;
+  let s;if(a<45e3)return fut?'in a few sec':'just now';
+  if(a<HR)s=Math.round(a/MIN)+'m';else if(a<DAY)s=Math.round(a/HR)+'h';else s=Math.round(a/DAY)+'d';
+  return fut?'in '+s:s+' ago';
+}
+function fmtPhone(p){p=digits(p);if(p.length===12&&p.startsWith('91'))return '+91 '+p.slice(2,7)+' '+p.slice(7);return '+'+p;}
+function initials(n){const w=String(n||'?').trim().split(/\s+/);return ((w[0]||'?')[0]+(w[1]?w[1][0]:'')).toUpperCase();}
+const AVC=['#0f8b7d','#2f6fe0','#d98a06','#7c4ddb','#dc3f45','#0e8aa8','#a0522d','#5b6878','#c2185b','#388e3c'];
+function avatar(name,phone,cls=''){const k=String(name||phone||'?');let h=0;for(const ch of k)h=(h*31+ch.charCodeAt(0))>>>0;return `<div class="av ${cls}" style="background:${AVC[h%AVC.length]}">${esc(initials(name||'#'))}</div>`;}
+function waFmt(t){return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/_([^_\n]+)_/g,'<i>$1</i>');}
+const STATUSES=['New','Inquiry','Interested','Quotation Sent','Callback','Needs Human','Booked','Closed'];
+const badge=s=>`<span class="badge b-${slug(s||'New')}">${esc(s||'New')}</span>`;
+
+/* ---- toast / modal ---- */
+function toast(msg,type=''){
+  const el=document.createElement('div');el.className='toast '+type;el.innerHTML=(type==='err'?icon('alert','sm'):type==='ok'?icon('check','sm'):icon('info','sm'))+`<span>${esc(msg)}</span>`;
+  const tb=$('#toasts');while(tb.children.length>=3)tb.firstChild.remove();tb.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},3600);
+}
+let MODAL=null;
+function openModal({title,body,actions=[],wide=false,drawer=false,onMount}){
+  closeModal();
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="ov ${drawer?'drawer':''}" data-ov><div class="md ${wide?'wide':''}" role="dialog" aria-modal="true"><div class="mh"><span>${title}</span><span class="sp"></span><button class="icon-btn" data-act="closeModal" aria-label="Close">${icon('x')}</button></div><div class="mb" id="mdBody">${body}</div>${actions.length?`<div class="mf">${actions.map((a,i)=>`<button class="btn ${a.cls||''}" data-mact="${i}">${a.label}</button>`).join('')}</div>`:''}</div></div>`;
+  MODAL={actions};
+  if(onMount)onMount($('#mdBody'));
+  const f=$('#mdBody input:not([type=hidden]),#mdBody select,#mdBody textarea');if(f&&!drawer&&matchMedia('(hover:hover)').matches)f.focus();
+}
+function closeModal(){$('#modalRoot').innerHTML='';MODAL=null;}
+const formData=root=>{const o={};$$('[name]',root||$('#mdBody')).forEach(el=>{o[el.name]=el.type==='checkbox'?el.checked:el.value;});return o;};
+function confirmBox(msg,onYes,label='Delete'){openModal({title:'Please confirm',body:`<p style="margin:0">${msg}</p>`,actions:[{label:'Cancel',onClick:closeModal},{label:label,cls:'dng',onClick:()=>{closeModal();onYes();}}]});}
+
+/* ---- persistence ---- */
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}}
+function load(){
+  try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);if(d&&d.contacts&&d.config){DB=d;return;}}}catch(e){}
+  DB=seedData();
+}
+let _rt=null;
+function touch(){save();clearTimeout(_rt);_rt=setTimeout(()=>{try{refresh();}catch(e){console.error(e);}},60);}
+function logEvent(kind,text,tone=''){DB.events.unshift({id:uid('e'),kind,text,tone,at:iso(Date.now())});if(DB.events.length>120)DB.events.length=120;}
+
+/* ============ ENGINE — mirrors the n8n workflow logic with mock data ============ */
+const C=phone=>DB.contacts.find(c=>c.phone===phone);
+function upsertContact(phone,patch={}){
+  let c=C(phone);
+  if(!c){c={phone,name:'',lead_status:'New',intent:'',service:'',notes:'',quote_amount:0,appointment_time:'',follow_up_at:'',follow_up_count:0,last_call_at:'',last_call_outcome:'',last_inbound_at:'',opted_in:true,bot_paused:false,tags:'',unread:0,created_at:iso(Date.now()),ctx:{}};DB.contacts.push(c);}
+  Object.assign(c,patch);return c;
+}
+const windowOpen=c=>!!c&&!!c.last_inbound_at&&Date.parse(c.last_inbound_at)>Date.now()-DAY;
+const windowLeftH=c=>c&&c.last_inbound_at?Math.max(0,(Date.parse(c.last_inbound_at)+DAY-Date.now())/HR):0;
+const msgsOf=phone=>DB.messages.filter(m=>m.phone===phone).sort((a,b)=>Date.parse(a.event_at)-Date.parse(b.event_at));
+function lastMsgOf(phone){let l=null;for(const m of DB.messages)if(m.phone===phone&&(!l||m.event_at>l.event_at))l=m;return l;}
+function lastActivity(c){const l=lastMsgOf(c.phone);return l?Date.parse(l.event_at):Date.parse(c.created_at||0)||0;}
+
+function addMsg(m){
+  const msg=Object.assign({id:uid('m'),wa_message_id:'wamid.'+Math.random().toString(36).slice(2,14).toUpperCase(),event_at:iso(Date.now()),status:m.direction==='in'?'received':'sent',msg_type:'text',error:'',campaign_id:'',template_name:'',tools:[]},m);
+  DB.messages.push(msg);
+  if(msg.direction==='out'&&msg.status==='sent')scheduleDelivery(msg);
+  return msg;
+}
+function scheduleDelivery(msg){
+  setTimeout(()=>{if(msg.status==='sent'){msg.status='delivered';touch();}},rnd(700,1600));
+  if(Math.random()<.78)setTimeout(()=>{if(msg.status==='delivered'){msg.status='read';touch();}},rnd(2800,6500));
+}
+function sendBot(c,text,tools=[]){return addMsg({phone:c.phone,direction:'out',sender:'bot',body:text,tools});}
+
+/* ---- business helpers ---- */
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function hhmm12(s){const [h,m]=s.split(':').map(Number);return `${h%12||12}:${pad(m)} ${h<12?'AM':'PM'}`;}
+function daysText(d){const a=[...d].sort();if(a.join()==='1,2,3,4,5,6')return 'Mon-Sat';if(a.join()==='1,2,3,4,5')return 'Mon-Fri';if(a.length===7)return 'Every day';return a.map(x=>DN[x]).join(', ');}
+function hoursText(){const c=DB.config;const closed=DN.filter((_,i)=>!c.open_days.includes(i));return `${daysText(c.open_days)}, ${hhmm12(c.work_start)} to ${hhmm12(c.work_end)}.`+(closed.length&&closed.length<7?` ${closed.join(', ')} closed.`:'');}
+function servicesText(){return DB.config.services.map(s=>s.custom?`${s.name} - custom, needs quotation`:`${s.name} - Rs ${s.price} (${s.duration} min)`).join('\n');}
+function openAt(s,e){
+  const c=DB.config,ps=tzParts(s),pe=tzParts(e-1);
+  if(!c.open_days.includes(ps.wd)||ps.d!==pe.d)return false;
+  const [sh,sm]=c.work_start.split(':').map(Number),[eh,em]=c.work_end.split(':').map(Number);
+  return ps.h*60+ps.min>=sh*60+sm&&pe.h*60+pe.min+1<=eh*60+em;
+}
+function checkSlot(startMs,durMin,ignoreId){
+  const endMs=startMs+durMin*MIN;
+  if(startMs<Date.now()-MIN)return {free:false,reason:'past'};
+  if(!openAt(startMs,endMs))return {free:false,reason:'closed'};
+  const clash=DB.appointments.find(a=>a.id!==ignoreId&&a.status==='confirmed'&&Date.parse(a.start)<endMs&&Date.parse(a.end)>startMs);
+  return clash?{free:false,reason:'busy',with:clash}:{free:true};
+}
+function suggestSlots(fromMs,durMin,n=3){
+  let t=Math.ceil(Math.max(fromMs,Date.now())/(30*MIN))*30*MIN;const out=[];
+  for(let i=0;i<48*21&&out.length<n;i++,t+=30*MIN)if(checkSlot(t,durMin).free)out.push(t);
+  return out;
+}
+function createAppointment({phone,name,service,start,dur,source='manual',notes=''}){
+  const svc=DB.config.services.find(s=>s.name===service);dur=dur||(svc&&svc.duration)||DB.config.appointment_duration_min;
+  const a={id:uid('ap'),phone,name:name||'',service:service||'Appointment',start:iso(start),end:iso(start+dur*MIN),status:'confirmed',source,notes};
+  DB.appointments.push(a);const c=C(phone);if(c)syncAppt(c);
+  logEvent('appt',`Appointment booked: ${name||fmtPhone(phone)} — ${service||'Appointment'}, ${fmtSlot(start)}`,'ok');
+  return a;
+}
+function syncAppt(c){
+  const n=DB.appointments.filter(a=>a.phone===c.phone&&a.status==='confirmed'&&Date.parse(a.end)>=Date.now()-HR).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0];
+  c.appointment_time=n?n.start:'';
+}
+
+/* ---- quotation (same maths as the "Create Quotation" tool) ---- */
+function buildQuote({items,discount_pct=0,gst_pct=18,qno}){
+  let sub=0;
+  const lines=items.map((it,i)=>{const qty=+it.qty||1;const amt=qty*(+it.rate||0);sub+=amt;return `${i+1}. ${it.name} x${qty} @ Rs ${it.rate} = Rs ${amt.toFixed(2)}`;});
+  const disc=sub*((+discount_pct||0)/100),taxable=sub-disc,gst=taxable*(gst_pct/100),total=taxable+gst;
+  qno=qno||('QT-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.floor(1000+Math.random()*9000));
+  const text=['*Quotation '+qno+'*',...lines,'Subtotal: Rs '+sub.toFixed(2),disc?'Discount: -Rs '+disc.toFixed(2):null,'GST ('+gst_pct+'%): Rs '+gst.toFixed(2),'*Total: Rs '+total.toFixed(2)+'*','Valid for 7 days.'].filter(Boolean).join('\n');
+  return {qno,items,sub,disc,gst,gst_pct,discount_pct:+discount_pct||0,total,text};
+}
+function saveQuote(c,q,{send=false,by='agent'}={}){
+  const rec={id:uid('q'),qno:q.qno,phone:c.phone,name:c.name||'',items:q.items,sub:q.sub,disc:q.disc,discount_pct:q.discount_pct,gst_pct:q.gst_pct,gst:q.gst,total:q.total,status:send?'Sent':'Draft',created_at:iso(Date.now()),text:q.text};
+  DB.quotes.unshift(rec);
+  if(send){Object.assign(c,{lead_status:'Quotation Sent',quote_amount:+q.total.toFixed(2),follow_up_at:tomorrow11(),intent:'quotation',service:c.service||q.items[0].name});}
+  logEvent('quote',`Quotation ${q.qno} ${send?'sent to':'created for'} ${c.name||fmtPhone(c.phone)} — ${money(q.total)}`,'pur');
+  return rec;
+}
+
+/* ---- handoff / call ---- */
+function handoff(c,reason){
+  Object.assign(c,{bot_paused:true,lead_status:'Needs Human',notes:'Handoff: '+(reason||'')});
+  logEvent('handoff',`Handoff: ${c.name||fmtPhone(c.phone)} needs a human — ${reason||'n/a'}`,'bad');
+  logEvent('email',`Handoff email sent to ${DB.config.team_email}`,'info');
+}
+function placeCall(c,{reason='',source='manual'}={}){
+  const call={id:uid('call'),phone:c.phone,name:c.name||'',reason,source,placed_at:iso(Date.now()),status:'ringing',outcome:'',summary:'',duration:0,callback_time:'',appointment_time:''};
+  DB.calls.unshift(call);
+  logEvent('call',`Call placed to ${c.name||fmtPhone(c.phone)} (${source})`,'info');
+  setTimeout(()=>{if(call.status==='ringing'){call.status='in-progress';touch();}},2000);
+  if(DB.settings.auto_outcome)setTimeout(()=>autoOutcome(call),rnd(4500,7500));
+  touch();return call;
+}
+function autoOutcome(call){
+  if(call.status==='completed')return;
+  const c=C(call.phone)||{},r=Math.random();
+  const outcome=r<.22?'booked':r<.42?'callback':r<.52?'not_interested':r<.78?'no_answer':'interested';
+  const svc=c.service||'the service';
+  const b={phone:call.phone,name:call.name,outcome,summary:{
+    booked:`Customer agreed to visit for ${svc}. Appointment fixed on call.`,
+    callback:'Customer is busy right now, asked us to call back later.',
+    not_interested:'Customer said they are not interested at the moment.',
+    no_answer:'Call went unanswered / voicemail.',
+    interested:`Customer is interested in ${svc} but wants to think about the price.`}[outcome]};
+  if(outcome==='booked'){const d=(DB.config.services.find(s=>s.name===c.service)||{}).duration||DB.config.appointment_duration_min;const s=suggestSlots(dayAt(1,11),d,4);b.appointment_time=iso(s[rnd(0,Math.max(0,s.length-1))]||dayAt(1,11));}
+  if(outcome==='callback')b.callback_time=iso(dayAt(1,pick([11,15,17])));
+  callOutcome(b,DB.config.api_secret);
+}
+/* Call Outcome Webhook -> Route Outcome */
+function callOutcome(b,key){
+  if(key!==DB.config.api_secret)return {status:401,json:{ok:false,error:'unauthorized'}};
+  const phone=digits(b.phone),outcome=String(b.outcome||'').toLowerCase();
+  if(!phone)return {status:400,json:{ok:false,error:'phone required'}};
+  const c=upsertContact(phone,{});if(b.name&&!c.name)c.name=b.name;
+  const nowI=iso(Date.now()),summary=b.summary||'';
+  if(outcome==='booked'){
+    const d=(DB.config.services.find(s=>s.name===c.service)||{}).duration||DB.config.appointment_duration_min;
+    const at=b.appointment_time&&!isNaN(Date.parse(b.appointment_time))?Date.parse(b.appointment_time):(suggestSlots(dayAt(1,11),d,1)[0]||dayAt(1,11));
+    createAppointment({phone,name:c.name,service:c.service||'Appointment',start:at,dur:d,source:'call',notes:'Booked via call. '+summary});
+    Object.assign(c,{lead_status:'Booked',last_call_at:nowI,last_call_outcome:'Booked on call',notes:summary,follow_up_at:''});syncAppt(c);
+    const tpl=DB.templates.find(t=>t.name===DB.config.confirmation_template&&t.status!=='DELETED');
+    addMsg({phone,direction:'out',sender:'bot',msg_type:'template',template_name:DB.config.confirmation_template,body:tpl?renderTpl(tpl.body,[c.name||'there',fmtSlot(at)]):'Appointment confirmation'});
+    b.appointment_time=iso(at);
+  }else if(outcome==='callback'){
+    Object.assign(c,{follow_up_at:b.callback_time||iso(Date.now()+DAY),last_call_at:nowI,last_call_outcome:'Callback requested',lead_status:'Callback',notes:summary});
+  }else if(outcome==='not_interested'){
+    Object.assign(c,{last_call_at:nowI,last_call_outcome:'Not interested',lead_status:'Closed',notes:summary});
+  }else if(outcome==='no_answer'){
+    Object.assign(c,{follow_up_at:iso(Date.now()+4*HR),last_call_at:nowI,last_call_outcome:'No answer'});
+  }else{
+    Object.assign(c,{follow_up_at:iso(Date.now()+DAY),last_call_at:nowI,last_call_outcome:outcome||'Spoke',lead_status:'Interested',notes:summary});
+  }
+  let call=DB.calls.find(x=>x.phone===phone&&x.status!=='completed');
+  if(!call){call={id:uid('call'),phone,name:c.name,reason:'Inbound outcome webhook',source:'webhook',placed_at:nowI};DB.calls.unshift(call);}
+  Object.assign(call,{status:'completed',outcome:outcome||'interested',summary,callback_time:b.callback_time||'',appointment_time:b.appointment_time||'',duration:outcome==='no_answer'?0:rnd(25,260)});
+  logEvent('call',`Call outcome: ${c.name||fmtPhone(phone)} → ${(outcome||'interested').replace('_',' ')}`,outcome==='booked'?'ok':outcome==='not_interested'?'bad':'info');
+  touch();return {status:200,json:{ok:true,phone,outcome}};
+}
+/* Follow-up scheduler (Every 15 Minutes -> Due Leads -> Place Follow-up Call -> Mark Follow-up Done) */
+const SKIP_ST=['closed','booked','not interested','needs human'];
+function skipReason(r){
+  const cfg=DB.config,st=String(r.lead_status||'').toLowerCase();
+  if(SKIP_ST.includes(st))return `Status "${r.lead_status}" is skipped`;
+  if(r.opted_in===false)return 'Opted out (STOP)';
+  if(r.bot_paused===true)return 'Bot paused / human handling';
+  if(!r.follow_up_at)return 'No follow-up scheduled';
+  if((parseInt(r.follow_up_count||0,10)||0)>=cfg.max_follow_ups)return `Max follow-ups (${cfg.max_follow_ups}) reached`;
+  if(Date.parse(r.follow_up_at)>Date.now())return 'Not due yet';
+  return '';
+}
+const dueLeads=()=>DB.contacts.filter(r=>!skipReason(r));
+const inCallWindow=()=>{const h=tzParts(Date.now()).h;return h>=DB.config.call_window_start&&h<DB.config.call_window_end;};
+let _schedRunning=false;
+async function runScheduler({force=false,silent=false}={}){
+  if(_schedRunning)return {skipped:'busy'};
+  if(!force&&!inCallWindow()){logEvent('sched',`Scheduler tick skipped — outside call window (${DB.config.call_window_start}:00–${DB.config.call_window_end}:00)`,'warn');if(!silent)toast('Outside call window — no calls placed','err');touch();return {skipped:'window'};}
+  const due=dueLeads();
+  logEvent('sched',`Scheduler tick: ${due.length} lead(s) due`,'info');
+  if(!due.length){if(!silent)toast('No leads are due right now');touch();return {placed:0};}
+  _schedRunning=true;let n=0;
+  for(const c of due){
+    placeCall(c,{source:'scheduler',reason:`Follow-up call #${(c.follow_up_count||0)+1}. Service: ${c.service||'n/a'}. Status: ${c.lead_status||'n/a'}. Quote: ${c.quote_amount||'n/a'}. Notes: ${c.notes||''}`});
+    c.follow_up_at=iso(Date.now()+DB.config.followup_gap_hours*HR);c.follow_up_count=(parseInt(c.follow_up_count||0,10)||0)+1;c.last_call_at=iso(Date.now());
+    n++;touch();await sleep(800);
+  }
+  _schedRunning=false;if(!silent)toast(`${n} follow-up call(s) placed`,'ok');return {placed:n};
+}
+let _schedTimer=null;
+function setAutoScheduler(on){clearInterval(_schedTimer);_schedTimer=null;DB.settings.auto_scheduler=!!on;if(on)_schedTimer=setInterval(()=>runScheduler({force:DB.settings.ignore_window,silent:true}),30000);save();}
+
+/* ---- templates ---- */
+const tplVars=t=>[...new Set((String(t).match(/\{\{\s*(\d+)\s*\}\}/g)||[]).map(x=>+x.replace(/\D/g,'')))].sort((a,b)=>a-b);
+function renderTpl(body,params){return String(body||'').replace(/\{\{\s*(\d+)\s*\}\}/g,(m,n)=>params&&params[n-1]!=null&&params[n-1]!==''?params[n-1]:m);}
+const fillVars=(s,c)=>String(s).replace(/\{\{\s*name\s*\}\}/g,c.name||'there').replace(/\{\{\s*phone\s*\}\}/g,c.phone);
+function createTemplate(b){
+  const name=String(b.name||'').toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  const body=String(b.body_text||'');
+  const rec={id:uid('tpl'),name,language:b.language||'en',category:String(b.category||'MARKETING').toUpperCase(),status:'PENDING',body,header_text:b.header_text||'',footer_text:b.footer_text||'',buttons:(b.buttons||[]).map(x=>typeof x==='string'?x:x.text),examples:b.examples||[],rejected_reason:'',wa_template_id:String(rnd(1e14,9e14)),last_synced:iso(Date.now())};
+  let err='';
+  if(!name||!body)err='(#100) name and body_text are required';
+  else if(tplVars(body).length&&(rec.examples||[]).filter(Boolean).length<tplVars(body).length)err='(#100) Invalid parameter: example values are required for body variables';
+  if(err){rec.status='ERROR';rec.rejected_reason=err;}
+  if(name){const i=DB.templates.findIndex(t=>t.name===name&&t.language===rec.language);if(i>=0){rec.id=DB.templates[i].id;DB.templates[i]=rec;}else DB.templates.unshift(rec);}
+  logEvent('template',`Template "${name}" submitted → ${rec.status}`,err?'bad':'info');
+  if(!err)setTimeout(()=>reviewTemplate(rec),rnd(6000,11000));
+  touch();return {status:200,json:{ok:rec.status!=='ERROR',template:name,status:rec.status,reason:rec.rejected_reason}};
+}
+function reviewTemplate(t,forced){
+  if(t.status!=='PENDING')return;
+  let ok=forced?forced==='APPROVED':Math.random()<.85;let reason='';
+  if(!forced&&t.category==='UTILITY'&&/\b(sale|offer|discount|%\s?off|limited time|buy now|cashback)\b/i.test(t.body)){ok=false;reason='TAG_CONTENT_MISMATCH: content looks promotional but category is UTILITY';}
+  else if(!ok)reason=pick(['INVALID_FORMAT: variables must be sequential and not start/end the message','ABUSIVE_CONTENT: template may violate the Commerce Policy','TAG_CONTENT_MISMATCH: category does not match the content']);
+  t.status=ok?'APPROVED':'REJECTED';t.rejected_reason=ok?'':reason;t.last_synced=iso(Date.now());
+  logEvent('template',`Meta webhook: template "${t.name}" ${t.status}${ok?'':' — '+reason}`,ok?'ok':'bad');touch();
+}
+function deleteTemplate(name){
+  const ts=DB.templates.filter(t=>t.name===name);
+  if(!ts.length)return {status:200,json:{ok:false,deleted:name}};
+  ts.forEach(t=>{t.status='DELETED';t.last_synced=iso(Date.now());});
+  logEvent('template',`Template "${name}" deleted`,'warn');touch();return {status:200,json:{ok:true,deleted:name}};
+}
+function syncTemplates(){
+  let n=0;DB.templates.forEach(t=>{if(t.status!=='DELETED'){n++;t.last_synced=iso(Date.now());if(t.status==='PENDING'&&Math.random()<.7)reviewTemplate(t);}});
+  logEvent('template',`Template sync: ${n} template(s) pulled from Meta`,'info');touch();return {status:200,json:{ok:true,synced:n}};
+}
+
+/* ---- campaigns ---- */
+function audienceFor(tag){
+  tag=String(tag||'').trim().toLowerCase();
+  return DB.contacts.filter(c=>{if(c.opted_in===false||!c.phone)return false;if(tag){return String(c.tags||'').toLowerCase().split(',').map(s=>s.trim()).includes(tag);}return true;});
+}
+function allTags(){const s=new Set();DB.contacts.forEach(c=>String(c.tags||'').split(',').map(x=>x.trim()).filter(Boolean).forEach(t=>s.add(t)));return [...s].sort();}
+function startCampaign(b){
+  if(!b.template_name)return {status:400,json:{ok:false,error:'template_name required'}};
+  const camp={id:uid('cmp'),name:b.name||('Campaign '+new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})),template_name:b.template_name,language:b.language||'en',segment_tag:b.segment_tag||'',params_json:JSON.stringify(b.params||[]),status:'running',total:0,sent:0,failed:0,started_at:iso(Date.now()),finished_at:''};
+  DB.campaigns.unshift(camp);
+  const aud=audienceFor(camp.segment_tag);camp.total=aud.length;
+  logEvent('campaign',`Campaign "${camp.name}" started — ${aud.length} recipient(s)`,'info');
+  runCampaign(camp,aud,b.params||[]);touch();
+  return {status:200,json:{ok:true,campaign_id:camp.id,status:'running'}};
+}
+async function runCampaign(camp,aud,params){
+  const tpl=DB.templates.find(t=>t.name===camp.template_name&&t.status!=='DELETED'&&t.language===camp.language)||DB.templates.find(t=>t.name===camp.template_name&&t.status!=='DELETED');
+  for(const c of aud){
+    await sleep(380);
+    let err='';
+    if(!tpl)err='(#132001) Template name does not exist in the translation';
+    else if(tpl.status!=='APPROVED')err='(#132015) Template is '+tpl.status.toLowerCase()+', not approved';
+    else if(Math.random()<.07)err=pick(['(#131026) Message undeliverable','(#131049) Meta chose not to deliver this marketing message','(#131047) Re-engagement message: 24h window closed']);
+    const filled=params.map(p=>fillVars(p,c));
+    addMsg({phone:c.phone,direction:'out',sender:'campaign',msg_type:'template',template_name:camp.template_name,campaign_id:camp.id,body:tpl?renderTpl(tpl.body,filled):camp.template_name,status:err?'failed':'sent',error:err});
+    if(err)camp.failed++;else camp.sent++;touch();
+  }
+  camp.status='completed';camp.finished_at=iso(Date.now());
+  logEvent('campaign',`Campaign "${camp.name}" finished — ${camp.sent} sent, ${camp.failed} failed`,camp.failed?'warn':'ok');touch();
+}
+function sendTemplateTo(phone,tplName,params=[]){
+  const tpl=DB.templates.find(t=>t.name===tplName&&t.status==='APPROVED');
+  if(!tpl)return {ok:false,error:'Template not approved'};
+  addMsg({phone,direction:'out',sender:'agent',msg_type:'template',template_name:tplName,body:renderTpl(tpl.body,params)});
+  touch();return {ok:true};
+}
+
+/* ---- wa-api webhook (POST /webhook/wa-api) ---- */
+function waApi(key,body){
+  body=body||{};
+  if(key!==DB.config.api_secret)return {status:401,json:{ok:false,error:'unauthorized'}};
+  const action=String(body.action||'').toLowerCase(),phone=digits(body.phone);
+  switch(action){
+    case 'handoff':{const c=C(phone);if(c)handoff(c,body.reason);touch();return {status:200,json:{ok:true,bot_paused:true,phone}};}
+    case 'resume_bot':{const c=C(phone);if(c){c.bot_paused=false;logEvent('bot',`Bot resumed for ${c.name||fmtPhone(phone)}`,'ok');}touch();return {status:200,json:{ok:true,bot_paused:false,phone}};}
+    case 'agent_reply':{
+      const c=C(phone);
+      if(!c||!windowOpen(c))return {status:409,json:{ok:false,error:'24h customer window closed (or contact unknown). Send an approved template via campaign_start instead.'}};
+      addMsg({phone,direction:'out',sender:'agent',body:String(body.text||'')});touch();return {status:200,json:{ok:true,sent:true}};}
+    case 'campaign_start':return startCampaign(body);
+    case 'template_create':return createTemplate(body);
+    case 'template_delete':return deleteTemplate(body.name);
+    case 'template_list':return syncTemplates();
+    default:return {status:400,json:{ok:false,error:'unknown action'}};
+  }
+}
+
+/* ============ INBOUND PIPELINE: WhatsApp Trigger -> Log -> Keyword Route -> Bot Paused? -> Text? -> AI Agent ============ */
+async function inboundMessage(phone,name,text,type='text'){
+  phone=digits(phone);if(!phone)return;
+  const c=upsertContact(phone,{last_inbound_at:iso(Date.now())});
+  if(name&&!c.name)c.name=name;
+  c.unread=(c.unread||0)+1;
+  addMsg({phone,direction:'in',sender:'customer',body:text,msg_type:type});
+  touch();
+  const t=String(text).trim().toLowerCase();
+  if(type==='text'&&['stop','unsubscribe','stop all'].includes(t)){
+    c.opted_in=false;logEvent('optout',`${c.name||fmtPhone(phone)} opted out (STOP)`,'warn');await sleep(600);
+    sendBot(c,'Aap unsubscribe ho gaye hain. Ab aapko promotional messages nahi aayenge. Dobara chalu karne ke liye START likhein.');touch();return;
+  }
+  if(type==='text'&&['start','subscribe','unstop'].includes(t)){
+    c.opted_in=true;logEvent('optin',`${c.name||fmtPhone(phone)} opted back in (START)`,'ok');await sleep(600);
+    sendBot(c,'Welcome back! Aap dobara subscribe ho gaye hain. Kaise help kar sakte hain?');touch();return;
+  }
+  if(c.bot_paused){logEvent('bot',`Bot paused for ${c.name||fmtPhone(phone)} — message left for the human team`,'warn');touch();return;}
+  if(type!=='text'){await sleep(700);sendBot(c,'Thanks for your message! Abhi main sirf text samajh sakta hu. Please apni query text mein likh dein.');touch();return;}
+  UI.typing=phone;touch();
+  await sleep(rnd(1000,1700));
+  let r;try{r=aiAgent(c,text);}catch(e){console.error(e);r={reply:'Sorry, something went wrong. Our team will get back to you shortly.',tools:[]};}
+  UI.typing=null;
+  sendBot(c,r.reply,r.tools);
+  logEvent('bot',`AI agent replied to ${c.name||fmtPhone(phone)}${r.tools.length?' (tools: '+r.tools.join(', ')+')':''}`,'info');
+  touch();
+}
+
+/* ============ MOCK AI AGENT (rule based stand-in for GPT-4o-mini + tools) ============ */
+function detectLang(t){return /\b(kal|aaj|karo|kitna|kitne|kya|hai|hain|chahiye|mujhe|aap|nahi|haan|bhai|batao|bata|samay|kab|abhi|paisa|kaise|baje|subah|shaam|theek|thik|karna|krna|kar do)\b/.test(t)?'hi':'en';}
+function matchService(t){
+  const words=String(t).toLowerCase().split(/[^a-z]+/).filter(Boolean);let best=null,bs=0,tie=false;
+  for(const s of DB.config.services){
+    const toks=s.name.toLowerCase().split(/[^a-z]+/).filter(w=>w.length>=4);let score=0;
+    for(const tk of toks)if(words.some(w=>w.length>=4&&(w.startsWith(tk.slice(0,5))||tk.startsWith(w.slice(0,5)))))score++;
+    if(score>bs){bs=score;best=s;tie=false;}else if(score===bs&&score>0)tie=true;
+  }
+  return bs>0&&!tie?best:null;
+}
+function parseWhen(t){
+  t=String(t).toLowerCase();const np=tzParts(Date.now());let date=null,time=null,m;
+  const addDays=n=>{const p=tzParts(fromWall(np.y,np.m,np.d,12,0)+n*DAY);return {y:p.y,m:p.m,d:p.d};};
+  if(/\b(today|aaj)\b/.test(t))date=addDays(0);
+  else if(/\b(day after|parso|parson)\b/.test(t))date=addDays(2);
+  else if(/\b(tomorrow|tmrw|tmr|kal)\b/.test(t))date=addDays(1);
+  else if((m=t.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/))){let diff=(['sun','mon','tue','wed','thu','fri','sat'].indexOf(m[1])-np.wd+7)%7;if(diff===0)diff=7;date=addDays(diff);}
+  else if((m=t.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s*(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/))){
+    const mo=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2])+1;let y=np.y;if(mo<np.m||(mo===np.m&&+m[1]<np.d))y++;date={y,m:mo,d:+m[1]};
+  }
+  if((m=t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/))){let h=+m[1]%12;if(m[3]==='pm')h+=12;time={h,min:+(m[2]||0)};}
+  else if((m=t.match(/\b(\d{1,2}):(\d{2})\b/)))time={h:+m[1],min:+m[2]};
+  else if((m=t.match(/\b(?:at|@)\s*(\d{1,2})\b/))||(m=t.match(/\b(\d{1,2})\s*baje\b/))){let h=+m[1];if(h<8)h+=12;time={h,min:0};}
+  else if(/\b(morning|subah|subha)\b/.test(t))time={h:10,min:0};
+  else if(/\bafternoon\b/.test(t))time={h:14,min:0};
+  else if(/\b(evening|shaam)\b/.test(t))time={h:17,min:0};
+  return {date,time};
+}
+function aiAgent(c,text){
+  const cfg=DB.config,tools=[];const T=n=>{if(!tools.includes(n))tools.push(n);};
+  const t=String(text).toLowerCase().trim(),hi=detectLang(t)==='hi';
+  const L=(en,h)=>hi?(h||en):en;
+  const first=(c.name||'').split(' ')[0]||'there';
+  c.ctx=c.ctx||{};const ctx=c.ctx;
+  const out=r=>({reply:r,tools});
+  const svcNames=cfg.services.map(s=>s.name).join(', ');
+  const fup=()=>{c.follow_up_at=tomorrow11();};
+
+  // 6. HUMAN
+  if(/\b(human|agent|manager|representative|real person|complaint|angry|upset|worst|cheat|fraud|bakwas|gussa|escalate)\b/.test(t)){
+    T('Save Lead');T('Request Human');c.intent='human';ctx.step=null;
+    handoff(c,'Customer asked for a human / upset: '+text.slice(0,100));
+    return out(L(`Sure ${first}, I'm connecting you with our team. A team member will reply here shortly. 🙏`,`Ji ${first}, main aapko hamari team se connect kar raha hu. Team ka koi member yahin jald reply karega. 🙏`));
+  }
+  // 5. CALL
+  if(/\bcall\b|\bphone (karo|kijiye|pe)\b|\bbaat karni\b/.test(t)){
+    T('Request Call Now');T('Save Lead');c.intent='call';c.notes='Asked for a call on WhatsApp';
+    placeCall(c,{source:'whatsapp',reason:'Customer asked for a call on WhatsApp. Service: '+(c.service||'n/a')});
+    return out(L(`Sure ${first}! Our team will call you shortly on this number. 📞`,`Ji ${first}! Hamari team aapko isi number par jald call karegi. 📞`));
+  }
+  const when=parseWhen(t),svc=matchService(t);
+  // booking confirmation step
+  if(ctx.step==='confirm'){
+    if(/\b(yes|yeah|yep|y|haan|ha|han|ok|okay|confirm|confirmed|sure|theek|thik|kar do|book it|done)\b/.test(t)&&!when.time&&!when.date&&!svc){
+      T('Book Appointment');T('Save Lead');
+      const s=cfg.services.find(x=>x.name===ctx.service);
+      createAppointment({phone:c.phone,name:c.name,service:ctx.service,start:ctx.start,dur:ctx.dur,source:'whatsapp bot',notes:'Booked by AI agent. Phone '+c.phone});
+      Object.assign(c,{lead_status:'Booked',intent:'booking',service:ctx.service,follow_up_at:'',notes:`Booked ${ctx.service} for ${fmtSlot(ctx.start)}`});syncAppt(c);
+      const slot=fmtSlot(ctx.start),sv=ctx.service;ctx.step=null;ctx.date=null;ctx.time=null;ctx.service=null;
+      return out(L(`Booked! ✅ *${sv}* on *${slot}*.\n📍 ${cfg.business_address}\nSee you then, ${first}!`,`Book ho gaya! ✅ *${sv}* — *${slot}*.\n📍 ${cfg.business_address}\nMilte hain, ${first}!`));
+    }
+    if(/\b(no|nahi|nope|cancel|change|different|other|alag)\b/.test(t)&&!when.time&&!when.date){
+      ctx.step='need_when';ctx.date=null;ctx.time=null;
+      return out(L('No problem! Which other date and time works for you?','Koi baat nahi! Kaun si date aur time theek rahega?'));
+    }
+  }
+  // 2. BOOKING (new request or continuing)
+  const bookIntent=/\b(book|booking|appointment|appoint|slot|schedule|visit|reserve|available|availability|milna|aana)\b/.test(t);
+  const inBooking=['need_service','need_when','confirm'].includes(ctx.step)&&(svc||when.date||when.time);
+  const priceIntent=/\b(price|prices|pricing|cost|charges?|fees?|rates?|kitna|kitne|quotation|quote|estimate|how much|paisa|paise|rupees)\b/.test(t);
+  if(bookIntent||inBooking||(when.time&&when.date&&!priceIntent&&ctx.step)){
+    if(svc)ctx.service=svc.name;if(when.date)ctx.date=when.date;if(when.time)ctx.time=when.time;
+    c.intent='booking';
+    if(!ctx.service){ctx.step='need_service';T('Save Lead');if(c.lead_status==='New')c.lead_status='Inquiry';return out(L(`Happy to help you book, ${first}! Which service do you need?\n${svcNames}`,`Zaroor ${first}! Aapko kaun si service chahiye?\n${svcNames}`));}
+    c.service=ctx.service;
+    if(!ctx.date||!ctx.time){ctx.step='need_when';T('Save Lead');if(c.lead_status==='New')c.lead_status='Inquiry';return out(L(`Got it — *${ctx.service}*. Which date and time suits you? We're open ${hoursText()}`,`Theek hai — *${ctx.service}*. Kaun si date aur time chahiye? Hum ${hoursText()} khule hain.`));}
+    const so=cfg.services.find(x=>x.name===ctx.service),dur=(so&&so.duration)||cfg.appointment_duration_min;
+    const start=fromWall(ctx.date.y,ctx.date.m,ctx.date.d,ctx.time.h,ctx.time.min);T('Check Availability');
+    const r=checkSlot(start,dur);
+    if(r.reason==='past'){ctx.date=null;ctx.time=null;ctx.step='need_when';return out(L('That time has already passed. Please share a future date and time.','Wo time nikal chuka hai. Please aage ki date aur time batayein.'));}
+    if(r.reason==='closed'){ctx.time=null;ctx.step='need_when';return out(L(`We're closed at that time. Our hours: ${hoursText()} Please pick another time.`,`Us time hum band hain. Hamara time: ${hoursText()} Dusra time batayein.`));}
+    if(r.reason==='busy'){const sug=suggestSlots(start,dur,3);ctx.time=null;ctx.step='need_when';return out(L(`That slot is already taken. Free options:\n${sug.map(s=>'• '+fmtSlot(s)).join('\n')}\nWhich one works?`,`Wo slot bhar chuka hai. Free slots:\n${sug.map(s=>'• '+fmtSlot(s)).join('\n')}\nKaun sa theek rahega?`));}
+    ctx.start=start;ctx.dur=dur;ctx.step='confirm';T('Save Lead');if(c.lead_status==='New')c.lead_status='Inquiry';
+    return out(L(`Good news, that slot is free! ✅\nConfirm *${ctx.service}* on *${fmtSlot(start)}*? Reply *YES* to book.`,`Slot khali hai! ✅\n*${ctx.service}* — *${fmtSlot(start)}* confirm karein? Book karne ke liye *YES* likhein.`));
+  }
+  // 3. QUOTATION / PRICE
+  if(priceIntent||(ctx.step==='need_quote_service'&&svc)){
+    if(!svc){ctx.step='need_quote_service';return out(L(`Here are our services:\n${servicesText()}\nWhich one would you like a quotation for?`,`Hamari services:\n${servicesText()}\nKis service ka quotation chahiye?`));}
+    ctx.step=null;c.service=svc.name;
+    if(svc.custom){T('Save Lead');Object.assign(c,{lead_status:'Inquiry',intent:'quotation',notes:`Wants custom quote for ${svc.name}`});fup();return out(L(`*${svc.name}* needs a custom quotation. Our team will assess and share an exact quote — want to book a consultation first?`,`*${svc.name}* ka custom quotation banta hai. Hamari team exact quote bhejegi — pehle consultation book kar dein?`));}
+    T('Create Quotation');T('Save Lead');
+    const q=buildQuote({items:[{name:svc.name,qty:1,rate:svc.price}],gst_pct:cfg.gst_pct});
+    saveQuote(c,q,{send:true});
+    return out(q.text);
+  }
+  // 4. interested but not ready
+  if(/\b(later|will think|let me think|think about|baad mein|baad me|sochta|sochti|not now|abhi nahi|maybe|discuss|family)\b/.test(t)){
+    T('Save Lead');Object.assign(c,{lead_status:c.lead_status==='Quotation Sent'?'Quotation Sent':'Inquiry',intent:c.intent||'inquiry'});c.notes=(c.notes?c.notes+' | ':'')+'Interested, not ready yet';fup();
+    return out(L(`No worries, ${first}! I'll check in with you tomorrow. Message me anytime. 🙂`,`Koi baat nahi ${first}! Main kal aapse dobara baat karunga. Kabhi bhi message karein. 🙂`));
+  }
+  // 1. INQUIRY (FAQ) — answers only from business info
+  const sentences=String(cfg.faq||'').split(/(?<=\.)\s+/);
+  const faqFind=re=>sentences.filter(s=>re.test(s.toLowerCase())).join(' ')||'';
+  if(/\b(timing|timings|hours|open|opens|closed|close|kab tak|khula|khule|band|sunday|working)\b/.test(t))return out(L(`We're open ${hoursText()}`,`Hum ${hoursText()} khule rehte hain.`));
+  if(/\b(address|location|where|kahan|kidhar|map|direction)\b/.test(t))return out(L(`📍 ${cfg.business_address}`,`📍 ${cfg.business_address}`));
+  if(/\b(payment|pay|upi|card|cash|gpay|paytm)\b/.test(t)){const f=faqFind(/payment|upi|card|cash/);if(f)return out(f);}
+  if(/\b(cancel|cancellation|refund|reschedule)\b/.test(t)){const f=faqFind(/cancel|refund/);if(f)return out(f);}
+  if(/\b(services?|menu|offer|treatments?|kya kya|list)\b/.test(t))return out(L(`Our services:\n${servicesText()}\nWould you like a quotation or an appointment?`,`Hamari services:\n${servicesText()}\nQuotation ya appointment chahiye?`));
+  if(/\b(thanks|thank you|thx|shukriya|dhanyavad|thank u)\b/.test(t))return out(L("You're welcome! 😊 Anything else I can help with?",'Aapka swagat hai! 😊 Aur kuch madad chahiye?'));
+  if(/^(hi+|hello+|hey+|hlo|helo|namaste|namaskar|good (morning|afternoon|evening)|gm|hii+)\b/.test(t)){
+    if(c.lead_status==='New'){T('Save Lead');c.intent='inquiry';}
+    return out(L(`Hi ${first}! 👋 Welcome to *${cfg.business_name}*. I can help with *appointments*, *prices* and *quotations*. What do you need?`,`Namaste ${first}! 👋 *${cfg.business_name}* mein aapka swagat hai. Main *appointment*, *price* aur *quotation* mein madad kar sakta hu. Kya chahiye?`));
+  }
+  if(svc){T('Save Lead');c.service=svc.name;c.intent='inquiry';if(c.lead_status==='New')c.lead_status='Inquiry';return out(L(`*${svc.name}* — ${svc.custom?'custom pricing':'Rs '+svc.price+' ('+svc.duration+' min)'}. Would you like a quotation or to book a slot?`,`*${svc.name}* — ${svc.custom?'custom pricing':'Rs '+svc.price+' ('+svc.duration+' min)'}. Quotation chahiye ya slot book karein?`));}
+  // unknown -> hand off
+  T('Save Lead');T('Request Human');ctx.step=null;
+  handoff(c,'Bot could not answer: '+text.slice(0,100));
+  return out(L(`I'm not sure about that, ${first} — I'll ask our team to confirm and they'll reply here shortly. 🙏`,`Iske baare mein mujhe pakka nahi pata, ${first} — main team se confirm karwa kar yahin batata hu. 🙏`));
+}
+
+/* ============ MOCK DATA ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function seedData(){
+  const R=mulberry32(11),ri=(a,b)=>Math.floor(R()*(b-a+1))+a,rp=a=>a[Math.floor(R()*a.length)];
+  const now=Date.now(),ago=m=>iso(now-m*MIN);
+  const cfg={
+    business_name:'Smile Care Dental Clinic',business_type:'Dental clinic',business_address:'Shop 12, Main Road, Arera Colony, Bhopal',timezone:'Asia/Kolkata',
+    work_start:'10:00',work_end:'19:00',open_days:[1,2,3,4,5,6],appointment_duration_min:30,
+    services:[{name:'Consultation',price:500,duration:30,custom:false},{name:'Teeth Cleaning',price:1500,duration:30,custom:false},{name:'Teeth Whitening',price:8000,duration:60,custom:false},{name:'Root Canal',price:6000,duration:60,custom:false},{name:'Braces',price:0,duration:60,custom:true}],
+    faq:'Payment: UPI, cash, card. Cancellation: free up to 4 hours before.',gst_pct:18,
+    base_url:'https://n8n.example.com',api_secret:'demo-api-key-2024',phone_number_id:'100000000000001',waba_id:'200000000000002',call_api_url:'https://voice.example.com/api/call',team_email:'team@smilecare.example',
+    call_window_start:10,call_window_end:19,max_follow_ups:3,followup_gap_hours:24,confirmation_template:'appointment_confirmation',template_language:'en'
+  };
+  const d={config:cfg,settings:{auto_outcome:true,auto_scheduler:false,ignore_window:true},contacts:[],messages:[],campaigns:[],templates:[],quotes:[],calls:[],appointments:[],events:[]};
+  const ph=n=>'9198765'+String(n).padStart(5,'0');
+  const mk=(n,name,o)=>{const c=Object.assign({phone:ph(n),name,lead_status:'New',intent:'',service:'',notes:'',quote_amount:0,appointment_time:'',follow_up_at:'',follow_up_count:0,last_call_at:'',last_call_outcome:'',last_inbound_at:'',opted_in:true,bot_paused:false,tags:'',unread:0,created_at:ago(ri(3,9)*1440),ctx:{}},o);d.contacts.push(c);return c;};
+  const M=(n,mins,sender,text,o={})=>{const out=sender!=='customer';const m=Object.assign({id:uid('m'),wa_message_id:'wamid.'+Math.floor(R()*1e12).toString(36).toUpperCase(),phone:ph(n),direction:out?'out':'in',sender,body:text,msg_type:'text',status:out?(mins>5?'read':'delivered'):'received',event_at:ago(mins),error:'',campaign_id:'',template_name:'',tools:[]},o);d.messages.push(m);return m;};
+  const AP=(n,svc,dayOff,h,mi,status='confirmed',source='whatsapp bot')=>{const c=d.contacts.find(x=>x.phone===ph(n));const sv=cfg.services.find(s=>s.name===svc);const st=dayAt(dayOff,h,mi);d.appointments.push({id:uid('ap'),phone:c.phone,name:c.name,service:svc,start:iso(st),end:iso(st+sv.duration*MIN),status,source,notes:''});return st;};
+  const CALL=(n,mins,source,outcome,summary,extra={})=>{const c=d.contacts.find(x=>x.phone===ph(n));d.calls.push(Object.assign({id:uid('call'),phone:c.phone,name:c.name,reason:'Follow-up call. Service: '+(c.service||'n/a'),source,placed_at:ago(mins),status:'completed',outcome,summary,duration:outcome==='no_answer'?0:ri(40,230),callback_time:'',appointment_time:''},extra));};
+  const greet=nm=>`Hi ${nm}! 👋 Welcome to *${cfg.business_name}*. I can help with *appointments*, *prices* and *quotations*. What do you need?`;
+
+  /* contacts */
+  mk(1,'Rahul Sharma',{lead_status:'Booked',service:'Teeth Cleaning',intent:'booking',tags:'dental,whatsapp-ad',last_inbound_at:ago(176),notes:'Booked Teeth Cleaning via WhatsApp'});
+  mk(2,'Priya Verma',{lead_status:'Quotation Sent',service:'Root Canal',intent:'quotation',tags:'dental,vip',quote_amount:7080,follow_up_at:ago(180),last_inbound_at:ago(380),notes:'Interested, not ready yet'});
+  mk(3,'Amit Patel',{lead_status:'Inquiry',service:'Consultation',intent:'inquiry',tags:'walk-in',follow_up_at:ago(60),follow_up_count:1,last_call_at:ago(1560),last_call_outcome:'No answer',last_inbound_at:ago(1490),notes:'Interested, not ready yet'});
+  mk(4,'Sneha Kulkarni',{lead_status:'Interested',service:'Teeth Whitening',intent:'inquiry',tags:'whatsapp-ad,diwali',follow_up_at:iso(now+20*HR),follow_up_count:1,last_call_at:ago(300),last_call_outcome:'interested',last_inbound_at:ago(2900),notes:'Wants to think about the price.'});
+  mk(5,'Vikram Singh',{lead_status:'Needs Human',service:'Root Canal',intent:'human',tags:'dental',bot_paused:true,unread:2,last_inbound_at:ago(45),notes:'Handoff: Customer asked for a human / upset: Bill galat hai'});
+  mk(6,'Anjali Mehta',{lead_status:'Callback',service:'Braces',intent:'call',tags:'vip',follow_up_at:iso(now+2*HR),last_call_at:ago(295),last_call_outcome:'Callback requested',last_inbound_at:ago(300),notes:'Asked to call back in the evening.'});
+  mk(7,'Rohit Gupta',{lead_status:'Closed',service:'Root Canal',intent:'quotation',tags:'dental',follow_up_count:3,last_call_at:ago(4320),last_call_outcome:'Not interested',last_inbound_at:ago(7000),notes:'Not interested at the moment.'});
+  mk(8,'Neha Joshi',{lead_status:'New',intent:'inquiry',tags:'whatsapp-ad',unread:2,last_inbound_at:ago(2)});
+  mk(9,'Karan Malhotra',{lead_status:'Booked',service:'Consultation',intent:'booking',tags:'walk-in',last_inbound_at:ago(100),notes:'Booked Consultation'});
+  mk(10,'Pooja Reddy',{lead_status:'Quotation Sent',service:'Teeth Whitening',intent:'quotation',tags:'diwali,vip',quote_amount:9440,follow_up_at:ago(300),follow_up_count:2,last_call_at:ago(1800),last_call_outcome:'interested',last_inbound_at:ago(5200),notes:'Comparing with another clinic.'});
+  mk(11,'Sanjay Yadav',{lead_status:'Inquiry',service:'Teeth Cleaning',intent:'inquiry',tags:'diwali',opted_in:false,last_inbound_at:ago(3990)});
+  mk(12,'Meera Nair',{lead_status:'Booked',service:'Teeth Cleaning',intent:'booking',tags:'dental,diwali',last_inbound_at:ago(1300)});
+  mk(13,'Deepak Chauhan',{lead_status:'Interested',service:'Root Canal',intent:'call',tags:'dental',follow_up_at:ago(30),follow_up_count:1,last_call_at:ago(1500),last_call_outcome:'interested',last_inbound_at:ago(4000),notes:'Wants a second opinion.'});
+  mk(14,'Kavita Iyer',{lead_status:'New',tags:'whatsapp-ad',last_inbound_at:ago(600)});
+  mk(15,'Arjun Kapoor',{lead_status:'Callback',service:'Teeth Whitening',intent:'call',tags:'vip',follow_up_at:ago(10),last_call_at:ago(1500),last_call_outcome:'Callback requested',last_inbound_at:ago(1700),notes:'Asked for callback after 5 PM.'});
+  mk(16,'Ritu Saxena',{lead_status:'Quotation Sent',service:'Teeth Cleaning',intent:'quotation',tags:'diwali',quote_amount:1770,follow_up_at:iso(now+18*HR),last_inbound_at:ago(900)});
+  mk(17,'Manish Tiwari',{lead_status:'Inquiry',service:'Braces',intent:'inquiry',tags:'walk-in',follow_up_at:iso(now+DAY),last_inbound_at:ago(1200),notes:'Wants custom quote for braces.'});
+  mk(18,'Fatima Khan',{lead_status:'Booked',service:'Root Canal',intent:'booking',tags:'dental,vip',last_inbound_at:ago(2600),last_call_at:ago(2900),last_call_outcome:'Booked on call',notes:'Booked on call.'});
+  mk(19,'Siddharth Rao',{lead_status:'Inquiry',service:'Teeth Whitening',intent:'inquiry',tags:'whatsapp-ad',last_inbound_at:ago(1900)});
+  mk(20,'Lakshmi Pillai',{lead_status:'Interested',service:'Consultation',intent:'inquiry',tags:'dental,diwali',last_inbound_at:ago(2500),follow_up_at:iso(now+6*HR),follow_up_count:1});
+
+  /* appointments */
+  const rahulAt=AP(1,'Teeth Cleaning',1,11,0);
+  const karanAt=AP(9,'Consultation',0,17,0);
+  AP(12,'Teeth Cleaning',2,15,0);AP(18,'Root Canal',3,12,0,'confirmed','call');AP(18,'Root Canal',6,12,0,'confirmed','manual');
+  AP(2,'Consultation',-3,11,0,'completed');AP(7,'Consultation',-6,16,0,'completed');AP(20,'Consultation',-2,14,30,'cancelled');AP(14,'Teeth Cleaning',-1,10,30,'completed','manual');
+  d.contacts.forEach(c=>{const n=d.appointments.filter(a=>a.phone===c.phone&&a.status==='confirmed'&&Date.parse(a.end)>=now-HR).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start))[0];c.appointment_time=n?n.start:'';});
+
+  /* scripted conversations */
+  const qPriya=buildQuote({items:[{name:'Root Canal',qty:1,rate:6000}],gst_pct:18,qno:'QT-'+new Date(now-380*MIN).toISOString().slice(0,10).replace(/-/g,'')+'-4821'});
+  const qPooja=buildQuote({items:[{name:'Teeth Whitening',qty:1,rate:8000}],gst_pct:18,qno:'QT-'+new Date(now-5100*MIN).toISOString().slice(0,10).replace(/-/g,'')+'-7310'});
+  const qRitu=buildQuote({items:[{name:'Teeth Cleaning',qty:1,rate:1500}],gst_pct:18,qno:'QT-'+new Date(now-880*MIN).toISOString().slice(0,10).replace(/-/g,'')+'-1096'});
+  const qRohit=buildQuote({items:[{name:'Root Canal',qty:1,rate:6000}],discount_pct:10,gst_pct:18,qno:'QT-'+new Date(now-7000*MIN).toISOString().slice(0,10).replace(/-/g,'')+'-3377'});
+  M(1,190,'customer','Hi, I want to get my teeth cleaned');
+  M(1,189,'bot',greet('Rahul'),{tools:['Save Lead']});
+  M(1,186,'customer','Book appointment for teeth cleaning tomorrow 11 am');
+  M(1,185,'bot',`Good news, that slot is free! ✅\nConfirm *Teeth Cleaning* on *${fmtSlot(rahulAt)}*? Reply *YES* to book.`,{tools:['Check Availability','Save Lead']});
+  M(1,177,'customer','YES');
+  M(1,176,'bot',`Booked! ✅ *Teeth Cleaning* on *${fmtSlot(rahulAt)}*.\n📍 ${cfg.business_address}\nSee you then, Rahul!`,{tools:['Book Appointment','Save Lead']});
+  M(2,401,'customer','Root canal ka kitna charge hai?');
+  M(2,400,'bot',qPriya.text,{tools:['Create Quotation','Save Lead']});
+  M(2,381,'customer','Thoda mehenga hai, let me discuss with family');
+  M(2,380,'bot','Koi baat nahi Priya! Main kal aapse dobara baat karunga. Kabhi bhi message karein. 🙂',{tools:['Save Lead']});
+  M(3,1500,'customer','Hi what are your timings?');
+  M(3,1499,'bot',"We're open Mon-Sat, 10:00 AM to 7:00 PM. Sunday closed.",{tools:[]});
+  M(3,1491,'customer','ok will think about it');
+  M(3,1490,'bot',"No worries, Amit! I'll check in with you tomorrow. Message me anytime. 🙂",{tools:['Save Lead']});
+  M(4,2910,'customer','Teeth whitening price?');
+  M(4,2909,'bot','*Teeth Whitening* — Rs 8000 (60 min). Would you like a quotation or to book a slot?',{tools:['Save Lead']});
+  M(4,2900,'customer','Kya Diwali pe koi offer hai?');
+  M(4,2899,'bot','Iske baare mein mujhe pakka nahi pata, Sneha — main team se confirm karwa kar yahin batata hu. 🙏',{tools:['Save Lead','Request Human']});
+  M(4,2870,'agent','Hi Sneha, this is the Smile Care team. We have 15% off on whitening till Diwali. Shall I block a slot for you?');
+  M(5,91,'customer','Bill galat hai, this is the worst service!!');
+  M(5,90,'bot','Ji Vikram, main aapko hamari team se connect kar raha hu. Team ka koi member yahin jald reply karega. 🙏',{tools:['Save Lead','Request Human']});
+  M(5,60,'customer','Hello? Koi reply karega?');
+  M(5,45,'customer','I want an explanation for the charges today.');
+  M(6,301,'customer','Can you call me please? Need to ask about braces');
+  M(6,300,'bot','Sure Anjali! Our team will call you shortly on this number. 📞',{tools:['Request Call Now','Save Lead']});
+  M(8,6,'customer','Hi');M(8,5,'bot',greet('Neha'),{tools:['Save Lead']});M(8,3,'customer','Do you do teeth whitening?');M(8,2,'customer','Is it painful?',{});
+  M(9,720,'customer','Book consultation today 5 pm');
+  M(9,719,'bot',`Good news, that slot is free! ✅\nConfirm *Consultation* on *${fmtSlot(karanAt)}*? Reply *YES* to book.`,{tools:['Check Availability','Save Lead']});
+  M(9,715,'customer','yes');
+  M(9,714,'bot',`Booked! ✅ *Consultation* on *${fmtSlot(karanAt)}*.\n📍 ${cfg.business_address}\nSee you then, Karan!`,{tools:['Book Appointment','Save Lead']});
+  M(9,121,'agent','Hi Karan, a quick reminder for your consultation today at 5 PM. See you! – Smile Care team');
+  M(9,100,'customer','Thanks, will be there 👍');
+  M(10,5210,'customer','Teeth whitening ka quotation chahiye');
+  M(10,5209,'bot',qPooja.text,{tools:['Create Quotation','Save Lead']});
+  M(10,5200,'customer','Let me think, will let you know');
+  M(10,5199,'bot',"No worries, Pooja! I'll check in with you tomorrow. Message me anytime. 🙂",{tools:['Save Lead']});
+  M(16,910,'customer','Cleaning ka rate batao');
+  M(16,909,'bot',qRitu.text,{tools:['Create Quotation','Save Lead']});
+  M(17,1210,'customer','Braces ke liye price?');
+  M(17,1209,'bot','*Braces* ka custom quotation banta hai. Hamari team exact quote bhejegi — pehle consultation book kar dein?',{tools:['Save Lead']});
+  M(7,7010,'customer','Root canal quotation please');
+  M(7,7009,'bot',qRohit.text,{tools:['Create Quotation','Save Lead']});
+  M(19,1910,'customer','Hello, whitening available?');M(19,1909,'bot','*Teeth Whitening* — Rs 8000 (60 min). Would you like a quotation or to book a slot?',{tools:['Save Lead']});
+  M(20,2510,'customer','Hi, is there parking at the clinic?');M(20,2509,'bot','I\'m not sure about that, Lakshmi — I\'ll ask our team to confirm and they\'ll reply here shortly. 🙏',{tools:['Save Lead','Request Human']});
+  M(14,610,'customer','Hello');M(14,609,'bot',greet('Kavita'),{tools:['Save Lead']});
+
+  /* older chatter for the 7-day chart + inbox history */
+  const pairs=[['Hello','greet'],['Timings kya hain?',"Hum Mon-Sat, 10:00 AM to 7:00 PM. Sunday closed. khule rehte hain."],['Address?',`📍 ${cfg.business_address}`],['Do you accept UPI?','Payment: UPI, cash, card.'],['Cleaning ka price?','*Teeth Cleaning* — Rs 1500 (30 min). Quotation chahiye ya slot book karein?'],['Is Sunday open?',"We're open Mon-Sat, 10:00 AM to 7:00 PM. Sunday closed."]];
+  d.contacts.forEach((c,i)=>{
+    const k=ri(1,3);
+    for(let j=0;j<k;j++){
+      const day=ri(2,6),mins=day*1440+ri(30,900),p=rp(pairs);
+      d.messages.push({id:uid('m'),wa_message_id:'wamid.'+Math.floor(R()*1e12).toString(36).toUpperCase(),phone:c.phone,direction:'in',sender:'customer',body:p[0],msg_type:'text',status:'received',event_at:ago(mins),error:'',campaign_id:'',template_name:'',tools:[]});
+      d.messages.push({id:uid('m'),wa_message_id:'wamid.'+Math.floor(R()*1e12).toString(36).toUpperCase(),phone:c.phone,direction:'out',sender:'bot',body:p[1]==='greet'?greet((c.name||'').split(' ')[0]):p[1],msg_type:'text',status:'read',event_at:ago(mins-1),error:'',campaign_id:'',template_name:'',tools:[]});
+    }
+  });
+  /* extra volume today / yesterday for the chart */
+  [1,3,12,16,18,19,14].forEach(n=>{
+    const mins=ri(60,1300),c=d.contacts[n-1];
+    d.messages.push({id:uid('m'),wa_message_id:'wamid.X'+n,phone:c.phone,direction:'in',sender:'customer',body:(rr=>rr[0])(rp([['Ok thanks'],['Hello'],['Any update?'],['Can I reschedule?']])),msg_type:'text',status:'received',event_at:ago(mins),error:'',campaign_id:'',template_name:'',tools:[]});
+    d.messages.push({id:uid('m'),wa_message_id:'wamid.Y'+n,phone:c.phone,direction:'out',sender:'bot',body:rp(['Sure! Let me know how I can help. 🙂','Thanks for reaching out — would you like to book a slot?','Noted! Our team will see you soon. 🙂','Happy to help! Want a quotation or an appointment?']),msg_type:'text',status:'read',event_at:ago(mins-1),error:'',campaign_id:'',template_name:'',tools:['Save Lead']});
+  });
+
+  /* templates */
+  const tp=(name,cat,status,body,o={})=>d.templates.push(Object.assign({id:uid('tpl'),name,language:'en',category:cat,status,body,header_text:'',footer_text:'',buttons:[],examples:[],rejected_reason:'',wa_template_id:String(ri(1e14,9e14)),last_synced:ago(ri(30,600))},o));
+  tp('appointment_confirmation','UTILITY','APPROVED','Hi {{1}}, your appointment is confirmed for {{2}}. Reply here if you need to reschedule.',{header_text:'Appointment Confirmed ✅',footer_text:cfg.business_name,examples:['Rahul','17 Oct, 11:00 AM']});
+  tp('followup_reminder','UTILITY','APPROVED','Hi {{1}}, this is a reminder from {{2}}. Our team will call you soon. Reply STOP to opt out.',{examples:['Priya','Smile Care'],buttons:['Call me now','Not now']});
+  tp('diwali_offer','MARKETING','APPROVED','🪔 Happy Diwali {{1}}! Get 15% off on Teeth Cleaning & Whitening this week at Smile Care. Book your slot now!',{header_text:'Diwali Special',footer_text:'Reply STOP to unsubscribe',examples:['Sneha'],buttons:['Book now','Know more']});
+  tp('new_service_launch','MARKETING','PENDING','Hi {{1}}, we have launched Invisible Aligners! Reply YES to know more.',{examples:['Amit']});
+  tp('summer_sale_v2','MARKETING','REJECTED','Hi {{1}}!!! BUY NOW!!! Flat 50% off!!! Limited time only!!!',{examples:['Amit'],rejected_reason:'ABUSIVE_CONTENT: template may violate the Commerce Policy'});
+  tp('old_welcome','UTILITY','DELETED','Welcome to Smile Care, {{1}}!',{examples:['Amit']});
+
+  /* campaigns (+ their messages) */
+  const camp=(name,tpl,tag,daysAgo,aud,params)=>{
+    const id=uid('cmp'),t=d.templates.find(x=>x.name===tpl);let failed=0;
+    aud.forEach((c,i)=>{const bad=R()<.08&&i>0;if(bad)failed++;
+      d.messages.push({id:uid('m'),wa_message_id:'wamid.C'+id+i,phone:c.phone,direction:'out',sender:'campaign',body:renderTpl(t.body,params.map(p=>fillVars(p,c))),msg_type:'template',status:bad?'failed':rp(['read','read','delivered']),event_at:ago(daysAgo*1440-i),error:bad?'(#131026) Message undeliverable':'',campaign_id:id,template_name:tpl,tools:[]});});
+    d.campaigns.push({id,name,template_name:tpl,language:'en',segment_tag:tag,params_json:JSON.stringify(params),status:'completed',total:aud.length,sent:aud.length-failed,failed,started_at:ago(daysAgo*1440),finished_at:ago(daysAgo*1440-aud.length)});
+  };
+  camp('Weekly reminders','followup_reminder','',6,d.contacts.filter(c=>c.opted_in!==false&&c.lead_status!=='Closed'),['{{name}}','Smile Care']);
+  camp('Diwali offer — Cleaning & Whitening','diwali_offer','diwali',3,d.contacts.filter(c=>String(c.tags).includes('diwali')),['{{name}}']);
+
+  /* quotes */
+  const qr=(c,q,status,mins)=>d.quotes.push({id:uid('q'),qno:q.qno,phone:ph(c),name:d.contacts[c-1].name,items:q.items,sub:q.sub,disc:q.disc,discount_pct:q.discount_pct,gst_pct:q.gst_pct,gst:q.gst,total:q.total,status,created_at:ago(mins),text:q.text});
+  qr(2,qPriya,'Sent',380);qr(10,qPooja,'Sent',5200);qr(16,qRitu,'Sent',900);qr(7,qRohit,'Rejected',7000);
+
+  /* calls */
+  CALL(3,1560,'scheduler','no_answer','Call went unanswered / voicemail.');
+  CALL(4,300,'scheduler','interested','Customer is interested in Teeth Whitening but wants to think about the price.');
+  CALL(6,295,'whatsapp','callback','Customer is busy right now, asked us to call back in the evening.',{callback_time:iso(now+2*HR)});
+  CALL(7,4320,'scheduler','not_interested','Customer said they are not interested at the moment.');
+  CALL(10,1800,'scheduler','interested','Customer comparing with another clinic, will decide this week.');
+  CALL(10,3300,'scheduler','no_answer','Call went unanswered / voicemail.');
+  CALL(13,1500,'scheduler','interested','Customer wants a second opinion before the root canal.');
+  CALL(15,1500,'scheduler','callback','Asked to call back after 5 PM.',{callback_time:ago(10)});
+  CALL(18,2900,'scheduler','booked','Customer agreed to visit for Root Canal. Appointment fixed on call.',{appointment_time:iso(dayAt(3,12,0))});
+
+  /* activity feed */
+  const ev=(m,kind,text,tone)=>d.events.push({id:uid('e'),kind,text,tone,at:ago(m)});
+  ev(2,'bot','AI agent replied to Neha Joshi','info');ev(45,'handoff','Handoff: Vikram Singh needs a human — Customer asked for a human / upset','bad');ev(46,'email','Handoff email sent to '+cfg.team_email,'info');
+  ev(176,'appt','Appointment booked: Rahul Sharma — Teeth Cleaning','ok');ev(295,'call','Call outcome: Anjali Mehta → callback','info');ev(380,'quote','Quotation '+qPriya.qno+' sent to Priya Verma — '+money(qPriya.total),'pur');
+  ev(1560,'call','Call outcome: Amit Patel → no answer','info');ev(3990,'optout','Sanjay Yadav opted out (STOP)','warn');ev(4320,'campaign','Campaign "Diwali offer — Cleaning & Whitening" finished','ok');ev(2900,'call','Call outcome: Fatima Khan → booked','ok');
+  d.events.sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+  return d;
+}
+
+/* ============ UI CORE: router, delegation, shared widgets ============ */
+const VIEWS={},ACT={},INP={};
+const NAV=[['dashboard','Dashboard','dashboard'],['inbox','Inbox','chat'],['leads','Leads','users'],['pipeline','Pipeline','kanban'],['appointments','Appointments','calendar'],['followups','Follow-ups & Calls','phone'],['quotes','Quotations','file'],['campaigns','Campaigns','mega'],['templates','Templates','tpl'],['api','API Console','code'],['settings','Settings','settings']];
+function navHTML(){
+  const unread=DB.contacts.filter(c=>c.unread>0||c.lead_status==='Needs Human'&&c.bot_paused).length;
+  const due=dueLeads().length;
+  return NAV.map(([k,l,ic])=>{
+    let b='';if(k==='inbox'&&unread)b=`<span class="cnt">${unread}</span>`;if(k==='followups'&&due)b=`<span class="cnt soft">${due}</span>`;
+    return `<button class="nav-i ${UI.tab===k?'on':''}" data-act="go" data-tab="${k}">${icon(ic)}<span>${l}</span>${b}</button>`;
+  }).join('');
+}
+function go(tab){
+  if(!VIEWS[tab])tab='dashboard';
+  UI.tab=tab;UI.sideOpen=false;$('#side').classList.remove('open');
+  try{history.replaceState(null,'','#'+tab);}catch(e){}
+  render();window.scrollTo(0,0);
+}
+function render(){
+  const v=VIEWS[UI.tab];
+  $('#pageTitle').textContent=v.title;$('#nav').innerHTML=navHTML();
+  $('#view').innerHTML=v.render();
+  if(v.mount)v.mount();
+}
+function refresh(){
+  const v=VIEWS[UI.tab];if(!v)return;
+  if(typeof _drag!=='undefined'&&_drag)return;
+  $('#nav').innerHTML=navHTML();
+  if(v.update)v.update();else{const y=window.scrollY;$('#view').innerHTML=v.render();if(v.mount)v.mount();window.scrollTo(0,y);}
+}
+ACT.go=el=>go(el.dataset.tab);
+ACT.toggleSide=()=>{$('#side').classList.toggle('open');};
+ACT.closeModal=()=>closeModal();
+ACT.theme=()=>{
+  const root=document.documentElement;
+  const cur=root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  const next=cur==='dark'?'light':'dark';root.dataset.theme=next;
+  try{localStorage.setItem('replora_theme',next);}catch(e){}
+  $('#themeBtn').innerHTML=icon(next==='dark'?'sun':'moon');
+};
+document.addEventListener('click',e=>{
+  const mb=e.target.closest('[data-mact]');
+  if(mb&&MODAL){const a=MODAL.actions[+mb.dataset.mact];if(a&&a.onClick)a.onClick();return;}
+  if(e.target.matches('[data-ov]')){closeModal();return;}
+  const t=e.target.closest('[data-act]');
+  if(t&&ACT[t.dataset.act])ACT[t.dataset.act](t,e);
+  if(!e.target.closest('.search'))$('#gsResults').classList.add('hide');
+});
+document.addEventListener('input',e=>{const t=e.target.closest('[data-in]');if(t&&INP[t.dataset.in])INP[t.dataset.in](t,e);});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-ch]');if(t&&INP[t.dataset.ch])INP[t.dataset.ch](t,e);});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();$('#gsResults').classList.add('hide');}
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){const t=e.target.closest('[data-enter]');if(t&&ACT[t.dataset.enter]){e.preventDefault();ACT[t.dataset.enter](t,e);}}
+});
+
+/* ---- global search ---- */
+INP.gsearch=el=>{
+  const q=el.value.trim().toLowerCase(),box=$('#gsResults');
+  if(!q){box.classList.add('hide');return;}
+  const r=DB.contacts.filter(c=>(c.name+' '+c.phone+' '+c.service+' '+c.tags).toLowerCase().includes(q)).slice(0,8);
+  box.innerHTML=r.length?r.map(c=>`<button data-act="openLead" data-phone="${c.phone}">${avatar(c.name,c.phone,'sm')}<span><b>${esc(c.name||'Unknown')}</b> <span class="muted xs-t">${fmtPhone(c.phone)}</span><br>${badge(c.lead_status)}</span></button>`).join(''):'<div class="empty">No leads found</div>';
+  box.classList.remove('hide');
+};
+ACT.openLead=el=>{$('#gsResults').classList.add('hide');openLeadDrawer(el.dataset.phone);};
+
+/* ---- simulate WhatsApp message (anyone can message the business) ---- */
+ACT.newChat=()=>{
+  openModal({title:'Simulate an incoming WhatsApp message',body:`
+    <p class="muted sm-t" style="margin-top:0">This acts like the <b>WhatsApp Trigger</b> in your n8n flow: the message is logged, keyword-routed (STOP/START) and answered by the AI agent.</p>
+    <div class="grid g2"><label class="f">Customer phone<input name="phone" type="tel" placeholder="9198765xxxxx" value="9198765${rnd(10000,99999)}"></label><label class="f">Profile name<input name="name" type="text" placeholder="e.g. Aarav Bansal"></label></div>
+    <label class="f" style="margin-top:12px">Message<textarea name="msg" placeholder="Hi, I want to book an appointment tomorrow at 5 pm">Hi, I want to book a teeth cleaning appointment</textarea></label>`,
+    actions:[{label:'Cancel',onClick:closeModal},{label:'Send as customer',cls:'pri',onClick:()=>{
+      const f=formData();const p=digits(f.phone);if(p.length<8||!f.msg.trim()){toast('Enter a valid phone and a message','err');return;}
+      closeModal();UI.chat=p;UI.mobileChat=true;inboundMessage(p,f.name.trim(),f.msg.trim());go('inbox');}}]});
+};
+
+/* ---- shared widgets ---- */
+function waPreview(t){
+  const vars=s=>waFmt(s).replace(/\{\{\s*(\d+)\s*\}\}/g,'<span class="var">{{$1}}</span>');
+  const ex=t.examples||[];
+  const body=t.examples&&t.examples.some(Boolean)?esc(renderTpl(t.body||'',ex)).replace(/\*([^*\n]+)\*/g,'<b>$1</b>'):vars(t.body||'');
+  return `<div class="wa-prev"><div class="bub in">${t.header_text?`<div class="hd2">${esc(t.header_text)}</div>`:''}<div class="tx">${body||'<span class="muted">Your message body…</span>'}</div>${t.footer_text?`<div class="ft">${esc(t.footer_text)}</div>`:''}<div class="meta">${fmtTime(Date.now())}</div></div>${(t.buttons||[]).length?`<div class="btns">${t.buttons.map(b=>`<span>${esc(b)}</span>`).join('')}</div>`:''}</div>`;
+}
+function statusColor(s){return {New:'var(--c6)',Inquiry:'var(--c2)',Interested:'var(--c1)','Quotation Sent':'var(--c4)',Callback:'var(--c3)','Needs Human':'var(--c5)',Booked:'var(--ok)',Closed:'var(--muted)'}[s]||'var(--c6)';}
+function niceMax(m){if(m<=5)return 5;const p=Math.pow(10,Math.floor(Math.log10(m)));return Math.ceil(m/p)*p>m*1.6?Math.ceil(m/(p/2))*(p/2):Math.ceil(m/p)*p;}
+function barChart(labels,series,colors,names,H=190){
+  const W=620,pl=34,pb=26,pt=10,max=niceMax(Math.max(1,...series.flat()));
+  const gw=(W-pl)/labels.length,bw=Math.min(20,gw/(series.length+1.2)),ih=H-pb-pt;
+  let g='';for(let i=0;i<=4;i++){const y=pt+ih-ih*i/4;g+=`<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--border)" stroke-width="1"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${Math.round(max*i/4)}</text>`;}
+  let bars='';labels.forEach((l,i)=>{
+    const cx=pl+gw*i+gw/2,tot=bw*series.length+3*(series.length-1);
+    series.forEach((s,j)=>{const h=ih*s[i]/max,x=cx-tot/2+j*(bw+3);bars+=`<rect x="${x}" y="${pt+ih-h}" width="${bw}" height="${Math.max(h,s[i]?1.5:0)}" rx="3" fill="${colors[j]}"><title>${esc(l)} · ${names[j]}: ${s[i]}</title></rect>`;});
+    bars+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${esc(l)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${names.join(' vs ')} per day">${g}${bars}</svg>`;
+}
+function donut(items,centerLabel){
+  const total=sum(items,i=>i.v),r=52,C2=2*Math.PI*r;let off=0,arcs='';
+  if(!total)arcs=`<circle r="${r}" cx="70" cy="70" fill="none" stroke="var(--border)" stroke-width="18"/>`;
+  items.forEach(i=>{if(!i.v)return;const len=C2*i.v/total;arcs+=`<circle r="${r}" cx="70" cy="70" fill="none" stroke="${i.color}" stroke-width="18" stroke-dasharray="${len} ${C2-len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"><title>${esc(i.l)}: ${i.v}</title></circle>`;off+=len;});
+  return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="${esc(centerLabel)}">${arcs}<text x="70" y="68" text-anchor="middle" font-size="24" font-weight="700" fill="var(--text)">${total}</text><text x="70" y="86" text-anchor="middle" font-size="10.5" fill="var(--muted)">${esc(centerLabel)}</text></svg>`;
+}
+function csvDownload(name,rows){
+  const csv=rows.map(r=>r.map(v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function jsonDownload(name,obj){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+const EV_ICON={bot:'bot',handoff:'alert',email:'mail',appt:'calendar',call:'phone',quote:'file',optout:'x',optin:'check',campaign:'mega',template:'tpl',sched:'clock'};
+const feedHTML=(n=12)=>DB.events.length?`<div class="feed">${DB.events.slice(0,n).map(e=>`<div><span class="ic k-${({ok:'ok',bad:'bad',info:'info',pur:'pur',warn:'warn'})[e.tone]||'info'}">${icon(EV_ICON[e.kind]||'info','sm')}</span><div class="sp"><div>${esc(e.text)}</div><div class="xs-t muted">${rel(e.at)}</div></div></div>`).join('')}</div>`:'<div class="empty">No activity yet</div>';
+
+/* ============ DASHBOARD ============ */
+VIEWS.dashboard={title:'Dashboard',render(){
+  const now=Date.now(),cs=DB.contacts;
+  const newWeek=cs.filter(c=>Date.parse(c.created_at)>now-7*DAY).length;
+  const active=cs.filter(windowOpen).length;
+  const human=cs.filter(c=>c.bot_paused||c.lead_status==='Needs Human').length;
+  const upAp=DB.appointments.filter(a=>a.status==='confirmed'&&Date.parse(a.end)>now).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+  const todayAp=upAp.filter(a=>dayKey(Date.parse(a.start))===dayKey(now)).length;
+  const pipe=sum(cs.filter(c=>c.lead_status==='Quotation Sent'),c=>c.quote_amount);
+  const due=dueLeads();
+  const m24=DB.messages.filter(m=>Date.parse(m.event_at)>now-DAY);
+  const engaged=cs.filter(c=>c.lead_status!=='New').length;
+  const conv=engaged?Math.round(100*cs.filter(c=>c.lead_status==='Booked').length/engaged):0;
+  const k=(l,v,s,tab,ic)=>`<div class="card kpi ${tab?'clk':''}" ${tab?`data-act="go" data-tab="${tab}"`:''}><div class="l">${icon(ic,'sm')} ${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  /* chart data */
+  const labels=[],inb=[],outb=[];
+  for(let i=6;i>=0;i--){const t=now-i*DAY,key=dayKey(t);labels.push(new Date(t).toLocaleDateString('en-IN',{timeZone:TZ(),weekday:'short'}));const ms=DB.messages.filter(m=>dayKey(Date.parse(m.event_at))===key);inb.push(ms.filter(m=>m.direction==='in').length);outb.push(ms.filter(m=>m.direction==='out').length);}
+  const stCount=STATUSES.map(s=>({s,n:cs.filter(c=>c.lead_status===s).length}));const stMax=Math.max(1,...stCount.map(x=>x.n));
+  const outc={};DB.calls.filter(c=>c.status==='completed').forEach(c=>{outc[c.outcome]=(outc[c.outcome]||0)+1;});
+  const oc=[['booked','Booked','var(--ok)'],['callback','Callback','var(--c3)'],['interested','Interested','var(--c1)'],['no_answer','No answer','var(--c6)'],['not_interested','Not interested','var(--c5)']].map(([k2,l,c])=>({l,v:outc[k2]||0,color:c}));
+  const funnel=[['Leads',cs.length],['Engaged',engaged],['Quote sent',cs.filter(c=>['Quotation Sent','Booked'].includes(c.lead_status)||c.quote_amount>0).length],['Booked',cs.filter(c=>c.lead_status==='Booked').length]];
+  return `
+  <div class="grid g4" style="margin-bottom:14px">
+    ${k('Total leads',cs.length,`+${newWeek} in the last 7 days`,'leads','users')}
+    ${k('Active chats (24h)',active,`${m24.filter(m=>m.direction==='in').length} in · ${m24.filter(m=>m.direction==='out').length} out today`,'inbox','chat')}
+    ${k('Needs human',human,human?'Bot paused — reply from Inbox':'All handled by AI','inbox','alert')}
+    ${k('Upcoming bookings',upAp.length,`${todayAp} today`,'appointments','calendar')}
+    ${k('Quotation pipeline',money(pipe),`${cs.filter(c=>c.lead_status==='Quotation Sent').length} open quotes`,'quotes','file')}
+    ${k('Follow-ups due',due.length,inCallWindow()?'Call window is open':'Outside call window','followups','phone')}
+    ${k('Conversion',conv+'%','Booked ÷ engaged leads','pipeline','zap')}
+    ${k('Campaigns sent',sum(DB.campaigns,c=>c.sent),`${DB.campaigns.length} campaigns · ${sum(DB.campaigns,c=>c.failed)} failed`,'campaigns','mega')}
+  </div>
+  <div class="grid g21" style="margin-bottom:14px" id="dashRow2">
+    <div class="card"><div class="hd">Messages — last 7 days <span class="sub">customer vs bot / team</span></div><div class="bd">${barChart(labels,[inb,outb],['var(--c2)','var(--c1)'],['Inbound','Outbound'])}<div class="row sm-t muted" style="gap:14px"><span><span class="dot" style="background:var(--c2)"></span> Inbound</span><span><span class="dot" style="background:var(--c1)"></span> Outbound</span></div></div></div>
+    <div class="card"><div class="hd">Leads by status</div><div class="bd">${stCount.map(x=>`<div class="hbar"><span>${x.s}</span><div class="bar"><i style="width:${100*x.n/stMax}%;background:${statusColor(x.s)}"></i></div><b>${x.n}</b></div>`).join('')}</div></div>
+  </div>
+  <div class="grid g3" style="margin-bottom:14px">
+    <div class="card"><div class="hd">Sales funnel</div><div class="bd">${funnel.map((f,i)=>`<div class="hbar" style="grid-template-columns:80px 1fr 34px"><span>${f[0]}</span><div class="bar" style="height:14px"><i style="width:${100*f[1]/Math.max(1,funnel[0][1])}%;background:var(--c${[2,1,4,1][i]});opacity:${1-i*.12}"></i></div><b>${f[1]}</b></div>`).join('')}<div class="sm-t muted" style="margin-top:8px">Quote→booking drop-off is where follow-up calls help most.</div></div></div>
+    <div class="card"><div class="hd">Call outcomes</div><div class="bd row" style="gap:16px;flex-wrap:wrap">${donut(oc,'calls')}<div class="sm-t" style="flex:1;min-width:120px">${oc.map(o=>`<div class="row"><span class="dot" style="background:${o.color}"></span><span class="sp">${o.l}</span><b>${o.v}</b></div>`).join('')}</div></div></div>
+    <div class="card"><div class="hd">Needs human <span class="sub">bot paused</span></div><div class="bd">${cs.filter(c=>c.bot_paused||c.lead_status==='Needs Human').slice(0,5).map(c=>`<div class="list-i">${avatar(c.name,c.phone,'sm')}<div class="sp"><b>${esc(c.name||fmtPhone(c.phone))}</b><div class="xs-t muted" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.notes||'')}</div></div><button class="btn sm" data-act="openChat" data-phone="${c.phone}" data-go="1">Reply</button></div>`).join('')||'<div class="empty">Nobody is waiting 🎉</div>'}</div></div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="hd">Upcoming appointments <span class="sp"></span><button class="btn sm ghost" data-act="go" data-tab="appointments">View all</button></div><div class="bd">${upAp.slice(0,6).map(a=>`<div class="list-i"><div class="badge b-Booked">${fmtDate(a.start)}</div><div class="sp"><b>${esc(a.name||fmtPhone(a.phone))}</b><div class="xs-t muted">${esc(a.service)} · ${fmtTime(a.start)}</div></div></div>`).join('')||'<div class="empty">No upcoming appointments</div>'}</div></div>
+    <div class="card"><div class="hd">Follow-ups due now <span class="sp"></span><button class="btn sm ghost" data-act="go" data-tab="followups">Open</button></div><div class="bd">${due.slice(0,6).map(c=>`<div class="list-i">${avatar(c.name,c.phone,'sm')}<div class="sp"><b>${esc(c.name||fmtPhone(c.phone))}</b><div class="xs-t muted">${badge(c.lead_status)} · #${(c.follow_up_count||0)+1} · due ${rel(c.follow_up_at)}</div></div><button class="btn sm" data-act="callLead" data-phone="${c.phone}">${icon('phone','sm')} Call</button></div>`).join('')||'<div class="empty">Nothing due. 🎉</div>'}</div></div>
+    <div class="card"><div class="hd">Live activity</div><div class="bd scroll-y">${feedHTML(14)}</div></div>
+  </div>`;
+}};
+
+/* ============ INBOX ============ */
+function dayLabel(ms){const k=dayKey(ms),t=dayKey(Date.now()),y=dayKey(Date.now()-DAY);return k===t?'Today':k===y?'Yesterday':fmtDate(ms);}
+function tickHTML(m){
+  if(m.direction!=='out')return '';
+  if(m.status==='failed')return `<span style="color:var(--danger)" title="${esc(m.error)}">${icon('alert','sm')}</span>`;
+  if(m.status==='read')return `<svg class="i tick read"><use href="#i-checks"/></svg>`;
+  if(m.status==='delivered')return `<svg class="i tick"><use href="#i-checks"/></svg>`;
+  return `<svg class="i tick" style="width:12px"><use href="#i-check"/></svg>`;
+}
+function bubbleHTML(m){
+  const out=m.direction==='out';
+  const who=m.sender==='bot'?`${icon('bot','sm')} AI Agent`:m.sender==='agent'?`${icon('users','sm')} Team`:m.sender==='campaign'?`${icon('mega','sm')} Campaign`:'';
+  const tpl=m.msg_type==='template'?`<div class="xs-t muted" style="margin-bottom:2px">${icon('tpl','sm')} Template · ${esc(m.template_name)}</div>`:'';
+  const body=m.msg_type==='image'?`${icon('image','sm')} <i>Image</i>`:waFmt(m.body);
+  const tools=(m.tools||[]).length?`<div>${m.tools.map(t=>`<span class="tool">${icon('zap','sm')}${esc(t)}</span>`).join('')}</div>`:'';
+  const err=m.status==='failed'?`<div class="xs-t" style="color:var(--danger)">${esc(m.error||'Failed to send')}</div>`:'';
+  return `<div class="bub ${out?'out':'in'}">${who?`<div class="who">${who}</div>`:''}${tpl}<div class="tx">${body}</div>${tools}${err}<div class="meta">${fmtTime(m.event_at)} ${tickHTML(m)}</div></div>`;
+}
+const CUSTOMER_CHIPS=['Hi','Book appointment tomorrow at 5 pm','Teeth cleaning price?','What are your timings?','Call me please','I want to talk to a human','Let me think about it','Braces ka kitna lagega?','STOP','START'];
+function chatsFiltered(){
+  const q=UI.chatSearch.trim().toLowerCase();
+  let cs=DB.contacts.filter(c=>lastMsgOf(c.phone)||c.unread);
+  if(UI.chatFilter==='unread')cs=cs.filter(c=>c.unread>0);
+  if(UI.chatFilter==='human')cs=cs.filter(c=>c.bot_paused||c.lead_status==='Needs Human');
+  if(q)cs=cs.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));
+  return cs.sort((a,b)=>lastActivity(b)-lastActivity(a));
+}
+function chatListHTML(){
+  const cs=chatsFiltered();
+  if(!cs.length)return '<div class="empty">No conversations</div>';
+  return cs.map(c=>{const l=lastMsgOf(c.phone);const pv=l?((l.direction==='out'?(l.sender==='bot'?'🤖 ':'You: '):'')+(l.msg_type==='image'?'📷 Image':l.body)).replace(/\n/g,' '):'';
+    return `<div class="cl-i ${UI.chat===c.phone?'on':''}" data-act="openChat" data-phone="${c.phone}">${avatar(c.name,c.phone)}<div class="sp" style="min-width:0"><div class="nm"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name||fmtPhone(c.phone))}</span>${c.bot_paused?`<span title="Bot paused" style="color:var(--danger)">${icon('pause','sm')}</span>`:''}${c.opted_in===false?'<span class="chip">STOP</span>':''}<span class="tm">${l?rel(l.event_at):''}</span></div><div class="row"><div class="pv sp">${esc(pv)}</div>${c.unread?`<span class="unread">${c.unread}</span>`:''}</div></div></div>`;}).join('');
+}
+function chatHeadHTML(c){
+  const open=windowOpen(c);
+  return `<button class="icon-btn back-m" data-act="chatBack">${icon('back')}</button>${avatar(c.name,c.phone)}
+  <div class="sp" style="min-width:140px"><div class="b">${esc(c.name||'Unknown')} ${badge(c.lead_status)}</div><div class="xs-t muted">${fmtPhone(c.phone)} · <span class="${open?'':'b'}" style="color:${open?'var(--ok)':'var(--danger)'}">${open?`24h window open · ${Math.max(1,Math.floor(windowLeftH(c)))}h left`:'24h window closed'}</span></div></div>
+  <button class="btn sm ${c.bot_paused?'pri':''}" data-act="toggleBot" data-phone="${c.phone}">${icon(c.bot_paused?'play':'pause','sm')} ${c.bot_paused?'Resume bot':'Pause bot'}</button>
+  <button class="btn sm hide-m" data-act="callLead" data-phone="${c.phone}">${icon('phone','sm')} Call</button>
+  <button class="btn sm hide-m" data-act="quoteFor" data-phone="${c.phone}">${icon('file','sm')} Quote</button>
+  <button class="icon-btn" data-act="toggleInfo" title="Lead info">${icon('info')}</button>`;
+}
+function chatMsgsHTML(c){
+  const ms=msgsOf(c.phone);let last='',h='';
+  ms.forEach(m=>{const k=dayKey(Date.parse(m.event_at));if(k!==last){last=k;h+=`<div class="dsep">${dayLabel(Date.parse(m.event_at))}</div>`;}h+=bubbleHTML(m);});
+  if(c.bot_paused)h+=`<div class="dsep" style="color:var(--danger)">${icon('pause','sm')} Bot paused — customer messages are not auto-answered</div>`;
+  if(UI.typing===c.phone)h+='<div class="typing"><i></i><i></i><i></i></div>';
+  return h||'<div class="empty">No messages yet</div>';
+}
+function composerHTML(c){
+  const open=windowOpen(c);
+  const tabs=`<div class="tabs"><button class="${UI.chatMode==='team'?'on':''}" data-act="chatMode" data-mode="team">Reply as team</button><button class="${UI.chatMode==='customer'?'on':''}" data-act="chatMode" data-mode="customer">${icon('bot','sm')} Demo: reply as customer</button></div>`;
+  if(UI.chatMode==='customer')return `${tabs}<div class="chips">${CUSTOMER_CHIPS.map(t=>`<button data-act="chip" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button data-act="sendImage">${icon('image','sm')} Send image</button></div>
+    <div class="line"><textarea id="cmpText" rows="1" placeholder="Type what the customer would say…" data-enter="sendCustomer"></textarea><button class="btn pri" data-act="sendCustomer">${icon('send','sm')} Send</button></div>`;
+  if(!open)return `${tabs}<div class="notice warn">${icon('clock','sm')}<span class="sp">The customer hasn't written in the last 24h — WhatsApp only allows an <b>approved template</b> now.</span><button class="btn sm" data-act="tplToChat" data-phone="${c.phone}">Send template</button></div>`;
+  return `${tabs}<div class="line"><textarea id="cmpText" rows="1" placeholder="Type a reply as the human team…" data-enter="sendTeam"></textarea><button class="btn pri" data-act="sendTeam">${icon('send','sm')} Send</button></div>${c.bot_paused?'':'<div class="xs-t muted">Tip: pause the bot first so the AI doesn\'t answer at the same time.</div>'}`;
+}
+function infoHTML(c){
+  const cust=(l,v)=>`<dt>${l}</dt><dd>${v||'<span class="muted">—</span>'}</dd>`;
+  return `<div class="col" style="align-items:center;text-align:center">${avatar(c.name,c.phone)}<div class="b">${esc(c.name||'Unknown')}</div><div class="muted sm-t">${fmtPhone(c.phone)}</div></div>
+  <label class="f" style="margin-top:12px">Lead status<select data-ch="chatStatus">${STATUSES.map(s=>`<option ${s===c.lead_status?'selected':''}>${s}</option>`).join('')}</select></label>
+  <dl class="kv">${cust('Service',esc(c.service))}${cust('Intent',esc(c.intent))}${cust('Quote',c.quote_amount?money(c.quote_amount):'')}${cust('Appointment',c.appointment_time?fmtDT(c.appointment_time):'')}${cust('Follow-up',c.follow_up_at?`${fmtDT(c.follow_up_at)} <span class="muted">(#${c.follow_up_count||0})</span>`:'')}${cust('Last call',c.last_call_outcome?`${esc(c.last_call_outcome)} · ${rel(c.last_call_at)}`:'')}${cust('Tags',String(c.tags||'').split(',').filter(Boolean).map(t=>`<span class="chip tag">${esc(t)}</span>`).join(''))}${cust('Opt-in',c.opted_in===false?'<span class="badge b-bad">Opted out</span>':'<span class="badge b-ok">Subscribed</span>')}${cust('Notes',esc(c.notes))}</dl>
+  <div class="col"><button class="btn" data-act="openLead" data-phone="${c.phone}">${icon('edit','sm')} Edit lead</button><button class="btn" data-act="callLead" data-phone="${c.phone}">${icon('phone','sm')} Request call now</button><button class="btn" data-act="quoteFor" data-phone="${c.phone}">${icon('file','sm')} Create quotation</button><button class="btn" data-act="bookFor" data-phone="${c.phone}">${icon('calendar','sm')} Book appointment</button></div>`;
+}
+VIEWS.inbox={title:'Inbox — WhatsApp',render(){
+  return `<div class="card inbox ${UI.info?'':'noinfo'} ${UI.mobileChat?'show-chat':''}" id="inbox">
+   <div class="chat-list"><div class="cl-top"><div class="row"><input type="search" id="chatSearch" placeholder="Search chats…" value="${esc(UI.chatSearch)}" data-in="chatSearch"><button class="icon-btn" data-act="newChat" title="New simulated message">${icon('plus')}</button></div>
+     <div class="tabs" id="chatTabs"></div></div><div class="cl-items" id="clItems"></div></div>
+   <div class="chat" id="chatPane"><div class="chat-h" id="chatHead"></div><div class="chat-msgs" id="chatMsgs"></div><div class="composer" id="chatComposer"></div></div>
+   <div class="info-p" id="infoPane"></div></div>`;
+},mount(){
+  if(!UI.chat||!C(UI.chat)){const l=chatsFiltered()[0];UI.chat=l?l.phone:null;}
+  UI._ckey='';this.update(true);
+},update(forceBottom){
+  const inbox=$('#inbox');if(!inbox)return;
+  inbox.classList.toggle('noinfo',!UI.info);inbox.classList.toggle('show-chat',!!UI.mobileChat);
+  const nUn=DB.contacts.filter(c=>c.unread>0).length,nH=DB.contacts.filter(c=>c.bot_paused||c.lead_status==='Needs Human').length;
+  $('#chatTabs').innerHTML=[['all','All'],['unread','Unread'+(nUn?` <span class="n">${nUn}</span>`:'')],['human','Human'+(nH?` <span class="n">${nH}</span>`:'')]].map(([k,l])=>`<button class="${UI.chatFilter===k?'on':''}" data-act="chatFilter" data-f="${k}">${l}</button>`).join('');
+  $('#clItems').innerHTML=chatListHTML();
+  const c=UI.chat&&C(UI.chat);
+  if(!c){$('#chatHead').innerHTML='';$('#chatMsgs').innerHTML='<div class="empty">Select a conversation or simulate a new message</div>';$('#chatComposer').innerHTML='';$('#infoPane').innerHTML='';return;}
+  if(c.unread){c.unread=0;save();$('#clItems').innerHTML=chatListHTML();$('#nav').innerHTML=navHTML();}
+  const msgs=$('#chatMsgs'),near=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<120;
+  $('#chatHead').innerHTML=chatHeadHTML(c);msgs.innerHTML=chatMsgsHTML(c);
+  if(forceBottom||near)msgs.scrollTop=msgs.scrollHeight;
+  const ck=[c.phone,UI.chatMode,windowOpen(c),c.bot_paused].join('|');
+  if(ck!==UI._ckey){UI._ckey=ck;$('#chatComposer').innerHTML=composerHTML(c);}
+  $('#infoPane').innerHTML=infoHTML(c);
+}};
+INP.chatSearch=el=>{UI.chatSearch=el.value;$('#clItems').innerHTML=chatListHTML();};
+INP.chatStatus=el=>{const c=C(UI.chat);if(c){c.lead_status=el.value;if(el.value==='Booked'||el.value==='Closed')c.follow_up_at='';touch();toast('Status updated','ok');}};
+ACT.chatFilter=el=>{UI.chatFilter=el.dataset.f;VIEWS.inbox.update();};
+ACT.chatMode=el=>{UI.chatMode=el.dataset.mode;UI._ckey='';VIEWS.inbox.update();setTimeout(()=>{const t=$('#cmpText');if(t)t.focus();},30);};
+ACT.openChat=el=>{UI.chat=el.dataset.phone;UI.mobileChat=true;UI._ckey='';if(UI.tab!=='inbox'){go('inbox');}else VIEWS.inbox.update(true);};
+ACT.chatBack=()=>{UI.mobileChat=false;VIEWS.inbox.update();};
+ACT.toggleInfo=()=>{const c=C(UI.chat);if(!c)return;if(matchMedia('(max-width:1180px)').matches){openModal({title:'Lead info',drawer:true,body:infoHTML(c),actions:[]});return;}UI.info=!UI.info;VIEWS.inbox.update();};
+ACT.chip=el=>{const t=$('#cmpText');t.value=el.dataset.t;t.focus();};
+ACT.sendTeam=()=>{
+  const t=$('#cmpText'),txt=t.value.trim();if(!txt)return;
+  const r=waApi(DB.config.api_secret,{action:'agent_reply',phone:UI.chat,text:txt});
+  if(r.status===409){toast(r.json.error,'err');return;}
+  t.value='';VIEWS.inbox.update(true);
+};
+ACT.sendCustomer=()=>{
+  const t=$('#cmpText'),txt=t.value.trim();if(!txt)return;t.value='';
+  const c=C(UI.chat);inboundMessage(c.phone,c.name,txt);setTimeout(()=>VIEWS.inbox.update(true),30);
+};
+ACT.sendImage=()=>{const c=C(UI.chat);inboundMessage(c.phone,c.name,'[image]','image');};
+ACT.toggleBot=el=>{
+  const c=C(el.dataset.phone);if(!c)return;
+  const r=waApi(DB.config.api_secret,{action:c.bot_paused?'resume_bot':'handoff',phone:c.phone,reason:'Paused manually by team'});
+  toast(c.bot_paused?'Bot paused — you are in control':'Bot resumed',c.bot_paused?'':'ok');
+};
+ACT.callLead=el=>{const c=C(el.dataset.phone);if(!c)return;if(c.opted_in===false&&!confirm('This contact opted out (STOP). Call anyway?'))return;placeCall(c,{source:'manual',reason:'Manual call requested from CRM. Service: '+(c.service||'n/a')});toast('Call placed to '+(c.name||fmtPhone(c.phone)),'ok');};
+ACT.quoteFor=el=>{UI.qb=null;UI.qbPhone=el.dataset.phone;go('quotes');};
+ACT.bookFor=el=>{closeModal();openApptModal({phone:el.dataset.phone});};
+ACT.tplToChat=el=>openTemplateSend(el.dataset.phone);
+function openTemplateSend(phone){
+  const c=C(phone),tpls=DB.templates.filter(t=>t.status==='APPROVED');
+  if(!tpls.length){toast('No approved templates — create one in Templates','err');return;}
+  const draw=()=>{const t=tpls.find(x=>x.name===$('#tsel').value),vs=tplVars(t.body);
+    $('#tsPrev').innerHTML=waPreview({...t,examples:[]});
+    $('#tsVars').innerHTML=vs.map((v,i)=>`<label class="f">{{${v}}}<input type="text" name="p${v}" value="${esc(i===0?(c.name||'there'):(t.examples[i]||''))}" data-in="tsVar"></label>`).join('')||'<span class="muted sm-t">No variables</span>';
+    INP.tsVar();};
+  INP.tsVar=()=>{const t=tpls.find(x=>x.name===$('#tsel').value),vs=tplVars(t.body);const f=formData();$('#tsPrev').innerHTML=waPreview({...t,examples:vs.map(v=>f['p'+v]||'')});};
+  INP.tsSel=draw;
+  openModal({title:'Send approved template',body:`<div class="notice warn" style="margin-bottom:12px">${icon('clock','sm')} Outside the 24h window only template messages are delivered.</div><label class="f">Template<select id="tsel" data-ch="tsSel">${tpls.map(t=>`<option>${esc(t.name)}</option>`).join('')}</select></label><div class="grid g2" style="margin:12px 0" id="tsVars"></div><div id="tsPrev"></div>`,
+    actions:[{label:'Cancel',onClick:closeModal},{label:'Send template',cls:'pri',onClick:()=>{const t=tpls.find(x=>x.name===$('#tsel').value),f=formData();const r=sendTemplateTo(phone,t.name,tplVars(t.body).map(v=>f['p'+v]||''));closeModal();toast(r.ok?'Template sent':r.error,r.ok?'ok':'err');}}],onMount:draw});
+}
+
+/* ============ LEADS ============ */
+function leadRows(){
+  const q=UI.leadQ.trim().toLowerCase();
+  let r=DB.contacts.filter(c=>(!q||(c.name+' '+c.phone+' '+c.service+' '+c.notes+' '+c.tags).toLowerCase().includes(q))&&(!UI.leadStatus||c.lead_status===UI.leadStatus)&&(!UI.leadTag||String(c.tags||'').split(',').map(s=>s.trim()).includes(UI.leadTag)));
+  const key={name:c=>(c.name||'').toLowerCase(),status:c=>STATUSES.indexOf(c.lead_status),quote:c=>+c.quote_amount||0,appt:c=>c.appointment_time?Date.parse(c.appointment_time):0,follow:c=>c.follow_up_at?Date.parse(c.follow_up_at):0,last:c=>lastActivity(c)}[UI.leadSort]||(c=>0);
+  return r.sort((a,b)=>{const x=key(a),y=key(b);return (x>y?1:x<y?-1:0)*UI.leadDir;});
+}
+function leadsTableHTML(){
+  const rows=leadRows();
+  const th=(k,l)=>`<th class="sortable" data-act="sortLeads" data-k="${k}">${l}${UI.leadSort===k?(UI.leadDir>0?' ▲':' ▼'):''}</th>`;
+  return `<div class="tbl-wrap"><table class="t"><thead><tr>${th('name','Lead')}${th('status','Status')}<th>Service</th>${th('quote','Quote')}${th('appt','Appointment')}${th('follow','Follow-up')}<th>Last call</th>${th('last','Last msg')}<th></th></tr></thead><tbody>${rows.map(c=>{
+    const fu=c.follow_up_at?`<span style="color:${Date.parse(c.follow_up_at)<Date.now()&&!skipReason(c)?'var(--danger)':'inherit'}">${fmtDT(c.follow_up_at)}</span> <span class="muted xs-t">#${c.follow_up_count||0}</span>`:'—';
+    return `<tr class="clk" data-act="openLead" data-phone="${c.phone}"><td><div class="row">${avatar(c.name,c.phone,'sm')}<div><b>${esc(c.name||'Unknown')}</b>${c.opted_in===false?' <span class="chip">STOP</span>':''}${c.bot_paused?' <span class="chip" style="color:var(--danger)">paused</span>':''}<div class="xs-t muted">${fmtPhone(c.phone)}</div></div></div></td><td>${badge(c.lead_status)}</td><td>${esc(c.service)||'—'}</td><td>${c.quote_amount?money(c.quote_amount):'—'}</td><td>${c.appointment_time?fmtDT(c.appointment_time):'—'}</td><td>${fu}</td><td>${c.last_call_outcome?`${esc(c.last_call_outcome)}<div class="xs-t muted">${rel(c.last_call_at)}</div>`:'—'}</td><td class="muted">${rel(lastActivity(c))}</td><td style="white-space:nowrap"><button class="icon-btn" style="display:inline-grid" data-act="openChatBtn" data-phone="${c.phone}" title="Open chat">${icon('chat','sm')}</button></td></tr>`;}).join('')||`<tr><td colspan="9" class="empty">No leads match your filters</td></tr>`}</tbody></table></div>`;
+}
+VIEWS.leads={title:'Leads',render(){
+  return `<div class="page-h"><h2>Leads <span class="muted sm-t" id="leadCount"></span></h2><span class="sp"></span><button class="btn" data-act="exportLeads">${icon('download','sm')} Export CSV</button><button class="btn pri" data-act="newLead">${icon('plus','sm')} Add lead</button></div>
+  <div class="card"><div class="bd row wrap" style="padding-bottom:12px"><div style="flex:1;min-width:200px"><input type="search" placeholder="Search name, phone, service, tag…" value="${esc(UI.leadQ)}" data-in="leadQ"></div>
+   <select style="width:auto" data-ch="leadStatus"><option value="">All statuses</option>${STATUSES.map(s=>`<option ${UI.leadStatus===s?'selected':''}>${s}</option>`).join('')}</select>
+   <select style="width:auto" data-ch="leadTag"><option value="">All tags</option>${allTags().map(t=>`<option ${UI.leadTag===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div><div id="leadsTbl">${leadsTableHTML()}</div></div>`;
+},mount(){$('#leadCount').textContent=`(${leadRows().length} of ${DB.contacts.length})`;},update(){const t=$('#leadsTbl');if(t){t.innerHTML=leadsTableHTML();$('#leadCount').textContent=`(${leadRows().length} of ${DB.contacts.length})`;}}};
+INP.leadQ=el=>{UI.leadQ=el.value;VIEWS.leads.update();};
+INP.leadStatus=el=>{UI.leadStatus=el.value;VIEWS.leads.update();};
+INP.leadTag=el=>{UI.leadTag=el.value;VIEWS.leads.update();};
+ACT.sortLeads=el=>{const k=el.dataset.k;if(UI.leadSort===k)UI.leadDir*=-1;else{UI.leadSort=k;UI.leadDir=k==='name'?1:-1;}VIEWS.leads.update();};
+ACT.openChatBtn=(el,e)=>{e.stopPropagation();ACT.openChat(el);};
+ACT.newLead=()=>openLeadDrawer(null);
+ACT.exportLeads=()=>{csvDownload('leads.csv',[['phone','name','lead_status','service','intent','quote_amount','appointment_time','follow_up_at','follow_up_count','last_call_outcome','opted_in','bot_paused','tags','notes'],...DB.contacts.map(c=>[c.phone,c.name,c.lead_status,c.service,c.intent,c.quote_amount,c.appointment_time,c.follow_up_at,c.follow_up_count,c.last_call_outcome,c.opted_in!==false,!!c.bot_paused,c.tags,c.notes])]);toast('leads.csv downloaded','ok');};
+function openLeadDrawer(phone){
+  const isNew=!phone,c=isNew?{phone:'',name:'',lead_status:'New',service:'',intent:'',notes:'',quote_amount:0,appointment_time:'',follow_up_at:'',follow_up_count:0,opted_in:true,bot_paused:false,tags:''}:C(phone);
+  if(!c){toast('Lead not found','err');return;}
+  const timeline=isNew?'':(()=>{
+    const items=[...msgsOf(c.phone).slice(-4).map(m=>({t:Date.parse(m.event_at),i:'chat',x:`${m.direction==='in'?'Customer':m.sender==='bot'?'AI agent':m.sender==='campaign'?'Campaign':'Team'}: ${String(m.body).slice(0,70)}`})),...DB.calls.filter(x=>x.phone===c.phone).slice(0,3).map(x=>({t:Date.parse(x.placed_at),i:'phone',x:`Call · ${x.outcome?x.outcome.replace('_',' '):x.status}${x.summary?' — '+x.summary:''}`})),...DB.appointments.filter(x=>x.phone===c.phone).map(x=>({t:Date.parse(x.start),i:'calendar',x:`${x.service} · ${x.status} · ${fmtSlot(Date.parse(x.start))}`})),...DB.quotes.filter(x=>x.phone===c.phone).map(x=>({t:Date.parse(x.created_at),i:'file',x:`Quotation ${x.qno} · ${money(x.total)} · ${x.status}`}))].sort((a,b)=>b.t-a.t).slice(0,8);
+    return `<div class="b" style="margin:18px 0 6px">Recent activity</div><div class="feed">${items.map(i=>`<div><span class="ic">${icon(i.i,'sm')}</span><div class="sp"><div>${esc(i.x)}</div><div class="xs-t muted">${rel(i.t)}</div></div></div>`).join('')||'<div class="muted">Nothing yet</div>'}</div>`;})();
+  openModal({title:isNew?'Add lead':esc(c.name||fmtPhone(c.phone)),drawer:true,body:`
+   <div class="grid g2">
+    <label class="f">Name<input name="name" type="text" value="${esc(c.name)}"></label>
+    <label class="f">Phone (digits, with country code)<input name="phone" type="tel" value="${esc(c.phone)}" ${isNew?'':'readonly'} placeholder="919876500123"></label>
+    <label class="f">Lead status<select name="lead_status">${STATUSES.map(s=>`<option ${s===c.lead_status?'selected':''}>${s}</option>`).join('')}</select></label>
+    <label class="f">Service<input name="service" type="text" list="svcl" value="${esc(c.service)}"><datalist id="svcl">${DB.config.services.map(s=>`<option>${esc(s.name)}</option>`).join('')}</datalist></label>
+    <label class="f">Intent<input name="intent" type="text" value="${esc(c.intent)}" placeholder="booking / inquiry / quotation / call"></label>
+    <label class="f">Quote amount (Rs)<input name="quote_amount" type="number" min="0" step="0.01" value="${c.quote_amount||0}"></label>
+    <label class="f">Appointment<input name="appointment_time" type="datetime-local" value="${toLocalInput(c.appointment_time)}"></label>
+    <label class="f">Follow-up at<input name="follow_up_at" type="datetime-local" value="${toLocalInput(c.follow_up_at)}"></label>
+    <label class="f">Follow-up count<input name="follow_up_count" type="number" min="0" value="${c.follow_up_count||0}"></label>
+    <label class="f">Tags (comma separated)<input name="tags" type="text" value="${esc(c.tags)}" placeholder="vip, diwali"></label>
+   </div>
+   <label class="f" style="margin-top:12px">Notes<textarea name="notes">${esc(c.notes)}</textarea></label>
+   <div class="row wrap" style="margin-top:12px;gap:22px"><label class="chk"><input type="checkbox" name="opted_in" ${c.opted_in!==false?'checked':''}> Opted in (WhatsApp marketing)</label><label class="chk"><input type="checkbox" name="bot_paused" ${c.bot_paused?'checked':''}> Bot paused (human handling)</label></div>${timeline}`,
+   actions:[...(isNew?[]:[{label:'Delete',cls:'dng',onClick:()=>confirmBox(`Delete <b>${esc(c.name||c.phone)}</b> and their messages?`,()=>{DB.contacts=DB.contacts.filter(x=>x.phone!==c.phone);DB.messages=DB.messages.filter(m=>m.phone!==c.phone);if(UI.chat===c.phone)UI.chat=null;closeModal();touch();toast('Lead deleted');})},{label:'Open chat',onClick:()=>{closeModal();ACT.openChat({dataset:{phone:c.phone}});}}]),{label:'Cancel',onClick:closeModal},{label:isNew?'Add lead':'Save changes',cls:'pri',onClick:()=>{
+     const f=formData(),p=digits(f.phone);if(p.length<8){toast('Enter a valid phone number','err');return;}
+     if(isNew&&C(p)){toast('A lead with this phone already exists','err');return;}
+     const t=upsertContact(p,{});
+     Object.assign(t,{name:f.name.trim(),lead_status:f.lead_status,service:f.service.trim(),intent:f.intent.trim(),quote_amount:+f.quote_amount||0,appointment_time:fromLocalInput(f.appointment_time),follow_up_at:fromLocalInput(f.follow_up_at),follow_up_count:+f.follow_up_count||0,tags:f.tags.split(',').map(s=>s.trim()).filter(Boolean).join(','),notes:f.notes,opted_in:f.opted_in,bot_paused:f.bot_paused});
+     closeModal();touch();toast(isNew?'Lead added':'Lead saved','ok');}}]});
+}
+
+/* ============ PIPELINE (kanban) ============ */
+VIEWS.pipeline={title:'Pipeline',render(){
+  return `<div class="page-h"><h2>Sales pipeline</h2><span class="muted sm-t">Drag cards between columns — or use the dropdown on a card — to change the lead status.</span></div>
+  <div class="kanban">${STATUSES.map(s=>{const cs=DB.contacts.filter(c=>c.lead_status===s).sort((a,b)=>lastActivity(b)-lastActivity(a));const val=sum(cs,c=>c.quote_amount);
+    return `<div class="kcol" data-col="${s}"><div class="kh"><span class="dot" style="background:${statusColor(s)}"></span>${s}<span class="badge" style="margin-left:auto">${cs.length}</span></div>${val?`<div class="xs-t muted" style="padding:0 12px 6px">${money(val)} in quotes</div>`:''}<div class="kb">${cs.map(c=>`<div class="kcard" draggable="true" data-ph="${c.phone}"><div class="row"><span class="nm sp">${esc(c.name||fmtPhone(c.phone))}</span><button class="btn sm ghost" style="padding:2px 6px" data-act="openLead" data-phone="${c.phone}" title="Edit">${icon('edit','sm')}</button></div><div class="xs-t muted">${esc(c.service||'—')}${c.quote_amount?' · '+money(c.quote_amount):''}</div>${c.appointment_time?`<div class="xs-t" style="color:var(--ok)">${icon('calendar','sm')} ${fmtDT(c.appointment_time)}</div>`:''}${c.follow_up_at&&!skipReason(c)?`<div class="xs-t" style="color:var(--danger)">${icon('clock','sm')} follow-up due</div>`:''}<div class="row" style="margin-top:6px"><select style="padding:3px 6px;font-size:12px" data-ch="moveLead" data-phone="${c.phone}">${STATUSES.map(x=>`<option ${x===s?'selected':''}>${x}</option>`).join('')}</select><button class="icon-btn" style="width:28px;height:28px" data-act="openChat" data-phone="${c.phone}" title="Open chat">${icon('chat','sm')}</button></div></div>`).join('')||'<div class="xs-t muted" style="padding:10px;text-align:center">Drop here</div>'}</div></div>`;}).join('')}</div>`;
+}};
+function moveLead(phone,status){
+  const c=C(phone);if(!c||c.lead_status===status)return;c.lead_status=status;
+  if(status==='Booked'||status==='Closed')c.follow_up_at='';
+  if(status==='Inquiry'&&!c.follow_up_at)c.follow_up_at=tomorrow11();
+  logEvent('lead',`${c.name||fmtPhone(phone)} moved to ${status}`,'info');touch();toast(`${c.name||'Lead'} → ${status}`,'ok');
+}
+INP.moveLead=el=>moveLead(el.dataset.phone,el.value);
+let _drag=null;
+document.addEventListener('dragstart',e=>{const k=e.target.closest&&e.target.closest('.kcard');if(!k)return;_drag=k.dataset.ph;k.classList.add('drag');try{e.dataTransfer.setData('text/plain',_drag);e.dataTransfer.effectAllowed='move';}catch(x){}});
+document.addEventListener('dragend',e=>{_drag=null;$$('.kcard.drag').forEach(x=>x.classList.remove('drag'));$$('.kcol.over').forEach(x=>x.classList.remove('over'));});
+document.addEventListener('dragover',e=>{const col=e.target.closest&&e.target.closest('.kcol');if(col&&_drag){e.preventDefault();$$('.kcol.over').forEach(x=>x!==col&&x.classList.remove('over'));col.classList.add('over');}});
+document.addEventListener('drop',e=>{const col=e.target.closest&&e.target.closest('.kcol');if(col&&_drag){e.preventDefault();const p=_drag;_drag=null;moveLead(p,col.dataset.col);}});
+
+/* ============ APPOINTMENTS ============ */
+function calInit(){if(!UI.calY){const p=tzParts(Date.now());UI.calY=p.y;UI.calM=p.m;}if(!UI.calDay)UI.calDay=dayKey(Date.now());}
+function apptCard(a){
+  const st={confirmed:'b-Booked',completed:'b-Interested',cancelled:'b-Closed'}[a.status];
+  return `<div class="list-i"><div class="badge ${st}" style="min-width:74px;justify-content:center">${fmtTime(a.start)}</div><div class="sp" style="min-width:0"><b>${esc(a.name||fmtPhone(a.phone))}</b><div class="xs-t muted">${esc(a.service)} · ${a.status} · ${esc(a.source)}</div></div>
+   ${a.status==='confirmed'?`<button class="icon-btn" title="Mark completed" data-act="apDone" data-id="${a.id}">${icon('check','sm')}</button><button class="icon-btn" title="Send reminder" data-act="apRemind" data-id="${a.id}">${icon('send','sm')}</button><button class="icon-btn" title="Reschedule" data-act="apEdit" data-id="${a.id}">${icon('edit','sm')}</button><button class="icon-btn" title="Cancel" data-act="apCancel" data-id="${a.id}">${icon('x','sm')}</button>`:`<button class="icon-btn" title="Delete" data-act="apDel" data-id="${a.id}">${icon('trash','sm')}</button>`}</div>`;
+}
+VIEWS.appointments={title:'Appointments',render(){
+  calInit();
+  const y=UI.calY,m=UI.calM,first=tzParts(fromWall(y,m,1,12,0)).wd,dim=new Date(y,m,0).getDate();
+  const by={};DB.appointments.forEach(a=>{(by[dayKey(Date.parse(a.start))]=by[dayKey(Date.parse(a.start))]||[]).push(a);});
+  const today=dayKey(Date.now());let cells='';
+  for(let i=0;i<42;i++){
+    const dn=i-first+1;let yy=y,mm=m,dd=dn,out=false;
+    if(dn<1){mm=m-1;if(mm<1){mm=12;yy=y-1;}dd=new Date(yy,mm,0).getDate()+dn;out=true;}else if(dn>dim){mm=m+1;if(mm>12){mm=1;yy=y+1;}dd=dn-dim;out=true;}
+    const key=`${yy}-${pad(mm)}-${pad(dd)}`,evs=(by[key]||[]).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+    const wd=tzParts(fromWall(yy,mm,dd,12,0)).wd;
+    cells+=`<div class="dc ${out?'out':''} ${key===today?'today':''} ${key===UI.calDay?'sel':''} ${DB.config.open_days.includes(wd)?'':'closed'}" data-act="calDay" data-key="${key}"><div class="dn">${dd}</div>${evs.slice(0,3).map(a=>`<div class="ev ${a.status==='cancelled'?'x':a.status==='completed'?'d':''}">${fmtTime(a.start).replace(' ','').toLowerCase()} ${esc((a.name||'').split(' ')[0])}</div>`).join('')}${evs.length>3?`<div class="xs-t muted">+${evs.length-3} more</div>`:''}</div>`;
+  }
+  const title=new Date(y,m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const dayAps=(by[UI.calDay]||[]).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+  const upcoming=DB.appointments.filter(a=>a.status==='confirmed'&&Date.parse(a.end)>Date.now()).sort((a,b)=>Date.parse(a.start)-Date.parse(b.start)).slice(0,6);
+  return `<div class="page-h"><h2>Appointments</h2><span class="muted sm-t">Mock Google Calendar · ${hoursText()}</span><span class="sp"></span><button class="btn" data-act="apCheck">${icon('search','sm')} Check availability</button><button class="btn pri" data-act="apNew">${icon('plus','sm')} New appointment</button></div>
+  <div class="grid g21">
+   <div class="card"><div class="bd"><div class="row" style="margin-bottom:10px"><button class="icon-btn" data-act="calNav" data-d="-1">‹</button><b style="min-width:150px;text-align:center">${title}</b><button class="icon-btn" data-act="calNav" data-d="1">›</button><button class="btn sm ghost" data-act="calToday">Today</button></div>
+    <div class="cal">${DN.map(d=>`<div class="dh">${d}</div>`).join('')}${cells}</div><div class="xs-t muted" style="margin-top:8px">Hatched days are closed. Click a day to see its schedule.</div></div></div>
+   <div class="col"><div class="card"><div class="hd">${fmtDate(fromWall(...UI.calDay.split('-').map(Number),12,0))} <span class="sp"></span><button class="btn sm" data-act="apNew" data-day="${UI.calDay}">${icon('plus','sm')} Add</button></div><div class="bd">${dayAps.map(apptCard).join('')||'<div class="empty">No appointments this day</div>'}</div></div>
+   <div class="card"><div class="hd">Next up</div><div class="bd">${upcoming.map(a=>`<div class="list-i"><div class="badge b-Booked">${fmtDate(a.start)}</div><div class="sp"><b>${esc(a.name||fmtPhone(a.phone))}</b><div class="xs-t muted">${esc(a.service)} · ${fmtTime(a.start)}</div></div></div>`).join('')||'<div class="empty">Nothing booked</div>'}</div></div></div></div>`;
+}};
+ACT.calNav=el=>{let m=UI.calM+ +el.dataset.d,y=UI.calY;if(m<1){m=12;y--;}if(m>12){m=1;y++;}UI.calM=m;UI.calY=y;render();};
+ACT.calToday=()=>{UI.calY=0;UI.calDay='';render();};
+ACT.calDay=el=>{UI.calDay=el.dataset.key;render();};
+ACT.apNew=el=>openApptModal({day:el.dataset&&el.dataset.day});
+ACT.apCheck=()=>openApptModal({checkOnly:true});
+ACT.apEdit=el=>openApptModal({id:el.dataset.id});
+ACT.apDone=el=>{const a=DB.appointments.find(x=>x.id===el.dataset.id);a.status='completed';const c=C(a.phone);if(c)syncAppt(c);logEvent('appt',`Appointment completed: ${a.name||a.phone}`,'ok');touch();toast('Marked completed','ok');};
+ACT.apCancel=el=>{const a=DB.appointments.find(x=>x.id===el.dataset.id);confirmBox(`Cancel the appointment of <b>${esc(a.name||a.phone)}</b> on ${fmtSlot(Date.parse(a.start))}?`,()=>{a.status='cancelled';const c=C(a.phone);if(c)syncAppt(c);logEvent('appt',`Appointment cancelled: ${a.name||a.phone}`,'warn');touch();},'Cancel appointment');};
+ACT.apDel=el=>{DB.appointments=DB.appointments.filter(x=>x.id!==el.dataset.id);touch();};
+ACT.apRemind=el=>{
+  const a=DB.appointments.find(x=>x.id===el.dataset.id),c=C(a.phone);if(!c)return;
+  const txt=`Hi ${(c.name||'there').split(' ')[0]}, a reminder for your *${a.service}* on *${fmtSlot(Date.parse(a.start))}* at ${DB.config.business_name}. Reply here to reschedule.`;
+  if(windowOpen(c)){addMsg({phone:c.phone,direction:'out',sender:'agent',body:txt});touch();toast('Reminder sent on WhatsApp','ok');}
+  else{const r=sendTemplateTo(c.phone,DB.config.confirmation_template,[c.name||'there',fmtSlot(Date.parse(a.start))]);toast(r.ok?'Window closed — reminder sent as template':r.error,r.ok?'ok':'err');}
+};
+function openApptModal({id,phone,day,checkOnly}={}){
+  const ap=id?DB.appointments.find(a=>a.id===id):null;
+  UI._ap={slot:ap?Date.parse(ap.start):null};
+  const dflSvc=(C(phone)&&DB.config.services.find(s=>s.name===C(phone).service))||DB.config.services[0];
+  const nf=suggestSlots(Date.now(),dflSvc.duration,1)[0];
+  const defDate=ap?toLocalInput(ap.start).slice(0,10):(day||(nf?dayKey(nf):dayKey(Date.now())));
+  const defSvc=ap?ap.service:((C(phone)||{}).service||DB.config.services[0].name);
+  const curPhone=ap?ap.phone:phone||'';
+  openModal({title:checkOnly?'Check availability':(ap?'Reschedule appointment':'New appointment'),wide:true,body:`
+   <div class="grid g2">
+    ${checkOnly?'':`<label class="f">Lead<select name="phone" data-ch="apLead"><option value="">➕ New walk-in…</option>${DB.contacts.map(c=>`<option value="${c.phone}" ${c.phone===curPhone?'selected':''}>${esc(c.name||c.phone)} (${fmtPhone(c.phone)})</option>`).join('')}</select></label>
+    <div class="grid g2 ${curPhone?'hide':''}" id="apNew"><label class="f">Name<input name="nname" type="text"></label><label class="f">Phone<input name="nphone" type="tel" placeholder="9198765xxxxx"></label></div>`}
+    <label class="f">Service<select name="service" data-ch="apRedraw">${DB.config.services.map(s=>`<option ${s.name===defSvc?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
+    <label class="f">Date<input name="date" type="date" value="${defDate}" data-ch="apRedraw"></label>
+   </div>
+   <div class="b" style="margin:14px 0 6px">Free slots <span class="muted sm-t" id="apInfo"></span></div><div class="slots" id="apSlots"></div>
+   ${checkOnly?'':`<label class="f" style="margin-top:12px">Notes<input name="notes" type="text" value="${esc(ap?ap.notes:'')}"></label><label class="chk" style="margin-top:10px"><input type="checkbox" name="notify" checked> Send confirmation on WhatsApp</label>`}`,
+   actions:checkOnly?[{label:'Close',onClick:closeModal}]:[{label:'Cancel',onClick:closeModal},{label:ap?'Save':'Book appointment',cls:'pri',onClick:()=>{
+     const f=formData();let p=f.phone||digits(f.nphone),name=f.nname||'';
+     if(!p||digits(p).length<8){toast('Choose a lead or enter a phone number','err');return;}
+     if(!UI._ap.slot){toast('Pick a free slot','err');return;}
+     const svc=DB.config.services.find(s=>s.name===f.service),r=checkSlot(UI._ap.slot,svc.duration,id);
+     if(!r.free){toast('Slot is not available ('+r.reason+')','err');return;}
+     const c=upsertContact(digits(p),{});if(name&&!c.name)c.name=name;
+     if(ap){ap.start=iso(UI._ap.slot);ap.end=iso(UI._ap.slot+svc.duration*MIN);ap.service=f.service;ap.notes=f.notes;syncAppt(c);logEvent('appt',`Appointment rescheduled: ${c.name||c.phone} → ${fmtSlot(UI._ap.slot)}`,'info');}
+     else{createAppointment({phone:c.phone,name:c.name,service:f.service,start:UI._ap.slot,dur:svc.duration,source:'manual',notes:f.notes});}
+     Object.assign(c,{lead_status:'Booked',service:f.service,follow_up_at:''});
+     if(f.notify){if(windowOpen(c))addMsg({phone:c.phone,direction:'out',sender:'agent',body:`Hi ${(c.name||'there').split(' ')[0]}, your *${f.service}* appointment is confirmed for *${fmtSlot(UI._ap.slot)}*. See you at ${DB.config.business_name}!`});else sendTemplateTo(c.phone,DB.config.confirmation_template,[c.name||'there',fmtSlot(UI._ap.slot)]);}
+     closeModal();touch();toast(ap?'Appointment updated':'Appointment booked','ok');}}],
+   onMount:()=>INP.apRedraw()});
+}
+INP.apLead=el=>{$('#apNew').classList.toggle('hide',!!el.value);const c=C(el.value);if(c&&c.service){const s=$('[name=service]');if([...s.options].some(o=>o.value===c.service)){s.value=c.service;INP.apRedraw();}}};
+INP.apRedraw=()=>{
+  const f=formData(),svc=DB.config.services.find(s=>s.name===f.service),box=$('#apSlots');if(!box||!svc)return;
+  const m=String(f.date).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m){box.innerHTML='<span class="muted">Pick a date</span>';return;}
+  const [sh,sm]=DB.config.work_start.split(':').map(Number),[eh,em]=DB.config.work_end.split(':').map(Number);
+  const editing=(MODAL&&UI._ap&&UI._ap.slot)?DB.appointments.find(a=>Date.parse(a.start)===UI._ap.slot&&a.status==='confirmed'):null;
+  let h='',free=0,tot=0;
+  for(let t=sh*60+sm;t+svc.duration<=eh*60+em;t+=30){const ms=fromWall(+m[1],+m[2],+m[3],Math.floor(t/60),t%60);const r=checkSlot(ms,svc.duration,editing&&editing.id);tot++;if(r.free)free++;h+=`<div class="slot ${r.free?'':'busy'} ${UI._ap.slot===ms?'sel':''}" data-act="apSlot" data-ms="${ms}" title="${r.free?'Free':r.reason}">${fmtTime(ms).replace(' ','')}</div>`;}
+  box.innerHTML=tot?h+(free?'':'<div class="notice warn" style="grid-column:1/-1">Fully booked or already past — try another date.</div>'):'<div class="notice warn" style="grid-column:1/-1">Closed on this day.</div>';
+  $('#apInfo').textContent=tot?`· ${free} of ${tot} free`:'';
+};
+ACT.apSlot=el=>{UI._ap.slot=+el.dataset.ms;$$('#apSlots .slot').forEach(s=>s.classList.toggle('sel',s===el));};
+
+/* ============ FOLLOW-UPS & CALLS ============ */
+const OUTC_B={booked:'b-ok',callback:'b-warn',interested:'b-info',no_answer:'',not_interested:'b-bad'};
+function callsTableHTML(){
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Placed</th><th>Lead</th><th>Source</th><th>Reason</th><th>Status</th><th>Outcome</th><th>Summary</th><th></th></tr></thead><tbody>${DB.calls.map(k=>`<tr><td class="muted" style="white-space:nowrap">${fmtDT(k.placed_at)}</td><td><b>${esc(k.name||fmtPhone(k.phone))}</b><div class="xs-t muted">${fmtPhone(k.phone)}</div></td><td><span class="chip">${esc(k.source)}</span></td><td class="sm-t" style="max-width:220px">${esc(String(k.reason||'').slice(0,90))}</td><td>${k.status==='completed'?`<span class="pill ok">completed${k.duration?` · ${Math.floor(k.duration/60)}:${pad(k.duration%60)}`:''}</span>`:`<span class="pill warn">${icon('phone','sm')} ${k.status}</span>`}</td><td>${k.outcome?`<span class="badge ${OUTC_B[k.outcome]||''}">${k.outcome.replace('_',' ')}</span>`:'—'}</td><td class="sm-t" style="max-width:260px">${esc(k.summary||'')}${k.appointment_time?`<div class="xs-t" style="color:var(--ok)">${icon('calendar','sm')} ${fmtDT(k.appointment_time)}</div>`:''}${k.callback_time?`<div class="xs-t" style="color:var(--warn)">${icon('clock','sm')} callback ${fmtDT(k.callback_time)}</div>`:''}</td><td>${k.status!=='completed'?`<button class="btn sm" data-act="setOutcome" data-id="${k.id}">Set outcome</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No calls yet</td></tr>'}</tbody></table></div>`;
+}
+function followTableHTML(list,showReason){
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Lead</th><th>Status</th><th>Service / Quote</th><th>Follow-up</th><th>Attempt</th><th>Last call</th>${showReason?'<th>Why not now</th>':''}<th></th></tr></thead><tbody>${list.map(c=>`<tr><td><div class="row">${avatar(c.name,c.phone,'sm')}<div><b>${esc(c.name||'Unknown')}</b><div class="xs-t muted">${fmtPhone(c.phone)}</div></div></div></td><td>${badge(c.lead_status)}</td><td>${esc(c.service||'—')}${c.quote_amount?`<div class="xs-t muted">${money(c.quote_amount)}</div>`:''}</td><td>${fmtDT(c.follow_up_at)}<div class="xs-t muted">${rel(c.follow_up_at)}</div></td><td>${c.follow_up_count||0} / ${DB.config.max_follow_ups}</td><td>${esc(c.last_call_outcome||'—')}</td>${showReason?`<td class="sm-t muted">${esc(skipReason(c))}</td>`:''}<td style="white-space:nowrap"><button class="btn sm" data-act="callLead" data-phone="${c.phone}">${icon('phone','sm')} Call</button></td></tr>`).join('')||`<tr><td colspan="8" class="empty">Nothing here</td></tr>`}</tbody></table></div>`;
+}
+VIEWS.followups={title:'Follow-ups & Calls',render(){
+  const cfg=DB.config,due=dueLeads(),sched=DB.contacts.filter(c=>c.follow_up_at&&skipReason(c)).sort((a,b)=>Date.parse(a.follow_up_at)-Date.parse(b.follow_up_at));
+  const live=DB.calls.filter(c=>c.status!=='completed').length;
+  return `<div class="page-h"><h2>Follow-ups &amp; calls</h2><span class="muted sm-t">Replica of the “Every 15 Minutes” scheduler + “Call Outcome Webhook”</span><span class="sp"></span><button class="btn" data-act="setOutcome">${icon('code','sm')} Simulate call-outcome webhook</button></div>
+  <div class="grid g3" style="margin-bottom:14px">
+   <div class="card"><div class="hd">${icon('clock','sm')} Scheduler</div><div class="bd col">
+     <div class="row"><span class="pill ${inCallWindow()?'ok':'bad'}">${inCallWindow()?'Call window OPEN':'Call window CLOSED'}</span><span class="muted sm-t">${cfg.call_window_start}:00 – ${cfg.call_window_end}:00 · ${esc(TZ())}</span></div>
+     <div class="sm-t muted">Max ${cfg.max_follow_ups} follow-ups per lead · ${cfg.followup_gap_hours}h gap · skips Closed / Booked / Needs Human / opted-out / paused leads.</div>
+     <label class="chk"><input type="checkbox" data-ch="ignoreWin" ${DB.settings.ignore_window?'checked':''}> Ignore call window (demo)</label>
+     <label class="chk"><input type="checkbox" data-ch="autoSched" ${DB.settings.auto_scheduler?'checked':''}> Auto-run every 30 s (simulated cron)</label>
+     <button class="btn pri" data-act="runSched">${icon('play','sm')} Run scheduler now (${due.length} due)</button></div></div>
+   <div class="card"><div class="hd">${icon('phone','sm')} Calls</div><div class="bd col">
+     <div class="row"><b style="font-size:26px">${DB.calls.length}</b><span class="muted sm-t">total · ${live} in progress</span></div>
+     <div class="sm-t muted">Call outcomes are posted back to the CRM exactly like your voice agent would hit <span class="mono">/webhook/call-outcome</span>.</div>
+     <label class="chk"><input type="checkbox" data-ch="autoOut" ${DB.settings.auto_outcome?'checked':''}> Auto-generate a call outcome after ~6 s</label></div></div>
+   <div class="card"><div class="hd">How outcomes update leads</div><div class="bd sm-t col" style="gap:4px"><div><span class="badge b-ok">booked</span> calendar event + status Booked + confirmation template</div><div><span class="badge b-warn">callback</span> status Callback, follow-up at requested time</div><div><span class="badge b-bad">not interested</span> status Closed</div><div><span class="badge">no answer</span> retry in 4 h</div><div><span class="badge b-info">interested</span> status Interested, retry in 24 h</div></div></div>
+  </div>
+  <div class="card"><div class="bd" style="padding-bottom:0"><div class="tabs" id="callTabs"></div></div><div id="callBody"></div></div>`;
+},mount(){this.update();},update(){
+  const due=dueLeads(),sched=DB.contacts.filter(c=>c.follow_up_at&&skipReason(c)).sort((a,b)=>Date.parse(a.follow_up_at)-Date.parse(b.follow_up_at));
+  const tabs=[['due',`Due now <span class="n">${due.length}</span>`],['sched',`Scheduled / skipped <span class="n">${sched.length}</span>`],['log',`Call log <span class="n">${DB.calls.length}</span>`]];
+  if(!$('#callTabs'))return;
+  $('#callTabs').innerHTML=tabs.map(([k,l])=>`<button class="${UI.callTab===k?'on':''}" data-act="callTab" data-t="${k}">${l}</button>`).join('');
+  $('#callBody').innerHTML=UI.callTab==='due'?followTableHTML(due,false):UI.callTab==='sched'?followTableHTML(sched,true):callsTableHTML();
+}};
+ACT.callTab=el=>{UI.callTab=el.dataset.t;VIEWS.followups.update();};
+ACT.runSched=async()=>{await runScheduler({force:DB.settings.ignore_window});UI.callTab='log';touch();};
+INP.ignoreWin=el=>{DB.settings.ignore_window=el.checked;save();};
+INP.autoOut=el=>{DB.settings.auto_outcome=el.checked;save();toast(el.checked?'Calls will resolve automatically':'Calls will wait for you to set the outcome');};
+INP.autoSched=el=>{setAutoScheduler(el.checked);toast(el.checked?'Scheduler running every 30 s':'Scheduler stopped');};
+ACT.setOutcome=el=>{
+  const call=el&&el.dataset&&el.dataset.id?DB.calls.find(c=>c.id===el.dataset.id):null;
+  const ph=call?call.phone:(dueLeads()[0]||DB.contacts[0]).phone;
+  const sug=suggestSlots(dayAt(1,11),30,1)[0];
+  openModal({title:'Call outcome webhook  <span class="mono muted">POST /webhook/call-outcome</span>',body:`
+   <div class="grid g2"><label class="f">Lead<select name="phone">${DB.contacts.map(c=>`<option value="${c.phone}" ${c.phone===ph?'selected':''}>${esc(c.name||c.phone)} (${fmtPhone(c.phone)})</option>`).join('')}</select></label>
+   <label class="f">Outcome<select name="outcome" data-ch="ocSel">${['booked','callback','not_interested','no_answer','interested'].map(o=>`<option>${o}</option>`).join('')}</select></label></div>
+   <label class="f" style="margin-top:12px">Summary<textarea name="summary" placeholder="What happened on the call?">Customer agreed to visit. Appointment fixed.</textarea></label>
+   <div class="grid g2" style="margin-top:12px"><label class="f" id="ocAppt">appointment_time<input name="appointment_time" type="datetime-local" value="${toLocalInput(iso(sug))}"></label><label class="f hide" id="ocCb">callback_time<input name="callback_time" type="datetime-local" value="${toLocalInput(iso(dayAt(1,15)))}"></label></div>
+   <label class="f" style="margin-top:12px">x-api-key header<input name="key" type="text" value="${esc(DB.config.api_secret)}"></label>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:'Send webhook',cls:'pri',onClick:()=>{const f=formData();const r=callOutcome({phone:f.phone,outcome:f.outcome,summary:f.summary,appointment_time:f.outcome==='booked'?fromLocalInput(f.appointment_time):'',callback_time:f.outcome==='callback'?fromLocalInput(f.callback_time):''},f.key);closeModal();toast(r.status===200?'Outcome applied to lead':'401 unauthorized — wrong API key',r.status===200?'ok':'err');}}]});
+};
+INP.ocSel=el=>{$('#ocAppt').classList.toggle('hide',el.value!=='booked');$('#ocCb').classList.toggle('hide',el.value!=='callback');};
+
+/* ============ QUOTATIONS ============ */
+function qbInit(){
+  if(UI.qb&&!UI.qbPhone)return;
+  const c=C(UI.qbPhone)||null,s=c&&DB.config.services.find(x=>x.name===c.service&&!x.custom)||DB.config.services.find(x=>!x.custom);
+  UI.qb={phone:c?c.phone:'',items:[{name:s.name,qty:1,rate:s.price}],discount:0,gst:DB.config.gst_pct,qno:'QT-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+rnd(1000,9999)};UI.qbPhone='';
+}
+function qbPreview(){const q=UI.qb,b=buildQuote({items:q.items.filter(i=>i.name),discount_pct:q.discount,gst_pct:q.gst,qno:q.qno});return {b,html:q.items.some(i=>i.name)?`<div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="who">${icon('bot','sm')} Quotation tool output</div><div class="tx">${waFmt(b.text)}</div><div class="meta">${fmtTime(Date.now())}</div></div></div>`:'<div class="empty">Add at least one item</div>'};}
+function qbRows(){return UI.qb.items.map((it,i)=>`<div class="qline"><input type="text" list="qsv" placeholder="Item" value="${esc(it.name)}" data-in="qbItem" data-i="${i}" data-k="name" data-ch="qbItem"><input type="number" min="1" value="${it.qty}" data-in="qbItem" data-i="${i}" data-k="qty"><input type="number" min="0" value="${it.rate}" data-in="qbItem" data-i="${i}" data-k="rate"><button class="icon-btn" data-act="qbDel" data-i="${i}" style="width:28px;height:28px">${icon('x','sm')}</button></div>`).join('')+`<datalist id="qsv">${DB.config.services.filter(s=>!s.custom).map(s=>`<option>${esc(s.name)}</option>`).join('')}</datalist>`;}
+function quoteStatus(q){return q.status==='Sent'&&Date.parse(q.created_at)+7*DAY<Date.now()?'Expired':q.status;}
+function quotesTableHTML(){
+  const bm={Draft:'',Sent:'b-pur',Accepted:'b-ok',Rejected:'b-bad',Expired:'b-warn'};
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Quotation</th><th>Lead</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody>${DB.quotes.map(q=>{const st=quoteStatus(q);return `<tr><td class="mono">${esc(q.qno)}</td><td><b>${esc(q.name||fmtPhone(q.phone))}</b></td><td class="sm-t">${esc(q.items.map(i=>i.name+(i.qty>1?' ×'+i.qty:'')).join(', '))}</td><td><b>${money(q.total)}</b></td><td><span class="badge ${bm[st]}">${st}</span></td><td class="muted">${rel(q.created_at)}</td><td style="white-space:nowrap"><button class="icon-btn" title="View" data-act="qView" data-id="${q.id}">${icon('file','sm')}</button>${['Draft','Sent'].includes(q.status)?`<button class="icon-btn" title="Resend on WhatsApp" data-act="qResend" data-id="${q.id}">${icon('send','sm')}</button><button class="icon-btn" title="Mark accepted" data-act="qAccept" data-id="${q.id}">${icon('check','sm')}</button><button class="icon-btn" title="Mark rejected" data-act="qReject" data-id="${q.id}">${icon('x','sm')}</button>`:''}<button class="icon-btn" title="Delete" data-act="qDel" data-id="${q.id}">${icon('trash','sm')}</button></td></tr>`;}).join('')||'<tr><td colspan="7" class="empty">No quotations yet</td></tr>'}</tbody></table></div>`;
+}
+VIEWS.quotes={title:'Quotations',render(){
+  qbInit();const q=UI.qb;
+  return `<div class="page-h"><h2>Quotations</h2><span class="muted sm-t">Same maths as the AI agent’s “Create Quotation” tool</span><span class="sp"></span><button class="btn" data-act="qbReset">${icon('refresh','sm')} New quote</button></div>
+  <div class="grid g2" style="margin-bottom:14px"><div class="card"><div class="hd">Quote builder</div><div class="bd">
+    <label class="f">Customer<select data-ch="qbLead"><option value="">Select a lead…</option>${DB.contacts.map(c=>`<option value="${c.phone}" ${c.phone===q.phone?'selected':''}>${esc(c.name||c.phone)} (${fmtPhone(c.phone)})</option>`).join('')}</select></label>
+    <div class="b sm-t" style="margin:14px 0 6px">Items <span class="muted" style="font-weight:400">— name · qty · rate (Rs)</span></div><div id="qbRows">${qbRows()}</div>
+    <button class="btn sm" data-act="qbAdd">${icon('plus','sm')} Add item</button>
+    <div class="grid g2" style="margin-top:14px"><label class="f">Discount %<input type="number" min="0" max="100" value="${q.discount}" data-in="qbNum" data-k="discount"></label><label class="f">GST %<input type="number" min="0" max="40" value="${q.gst}" data-in="qbNum" data-k="gst"></label></div>
+    <div class="row wrap" style="margin-top:14px"><button class="btn" data-act="qbSave" data-send="0">Save draft</button><button class="btn pri" data-act="qbSave" data-send="1">${icon('send','sm')} Save &amp; send on WhatsApp</button><button class="btn ghost" data-act="qbCopy">${icon('copy','sm')} Copy text</button></div></div></div>
+  <div class="card"><div class="hd">WhatsApp preview</div><div class="bd" id="qbPrev">${qbPreview().html}</div></div></div>
+  <div class="card"><div class="hd">All quotations <span class="sub">valid 7 days</span></div><div id="qList">${quotesTableHTML()}</div></div>`;
+},update(){const l=$('#qList');if(l)l.innerHTML=quotesTableHTML();}};
+INP.qbLead=el=>{UI.qb.phone=el.value;const c=C(el.value);if(c&&c.service){const s=DB.config.services.find(x=>x.name===c.service&&!x.custom);if(s&&UI.qb.items.length===1){UI.qb.items=[{name:s.name,qty:1,rate:s.price}];$('#qbRows').innerHTML=qbRows();$('#qbPrev').innerHTML=qbPreview().html;}}};
+INP.qbItem=(el,e)=>{
+  const it=UI.qb.items[+el.dataset.i],k=el.dataset.k;if(!it)return;
+  it[k]=k==='name'?el.value:(+el.value||0);
+  if(k==='name'&&e.type==='change'){const s=DB.config.services.find(x=>x.name.toLowerCase()===el.value.toLowerCase());if(s){it.name=s.name;it.rate=s.price;$('#qbRows').innerHTML=qbRows();}}
+  $('#qbPrev').innerHTML=qbPreview().html;
+};
+INP.qbNum=el=>{UI.qb[el.dataset.k]=+el.value||0;$('#qbPrev').innerHTML=qbPreview().html;};
+ACT.qbAdd=()=>{UI.qb.items.push({name:'',qty:1,rate:0});$('#qbRows').innerHTML=qbRows();};
+ACT.qbDel=el=>{UI.qb.items.splice(+el.dataset.i,1);$('#qbRows').innerHTML=qbRows();$('#qbPrev').innerHTML=qbPreview().html;};
+ACT.qbReset=()=>{UI.qb=null;UI.qbPhone='';render();};
+ACT.qbCopy=()=>{const t=qbPreview().b.text;try{navigator.clipboard.writeText(t);toast('Quotation text copied','ok');}catch(e){toast('Copy not available in this browser','err');}};
+ACT.qbSave=el=>{
+  const q=UI.qb,c=C(q.phone);if(!c){toast('Select a customer first','err');return;}
+  if(!q.items.some(i=>i.name)){toast('Add at least one item','err');return;}
+  const send=el.dataset.send==='1';
+  if(send&&!windowOpen(c)){toast('24h window closed — save as draft or send an approved template from the Inbox','err');return;}
+  const b=buildQuote({items:q.items.filter(i=>i.name),discount_pct:q.discount,gst_pct:q.gst,qno:q.qno});
+  const rec=saveQuote(c,b,{send});
+  if(send)addMsg({phone:c.phone,direction:'out',sender:'agent',body:b.text});
+  UI.qb=null;touch();render();toast(send?'Quotation sent on WhatsApp — follow-up set for tomorrow 11:00':'Draft saved','ok');
+};
+ACT.qView=el=>{const q=DB.quotes.find(x=>x.id===el.dataset.id);openModal({title:esc(q.qno),body:`<div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="tx">${waFmt(q.text)}</div></div></div><p class="muted sm-t">For ${esc(q.name||q.phone)} · created ${fmtDT(q.created_at)} · valid till ${fmtDate(Date.parse(q.created_at)+7*DAY)}</p>`,actions:[{label:'Close',onClick:closeModal}]});};
+ACT.qResend=el=>{const q=DB.quotes.find(x=>x.id===el.dataset.id),c=C(q.phone);if(!c||!windowOpen(c)){toast('24h window closed — use a template from the Inbox','err');return;}addMsg({phone:c.phone,direction:'out',sender:'agent',body:q.text});q.status='Sent';touch();toast('Quotation re-sent','ok');};
+ACT.qAccept=el=>{const q=DB.quotes.find(x=>x.id===el.dataset.id);q.status='Accepted';const c=C(q.phone);if(c){c.follow_up_at='';if(c.lead_status==='Quotation Sent')c.lead_status='Interested';}logEvent('quote',`Quotation ${q.qno} accepted by ${q.name||q.phone}`,'ok');touch();toast('Accepted — now book an appointment','ok');};
+ACT.qReject=el=>{const q=DB.quotes.find(x=>x.id===el.dataset.id);q.status='Rejected';logEvent('quote',`Quotation ${q.qno} rejected by ${q.name||q.phone}`,'bad');touch();};
+ACT.qDel=el=>{DB.quotes=DB.quotes.filter(x=>x.id!==el.dataset.id);touch();};
+
+/* ============ CAMPAIGNS ============ */
+VIEWS.campaigns={title:'Campaigns',render(){
+  const cs=DB.campaigns,tot=sum(cs,c=>c.sent),fl=sum(cs,c=>c.failed);
+  const msgs=DB.messages.filter(m=>m.campaign_id),read=msgs.filter(m=>m.status==='read').length,deliv=msgs.filter(m=>['delivered','read'].includes(m.status)).length;
+  const opted=DB.contacts.filter(c=>c.opted_in===false).length;
+  return `<div class="page-h"><h2>Broadcast campaigns</h2><span class="muted sm-t">Approved WhatsApp templates sent to opted-in contacts, one per second</span><span class="sp"></span><button class="btn pri" data-act="campNew">${icon('plus','sm')} New campaign</button></div>
+  <div class="grid g4" style="margin-bottom:14px"><div class="card kpi"><div class="l">Messages sent</div><div class="v">${tot}</div><div class="s">${cs.length} campaigns</div></div><div class="card kpi"><div class="l">Delivered</div><div class="v">${msgs.length?Math.round(100*deliv/msgs.length):0}%</div><div class="s">${deliv} of ${msgs.length}</div></div><div class="card kpi"><div class="l">Read rate</div><div class="v">${msgs.length?Math.round(100*read/msgs.length):0}%</div><div class="s">${read} read</div></div><div class="card kpi"><div class="l">Failed / opted-out</div><div class="v">${fl}</div><div class="s">${opted} contact(s) replied STOP</div></div></div>
+  <div class="card"><div class="tbl-wrap"><table class="t"><thead><tr><th>Campaign</th><th>Template</th><th>Segment</th><th>Progress</th><th>Sent</th><th>Failed</th><th>Status</th><th>Started</th><th></th></tr></thead><tbody>${cs.map(c=>`<tr class="clk" data-act="campView" data-id="${c.id}"><td><b>${esc(c.name)}</b></td><td class="mono">${esc(c.template_name)}</td><td>${c.segment_tag?`<span class="chip tag">${esc(c.segment_tag)}</span>`:'<span class="muted">All opted-in</span>'}</td><td style="min-width:130px"><div class="bar"><i style="width:${c.total?100*(c.sent+c.failed)/c.total:0}%"></i></div><div class="xs-t muted">${c.sent+c.failed} / ${c.total}</div></td><td>${c.sent}</td><td>${c.failed?`<span style="color:var(--danger)">${c.failed}</span>`:0}</td><td>${c.status==='running'?'<span class="pill warn">running…</span>':'<span class="pill ok">completed</span>'}</td><td class="muted">${rel(c.started_at)}</td><td><button class="btn sm ghost" data-act="campDel" data-id="${c.id}">${icon('trash','sm')}</button></td></tr>`).join('')||'<tr><td colspan="9" class="empty">No campaigns yet — create your first broadcast</td></tr>'}</tbody></table></div></div>`;
+}};
+ACT.campDel=(el,e)=>{e.stopPropagation();const c=DB.campaigns.find(x=>x.id===el.dataset.id);confirmBox(`Delete campaign <b>${esc(c.name)}</b> from history? Messages stay in the chats.`,()=>{DB.campaigns=DB.campaigns.filter(x=>x.id!==c.id);touch();});};
+ACT.campView=el=>{
+  const c=DB.campaigns.find(x=>x.id===el.dataset.id),ms=DB.messages.filter(m=>m.campaign_id===c.id);
+  openModal({title:esc(c.name),wide:true,body:`<div class="row wrap" style="margin-bottom:12px"><span class="chip">${esc(c.template_name)} · ${c.language}</span>${c.segment_tag?`<span class="chip tag">${esc(c.segment_tag)}</span>`:''}<span class="pill ${c.status==='running'?'warn':'ok'}">${c.status}</span><span class="sp"></span><span class="muted sm-t">${c.sent} sent · ${c.failed} failed · ${c.total} total</span></div>
+   <div class="tbl-wrap" style="max-height:48vh"><table class="t"><thead><tr><th>Recipient</th><th>Message</th><th>Status</th><th>Error</th></tr></thead><tbody>${ms.map(m=>{const ct=C(m.phone)||{};return `<tr><td><b>${esc(ct.name||'')}</b><div class="xs-t muted">${fmtPhone(m.phone)}</div></td><td class="sm-t">${esc(m.body)}</td><td><span class="badge ${m.status==='failed'?'b-bad':m.status==='read'?'b-info':m.status==='delivered'?'b-ok':''}">${m.status}</span></td><td class="sm-t" style="color:var(--danger)">${esc(m.error)}</td></tr>`;}).join('')||'<tr><td colspan="4" class="empty">No messages yet</td></tr>'}</tbody></table></div>`,actions:[{label:'Close',onClick:closeModal}]});
+};
+ACT.campNew=()=>{
+  const tpls=DB.templates.filter(t=>t.status==='APPROVED');if(!tpls.length){toast('You need an APPROVED template first','err');return;}
+  openModal({title:'New campaign',wide:true,body:`<div class="grid g2"><div class="col">
+    <label class="f">Campaign name<input name="name" type="text" placeholder="e.g. Weekend whitening offer" value="Campaign ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}"></label>
+    <label class="f">Template (approved only)<select name="tpl" data-ch="cpRedraw">${tpls.map(t=>`<option>${esc(t.name)}</option>`).join('')}</select></label>
+    <label class="f">Audience segment (tag)<select name="tag" data-ch="cpRedraw"><option value="">All opted-in contacts (${audienceFor('').length})</option>${allTags().map(t=>`<option value="${esc(t)}">${esc(t)} (${audienceFor(t).length})</option>`).join('')}</select></label>
+    <div id="cpVars" class="col"></div><div class="notice info" id="cpAud"></div></div>
+    <div><div class="b sm-t muted" style="margin-bottom:6px">Preview (first recipient)</div><div id="cpPrev"></div></div></div>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:`${'Start campaign'}`,cls:'pri',onClick:()=>{
+     const f=formData(),t=tpls.find(x=>x.name===f.tpl),vs=tplVars(t.body),aud=audienceFor(f.tag);
+     if(!aud.length){toast('No opted-in contacts in this segment','err');return;}
+     const r=waApi(DB.config.api_secret,{action:'campaign_start',name:f.name,template_name:t.name,language:t.language,segment_tag:f.tag,params:vs.map(v=>f['p'+v]||'')});
+     closeModal();toast(`Campaign started — sending to ${aud.length} contacts`,'ok');}}],
+   onMount:()=>INP.cpRedraw()});
+};
+INP.cpRedraw=(el)=>{
+  const f=formData(),t=DB.templates.find(x=>x.name===f.tpl),vs=tplVars(t.body),vb=$('#cpVars');
+  if(!el||el.name==='tpl'){vb.innerHTML=vs.map((v,i)=>`<label class="f"><span>Variable {{${v}} <span style="font-weight:400">— supports {{name}} and {{phone}}</span></span><input name="p${v}" type="text" value="${i===0?'{{name}}':esc(t.examples[i]||'')}" data-in="cpRedraw"></label>`).join('')||'<span class="muted sm-t">This template has no variables.</span>';}
+  const f2=formData(),aud=audienceFor(f2.tag),c=aud[0]||{name:'there',phone:''};
+  $('#cpAud').innerHTML=`${icon('users','sm')} <span><b>${aud.length}</b> recipients · ${DB.contacts.filter(x=>x.opted_in===false).length} opted-out contact(s) are excluded automatically</span>`;
+  $('#cpPrev').innerHTML=waPreview({...t,body:renderTpl(t.body,vs.map(v=>fillVars(f2['p'+v]||'',c))),examples:[]});
+};
+
+/* ============ TEMPLATES ============ */
+const TPL_B={APPROVED:'b-ok',PENDING:'b-warn',REJECTED:'b-bad',ERROR:'b-bad',DELETED:''};
+VIEWS.templates={title:'WhatsApp Templates',render(){
+  const all=DB.templates.filter(t=>UI.tplShowDeleted||t.status!=='DELETED');
+  const list=all.filter(t=>!UI.tplFilter||t.status===UI.tplFilter);
+  const cnt=s=>DB.templates.filter(t=>t.status===s).length;
+  return `<div class="page-h"><h2>Message templates</h2><span class="muted sm-t">Synced with Meta daily at 06:00 · status changes arrive via webhook</span><span class="sp"></span><label class="chk"><input type="checkbox" data-ch="tplDeleted" ${UI.tplShowDeleted?'checked':''}> show deleted</label><button class="btn" data-act="tplSync">${icon('refresh','sm')} Sync from Meta</button><button class="btn pri" data-act="tplNew">${icon('plus','sm')} Create template</button></div>
+  <div class="tabs" style="margin-bottom:14px">${[['','All'],['APPROVED','Approved'],['PENDING','Pending'],['REJECTED','Rejected'],['ERROR','Error']].map(([k,l])=>`<button class="${UI.tplFilter===k?'on':''}" data-act="tplFilter" data-f="${k}">${l}${k?`<span class="n">${cnt(k)}</span>`:`<span class="n">${all.length}</span>`}</button>`).join('')}</div>
+  <div class="grid g3">${list.map(t=>`<div class="card"><div class="hd"><span class="mono" style="font-size:13px">${esc(t.name)}</span><span class="sp"></span><span class="badge ${TPL_B[t.status]}">${t.status}</span></div><div class="bd col">
+    <div class="row wrap"><span class="chip">${t.category}</span><span class="chip">${t.language}</span><span class="chip">synced ${rel(t.last_synced)}</span></div>
+    ${waPreview({...t,examples:t.examples||[]})}
+    ${t.rejected_reason?`<div class="notice bad">${icon('alert','sm')}<span>${esc(t.rejected_reason)}</span></div>`:''}
+    <div class="row wrap">${t.status==='APPROVED'?`<button class="btn sm pri" data-act="tplUse" data-n="${esc(t.name)}">${icon('mega','sm')} Use in campaign</button>`:''}${t.status==='PENDING'?`<button class="btn sm" data-act="tplSim" data-n="${esc(t.name)}" data-r="APPROVED">${icon('check','sm')} Simulate approval</button><button class="btn sm" data-act="tplSim" data-n="${esc(t.name)}" data-r="REJECTED">${icon('x','sm')} Reject</button>`:''}${t.status!=='DELETED'?`<span class="sp"></span><button class="btn sm dng ghost" data-act="tplDel" data-n="${esc(t.name)}">${icon('trash','sm')} Delete</button>`:''}</div></div></div>`).join('')||'<div class="card"><div class="empty">No templates in this view</div></div>'}</div>`;
+}};
+INP.tplDeleted=el=>{UI.tplShowDeleted=el.checked;render();};
+ACT.tplFilter=el=>{UI.tplFilter=el.dataset.f;render();};
+ACT.tplSync=()=>{const r=syncTemplates();toast(`Synced ${r.json.synced} templates from Meta`,'ok');};
+ACT.tplSim=el=>{const t=DB.templates.find(x=>x.name===el.dataset.n&&x.status==='PENDING');if(t)reviewTemplate(t,el.dataset.r);};
+ACT.tplDel=el=>confirmBox(`Delete template <b>${esc(el.dataset.n)}</b> on Meta? Campaigns using it will fail.`,()=>{deleteTemplate(el.dataset.n);toast('Template deleted');});
+ACT.tplUse=el=>{ACT.campNew();setTimeout(()=>{const s=$('[name=tpl]');if(s){s.value=el.dataset.n;INP.cpRedraw({name:'tpl'});}},0);};
+ACT.tplNew=()=>{
+  openModal({title:'Create template  <span class="mono muted">POST /{waba}/message_templates</span>',wide:true,body:`<div class="grid g2"><div class="col">
+   <div class="grid g2"><label class="f">Name<input name="name" type="text" placeholder="payment_reminder" data-in="tplDraw"></label><label class="f">Category<select name="category" data-ch="tplDraw"><option>MARKETING</option><option>UTILITY</option><option>AUTHENTICATION</option></select></label></div>
+   <div class="grid g2"><label class="f">Language<select name="language"><option value="en">English (en)</option><option value="hi">Hindi (hi)</option><option value="en_US">English US (en_US)</option></select></label><label class="f">Header (optional)<input name="header_text" type="text" data-in="tplDraw"></label></div>
+   <label class="f">Body — use {{1}}, {{2}} for variables<textarea name="body_text" rows="4" data-in="tplDraw" placeholder="Hi {{1}}, your appointment is on {{2}}."></textarea></label>
+   <label class="f">Example values for variables (comma separated)<input name="examples" type="text" data-in="tplDraw" placeholder="Rahul, 17 Oct 11:00 AM"></label>
+   <label class="f">Footer (optional)<input name="footer_text" type="text" data-in="tplDraw"></label>
+   <label class="f">Quick-reply buttons (one per line, max 3)<textarea name="buttons" rows="2" data-in="tplDraw"></textarea></label></div>
+   <div><div class="b sm-t muted" style="margin-bottom:6px">Live preview</div><div id="tplPrev"></div><div class="notice info" style="margin-top:10px">${icon('info','sm')}<span>Meta reviews new templates — status becomes PENDING, then APPROVED or REJECTED a few seconds later (simulated).</span></div></div></div>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:'Submit to Meta',cls:'pri',onClick:()=>{
+     const f=formData();
+     const r=waApi(DB.config.api_secret,{action:'template_create',name:f.name,category:f.category,language:f.language,header_text:f.header_text,body_text:f.body_text,footer_text:f.footer_text,examples:f.examples.split(',').map(s=>s.trim()).filter(Boolean),buttons:f.buttons.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,3)});
+     if(!r.json.ok){toast(r.json.reason||'Template rejected by API','err');return;}
+     closeModal();toast('Template submitted — status PENDING','ok');}}],
+   onMount:()=>INP.tplDraw()});
+};
+INP.tplDraw=()=>{const f=formData();$('#tplPrev').innerHTML=waPreview({header_text:f.header_text,body:f.body_text,footer_text:f.footer_text,examples:f.examples.split(',').map(s=>s.trim()).filter(Boolean),buttons:f.buttons.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,3)});};
+
+/* ============ API CONSOLE ============ */
+const API_SAMPLES=()=>{
+  const p=(DB.contacts.find(c=>c.bot_paused)||DB.contacts[0]).phone,o=(DB.contacts.find(c=>windowOpen(c)&&!c.bot_paused)||DB.contacts[0]).phone;
+  return {
+    handoff:{action:'handoff',phone:o,reason:'Customer is asking for a discount we cannot approve'},
+    resume_bot:{action:'resume_bot',phone:p},
+    agent_reply:{action:'agent_reply',phone:o,text:'Hello! This is the team — how can we help?'},
+    campaign_start:{action:'campaign_start',name:'API demo blast',template_name:'diwali_offer',language:'en',segment_tag:'vip',params:['{{name}}']},
+    template_create:{action:'template_create',name:'payment_reminder',category:'UTILITY',language:'en',body_text:'Hi {{1}}, your invoice {{2}} is due. Please pay at the clinic.',examples:['Rahul','INV-102'],footer_text:DB.config.business_name,buttons:['Pay now']},
+    template_delete:{action:'template_delete',name:'summer_sale_v2'},
+    template_list:{action:'template_list'},
+    call_outcome:{phone:o,name:(C(o)||{}).name||'',outcome:'booked',summary:'Customer confirmed the visit.',appointment_time:iso(suggestSlots(dayAt(1,11),30,1)[0])},
+    wa_inbound:{object:'whatsapp_business_account',entry:[{changes:[{field:'messages',value:{metadata:{phone_number_id:DB.config.phone_number_id},contacts:[{profile:{name:'Aarav Bansal'}}],messages:[{from:'919876511111',id:'wamid.DEMO'+rnd(1000,9999),type:'text',text:{body:'Hi, do you do teeth whitening?'}}]}}]}]},
+    wa_status:{object:'whatsapp_business_account',entry:[{changes:[{field:'messages',value:{metadata:{phone_number_id:DB.config.phone_number_id},statuses:[{id:(DB.messages.filter(m=>m.direction==='out').slice(-1)[0]||{}).wa_message_id||'wamid.X',status:'read'}]}}]}]},
+    wa_template:{object:'whatsapp_business_account',entry:[{changes:[{field:'message_template_status_update',value:{event:'APPROVED',message_template_name:'new_service_launch',reason:'NONE'}}]}]}
+  };
+};
+const API_EP={handoff:'/webhook/wa-api',resume_bot:'/webhook/wa-api',agent_reply:'/webhook/wa-api',campaign_start:'/webhook/wa-api',template_create:'/webhook/wa-api',template_delete:'/webhook/wa-api',template_list:'/webhook/wa-api',call_outcome:'/webhook/call-outcome',wa_inbound:'WhatsApp Trigger (Meta → n8n)',wa_status:'WhatsApp Trigger (Meta → n8n)',wa_template:'WhatsApp Trigger (Meta → n8n)'};
+function whatsappWebhook(p){
+  const out=[];
+  for(const e of p.entry||[])for(const ch of e.changes||[]){
+    const v=ch.value||{};
+    if(ch.field==='message_template_status_update'||v.message_template_name){
+      const t=DB.templates.find(x=>x.name===v.message_template_name);
+      if(t){t.status=String(v.event||'').toUpperCase();t.rejected_reason=v.reason&&v.reason!=='NONE'?v.reason:'';t.last_synced=iso(Date.now());out.push(`template ${t.name} → ${t.status}`);}else out.push('template not found');
+    }else if((v.statuses||[]).length){
+      v.statuses.forEach(s=>{const m=DB.messages.find(x=>x.wa_message_id===s.id);if(m){m.status=s.status;m.error=(s.errors&&s.errors[0]&&s.errors[0].title)||'';out.push(`message ${s.id} → ${s.status}`);}else out.push(`message ${s.id} not found`);});
+    }else if((v.messages||[]).length){
+      v.messages.forEach(m=>{const txt=(m.text&&m.text.body)||(m.button&&m.button.text)||(m.interactive&&m.interactive.button_reply&&m.interactive.button_reply.title)||'';inboundMessage(String(m.from),(v.contacts&&v.contacts[0]&&v.contacts[0].profile&&v.contacts[0].profile.name)||'',txt,m.type||'text');out.push(`inbound message from ${m.from} → AI agent`);});
+    }
+  }
+  touch();return {status:200,json:{ok:true,routed:out}};
+}
+VIEWS.api={title:'API Console',render(){
+  const a=UI.apiAction,sample=API_SAMPLES()[a];UI._apiBody=JSON.stringify(sample,null,2);
+  return `<div class="page-h"><h2>API console</h2><span class="muted sm-t">Fire the same webhooks your n8n workflow exposes — responses are produced by the mock engine</span></div>
+  <div class="grid g2"><div class="card"><div class="hd">Request</div><div class="bd col">
+    <label class="f">Endpoint / event<select id="apiSel" data-ch="apiAction"><optgroup label="POST /webhook/wa-api (x-api-key)">${['handoff','resume_bot','agent_reply','campaign_start','template_create','template_delete','template_list'].map(k=>`<option value="${k}" ${a===k?'selected':''}>action: ${k}</option>`).join('')}</optgroup><optgroup label="POST /webhook/call-outcome (x-api-key)"><option value="call_outcome" ${a==='call_outcome'?'selected':''}>call outcome</option></optgroup><optgroup label="WhatsApp Cloud API → Trigger"><option value="wa_inbound" ${a==='wa_inbound'?'selected':''}>inbound customer message</option><option value="wa_status" ${a==='wa_status'?'selected':''}>delivery status update</option><option value="wa_template" ${a==='wa_template'?'selected':''}>template status update</option></optgroup></select></label>
+    <div class="row"><span class="pill">POST</span><span class="mono">${esc(DB.config.base_url)}${API_EP[a].startsWith('/')?API_EP[a]:''}</span></div>
+    ${API_EP[a].startsWith('/')?`<label class="f">x-api-key header<input id="apiKey" type="text" value="${esc(DB.config.api_secret)}"></label>`:'<div class="notice info">'+icon('info','sm')+' Meta calls the WhatsApp Trigger without your API key.</div>'}
+    <label class="f">JSON body<textarea id="apiBody" rows="14" class="mono" spellcheck="false">${esc(UI._apiBody)}</textarea></label>
+    <div class="row"><button class="btn pri" data-act="apiSend">${icon('send','sm')} Send request</button><span class="muted xs-t">Try a wrong key to see the 401 branch.</span></div></div></div>
+  <div class="col"><div class="card"><div class="hd">Response <span class="sp"></span><span id="apiStatus"></span></div><div class="bd"><pre class="json" id="apiResp">Send a request to see the response…</pre></div></div>
+   <div class="card"><div class="hd">History</div><div class="bd" id="apiHist"></div></div></div></div>`;
+},mount(){this.update();},update(){const h=$('#apiHist');if(h)h.innerHTML=(UI._apiHist||[]).map(x=>`<div class="list-i"><span class="pill ${x.s===200?'ok':'bad'}">${x.s}</span><div class="sp"><b class="mono">${esc(x.a)}</b><div class="xs-t muted">${x.t}</div></div></div>`).join('')||'<div class="empty">No requests yet</div>';}};
+INP.apiAction=el=>{UI.apiAction=el.value;render();};
+ACT.apiSend=()=>{
+  let body;try{body=JSON.parse($('#apiBody').value||'{}');}catch(e){toast('Invalid JSON: '+e.message,'err');return;}
+  const a=UI.apiAction,k=$('#apiKey')?$('#apiKey').value:'',ep=API_EP[a];let r;
+  if(ep==='/webhook/wa-api')r=waApi(k,body);else if(ep==='/webhook/call-outcome')r=callOutcome(body,k);else r=whatsappWebhook(body);
+  $('#apiResp').textContent=JSON.stringify(r.json,null,2);
+  $('#apiStatus').innerHTML=`<span class="pill ${r.status===200?'ok':'bad'}">HTTP ${r.status}</span>`;
+  UI._apiHist=[{a:a+(body.action&&a!==body.action?'':''),s:r.status,t:new Date().toLocaleTimeString('en-IN',{timeZone:TZ()})},...(UI._apiHist||[])].slice(0,8);
+  VIEWS.api.update();
+};
+
+/* ============ SETTINGS ============ */
+const TZS=['Asia/Kolkata','Asia/Dubai','Asia/Singapore','Europe/London','America/New_York','America/Los_Angeles','Australia/Sydney','UTC'];
+function svcRowsHTML(list){return list.map((s,i)=>`<div class="grid" style="grid-template-columns:minmax(0,1fr) 90px 80px auto 30px;gap:6px;margin-bottom:6px;align-items:center" data-svc><input type="text" data-f="name" value="${esc(s.name)}" placeholder="Service name"><input type="number" data-f="price" value="${s.price}" min="0" placeholder="Rs" ${s.custom?'disabled':''}><input type="number" data-f="duration" value="${s.duration}" min="5" step="5" placeholder="min"><label class="chk xs-t"><input type="checkbox" data-f="custom" data-ch="svcCustom" ${s.custom?'checked':''}> custom quote</label><button class="icon-btn" style="width:28px;height:28px" data-act="svcDel" data-i="${i}">${icon('x','sm')}</button></div>`).join('');}
+function readSvcs(){return $$('[data-svc]').map(r=>({name:$('[data-f=name]',r).value.trim(),price:+$('[data-f=price]',r).value||0,duration:+$('[data-f=duration]',r).value||30,custom:$('[data-f=custom]',r).checked})).filter(s=>s.name);}
+VIEWS.settings={title:'Settings',update(){},render(){
+  const c=DB.config;
+  return `<div class="page-h"><h2>Settings</h2><span class="muted sm-t">Mirrors the “Business Config”, “Config Followup” and “API Config” nodes of the workflow</span></div>
+  <div class="grid g2" style="align-items:start">
+  <div class="col">
+   <div class="card" id="sec-business"><div class="hd">Business profile <span class="sub">Business Config node</span></div><div class="bd col">
+    <div class="grid g2"><label class="f">Business name<input name="business_name" type="text" value="${esc(c.business_name)}"></label><label class="f">Business type<input name="business_type" type="text" value="${esc(c.business_type)}"></label></div>
+    <label class="f">Address<input name="business_address" type="text" value="${esc(c.business_address)}"></label>
+    <div class="grid g3"><label class="f">Timezone<select name="timezone">${TZS.map(z=>`<option ${z===c.timezone?'selected':''}>${z}</option>`).join('')}</select></label><label class="f">Opens<input name="work_start" type="time" value="${c.work_start}"></label><label class="f">Closes<input name="work_end" type="time" value="${c.work_end}"></label></div>
+    <div class="row wrap">${DN.map((d,i)=>`<label class="chk"><input type="checkbox" name="d${i}" ${c.open_days.includes(i)?'checked':''}> ${d}</label>`).join('')}</div>
+    <div class="grid g2"><label class="f">Default appointment length (min)<input name="appointment_duration_min" type="number" min="5" step="5" value="${c.appointment_duration_min}"></label><label class="f">GST % on quotations<input name="gst_pct" type="number" min="0" value="${c.gst_pct}"></label></div>
+    <label class="f">FAQ the AI may use (payment, cancellation…)<textarea name="faq" rows="3">${esc(c.faq)}</textarea></label>
+    <div><button class="btn pri" data-act="saveSec" data-sec="business">Save business profile</button></div></div></div>
+   <div class="card" id="sec-services"><div class="hd">Services &amp; prices <span class="sub">services_and_prices</span></div><div class="bd"><div id="svcRows">${svcRowsHTML(c.services)}</div><div class="row" style="margin-top:8px"><button class="btn sm" data-act="svcAdd">${icon('plus','sm')} Add service</button><span class="sp"></span><button class="btn pri" data-act="saveSec" data-sec="services">Save services</button></div></div></div>
+  </div>
+  <div class="col">
+   <div class="card" id="sec-follow"><div class="hd">Follow-up &amp; calling <span class="sub">Config Followup node</span></div><div class="bd col">
+    <div class="grid g2"><label class="f">Call window starts (hour)<input name="call_window_start" type="number" min="0" max="23" value="${c.call_window_start}"></label><label class="f">Call window ends (hour)<input name="call_window_end" type="number" min="1" max="24" value="${c.call_window_end}"></label></div>
+    <div class="grid g2"><label class="f">Max follow-ups per lead<input name="max_follow_ups" type="number" min="1" value="${c.max_follow_ups}"></label><label class="f">Gap between follow-ups (hours)<input name="followup_gap_hours" type="number" min="1" value="${c.followup_gap_hours}"></label></div>
+    <label class="f">Voice-call API URL (mock)<input name="call_api_url" type="text" value="${esc(c.call_api_url)}"></label>
+    <div><button class="btn pri" data-act="saveSec" data-sec="follow">Save follow-up settings</button></div></div></div>
+   <div class="card" id="sec-int"><div class="hd">Integrations <span class="sub">API Config · mock values</span></div><div class="bd col">
+    <label class="f">n8n base URL<input name="base_url" type="text" value="${esc(c.base_url)}"></label>
+    <label class="f">API secret (x-api-key)<div class="row"><input name="api_secret" id="apiSecret" type="password" value="${esc(c.api_secret)}"><button class="icon-btn" style="flex:none" data-act="revealKey" title="Show / hide">${icon('key','sm')}</button><button class="btn sm" style="flex:none" data-act="regenKey">Regenerate</button></div></label>
+    <div class="grid g2"><label class="f">WhatsApp phone number ID<input name="phone_number_id" type="text" value="${esc(c.phone_number_id)}"></label><label class="f">WABA ID<input name="waba_id" type="text" value="${esc(c.waba_id)}"></label></div>
+    <div class="grid g2"><label class="f">Team e-mail (handoff alerts)<input name="team_email" type="email" value="${esc(c.team_email)}"></label><label class="f">Booking confirmation template<select name="confirmation_template">${DB.templates.filter(t=>t.status!=='DELETED').map(t=>`<option ${t.name===c.confirmation_template?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label></div>
+    <div><button class="btn pri" data-act="saveSec" data-sec="int">Save integrations</button></div></div></div>
+   <div class="card"><div class="hd">Data</div><div class="bd col">
+    <div class="sm-t muted">Everything lives in this browser (localStorage). Export a backup, import one, or start over.</div>
+    <div class="row wrap"><button class="btn" data-act="exportDb">${icon('download','sm')} Export JSON</button><button class="btn" data-act="importDb">${icon('upload','sm')} Import JSON</button><input type="file" id="importFile" accept="application/json" class="hide" data-ch="importFile"><span class="sp"></span><button class="btn dng" data-act="resetDb">${icon('refresh','sm')} Reset demo data</button><button class="btn dng" data-act="clearDb">${icon('trash','sm')} Clear all</button></div></div></div>
+  </div></div>`;
+}};
+ACT.svcAdd=()=>{const l=readSvcs();l.push({name:'',price:0,duration:30,custom:false});$('#svcRows').innerHTML=svcRowsHTML(l);};
+ACT.svcDel=el=>{const l=readSvcs();l.splice(+el.dataset.i,1);$('#svcRows').innerHTML=svcRowsHTML(l);};
+INP.svcCustom=el=>{$('[data-f=price]',el.closest('[data-svc]')).disabled=el.checked;};
+ACT.revealKey=()=>{const i=$('#apiSecret');i.type=i.type==='password'?'text':'password';};
+ACT.regenKey=()=>{$('#apiSecret').value='key_'+Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('');$('#apiSecret').type='text';toast('New key generated — click Save integrations');};
+ACT.saveSec=el=>{
+  const sec=el.dataset.sec,root=$('#sec-'+sec),f=formData(root),c=DB.config;
+  if(sec==='business'){
+    const days=DN.map((_,i)=>i).filter(i=>f['d'+i]);if(!days.length){toast('Pick at least one working day','err');return;}
+    if(f.work_end<=f.work_start){toast('Closing time must be after opening time','err');return;}
+    Object.assign(c,{business_name:f.business_name,business_type:f.business_type,business_address:f.business_address,timezone:f.timezone,work_start:f.work_start,work_end:f.work_end,open_days:days,appointment_duration_min:+f.appointment_duration_min||30,gst_pct:+f.gst_pct||0,faq:f.faq});
+  }else if(sec==='services'){const s=readSvcs();if(!s.length){toast('Keep at least one service','err');return;}c.services=s;}
+  else if(sec==='follow'){Object.assign(c,{call_window_start:+f.call_window_start,call_window_end:+f.call_window_end,max_follow_ups:+f.max_follow_ups||1,followup_gap_hours:+f.followup_gap_hours||24,call_api_url:f.call_api_url});}
+  else if(sec==='int'){if(!f.api_secret.trim()){toast('API secret cannot be empty','err');return;}Object.assign(c,{base_url:f.base_url,api_secret:f.api_secret.trim(),phone_number_id:f.phone_number_id,waba_id:f.waba_id,team_email:f.team_email,confirmation_template:f.confirmation_template});}
+  save();toast('Settings saved','ok');
+};
+ACT.exportDb=()=>{jsonDownload('replora-crm-backup.json',DB);toast('Backup downloaded','ok');};
+ACT.importDb=()=>$('#importFile').click();
+INP.importFile=el=>{const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.contacts||!d.config)throw new Error('Not a Replora backup');DB=d;save();render();toast('Backup imported','ok');}catch(e){toast('Import failed: '+e.message,'err');}};r.readAsText(f);};
+ACT.resetDb=()=>confirmBox('Reset to the original demo data? Your changes will be lost.',()=>{DB=seedData();UI.chat=null;save();render();toast('Demo data restored','ok');},'Reset');
+ACT.clearDb=()=>confirmBox('Delete <b>all</b> leads, chats, campaigns and appointments? Settings and templates are kept.',()=>{Object.assign(DB,{contacts:[],messages:[],campaigns:[],quotes:[],calls:[],appointments:[],events:[]});UI.chat=null;save();render();toast('All records cleared');},'Clear all');
+
+/* ============ BOOT ============ */
+(function boot(){
+  try{const th=localStorage.getItem('replora_theme');if(th)document.documentElement.dataset.theme=th;}catch(e){}
+  load();
+  DB.settings=Object.assign({auto_outcome:true,auto_scheduler:false,ignore_window:true},DB.settings||{});
+  ['contacts','messages','campaigns','templates','quotes','calls','appointments','events'].forEach(k=>{if(!Array.isArray(DB[k]))DB[k]=[];});
+  DB.campaigns.forEach(c=>{if(c.status==='running'){c.status='completed';c.finished_at=c.finished_at||iso(Date.now());}});
+  DB.calls.forEach(c=>{if(c.status!=='completed'&&DB.settings.auto_outcome)setTimeout(()=>autoOutcome(c),rnd(1500,4000));});
+  if(DB.settings.auto_scheduler)setAutoScheduler(true);
+  const dark=(document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
+  $('#themeBtn').innerHTML=icon(dark?'sun':'moon');
+  const h=location.hash.slice(1);UI.tab=VIEWS[h]?h:'dashboard';
+  render();
+  setInterval(()=>{if(!document.hidden&&!MODAL)refresh();},30000);
+  window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(VIEWS[t]&&t!==UI.tab){UI.tab=t;render();}});
+  window.__crm={get db(){return DB;},ui:UI,go};
+})();
+
+</script>
+</body>
+</html>
