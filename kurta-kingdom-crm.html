@@ -1,0 +1,1622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kurta Kingdom CRM</title>
+<meta name="description" content="Social commerce CRM: comment-to-DM carousels + WhatsApp order desk — demo with mock data">
+<style>
+:root{
+  --bg:#f3f5f7;--surface:#fff;--surface2:#f7f9fa;--border:#e2e8ee;--text:#101c2c;--muted:#66758a;
+  --brand:#0f8b7d;--brand-d:#0a6b60;--brand-soft:#e0f4f0;--accent:#25d366;
+  --danger:#dc3f45;--danger-soft:#fdeaea;--warn:#b87405;--warn-soft:#fff3d6;--info:#2f6fe0;--info-soft:#e6efff;
+  --purple:#7c4ddb;--purple-soft:#efe8ff;--ok:#1a8f4d;--ok-soft:#e1f6e9;--gray:#5b6878;--gray-soft:#eceff3;
+  --chat-bg:#ece5dd;--bub-in:#fff;--bub-out:#d9fdd3;--bub-text:#101c2c;
+  --shadow:0 1px 2px rgba(16,28,44,.06),0 4px 16px rgba(16,28,44,.05);--radius:12px;
+  --c1:#0f8b7d;--c2:#2f6fe0;--c3:#d98a06;--c4:#7c4ddb;--c5:#dc3f45;--c6:#5b6878;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c131b;--surface:#131c27;--surface2:#192432;--border:#263446;--text:#e5ecf4;--muted:#8a9bb0;
+  --brand:#2bbfa9;--brand-d:#1fa08c;--brand-soft:#123a35;--danger:#ff6b70;--danger-soft:#3a1a1d;--warn:#f0b13a;--warn-soft:#3a2d10;
+  --info:#6ea0ff;--info-soft:#18284a;--purple:#a98bff;--purple-soft:#2a2044;--ok:#4ed08a;--ok-soft:#10301f;--gray:#9aa8ba;--gray-soft:#202c3b;
+  --chat-bg:#0b141a;--bub-in:#1f2c34;--bub-out:#005c4b;--bub-text:#e9edef;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --c1:#2bbfa9;--c2:#6ea0ff;--c3:#f0b13a;--c4:#a98bff;--c5:#ff6b70;--c6:#9aa8ba}}
+:root[data-theme="dark"]{
+  --bg:#0c131b;--surface:#131c27;--surface2:#192432;--border:#263446;--text:#e5ecf4;--muted:#8a9bb0;
+  --brand:#2bbfa9;--brand-d:#1fa08c;--brand-soft:#123a35;--danger:#ff6b70;--danger-soft:#3a1a1d;--warn:#f0b13a;--warn-soft:#3a2d10;
+  --info:#6ea0ff;--info-soft:#18284a;--purple:#a98bff;--purple-soft:#2a2044;--ok:#4ed08a;--ok-soft:#10301f;--gray:#9aa8ba;--gray-soft:#202c3b;
+  --chat-bg:#0b141a;--bub-in:#1f2c34;--bub-out:#005c4b;--bub-text:#e9edef;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --c1:#2bbfa9;--c2:#6ea0ff;--c3:#f0b13a;--c4:#a98bff;--c5:#ff6b70;--c6:#9aa8ba}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand)}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.i.sm{width:14px;height:14px}
+.muted{color:var(--muted)}.sm-t{font-size:12px}.xs-t{font-size:11px}.b{font-weight:600}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+.row{display:flex;align-items:center;gap:8px}.row.wrap{flex-wrap:wrap}.sp{flex:1}.col{display:flex;flex-direction:column;gap:8px}
+.hide{display:none!important}
+/* layout */
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:30}
+.brand{display:flex;gap:10px;align-items:center;padding:16px 16px 12px}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;display:grid;place-items:center;font-weight:800;font-size:17px}
+.brand b{display:block;font-size:15px;line-height:1.1}.brand small{color:var(--muted);font-size:11px}
+#nav{padding:6px 10px;overflow:auto;flex:1}
+.nav-i{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;background:none;border-radius:9px;color:var(--muted);cursor:pointer;text-align:left;font-weight:500;margin-bottom:2px}
+.nav-i:hover{background:var(--surface2);color:var(--text)}
+.nav-i.on{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.nav-i .cnt{margin-left:auto;background:var(--danger);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px;font-weight:600}
+.nav-i .cnt.soft{background:var(--gray-soft);color:var(--muted)}
+.side-foot{padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.top h1{font-size:18px;margin:0;white-space:nowrap}
+.menu-btn{display:none}
+.search{position:relative;flex:1;max-width:420px;margin-left:12px}
+.search input[type=search]{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.search .i{position:absolute;left:11px;top:9px;color:var(--muted)}
+.gs-results{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);max-height:320px;overflow:auto;z-index:50}
+.gs-results button{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:9px 12px;text-align:left;cursor:pointer}
+.gs-results button:hover{background:var(--surface2)}
+#view{padding:20px 24px 40px;flex:1;min-width:0}
+/* controls */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;white-space:nowrap;line-height:1.2}
+.btn:hover{background:var(--surface2)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}.btn.pri:hover{background:var(--brand-d)}
+.btn.dng{color:var(--danger)}.btn.dng:hover{background:var(--danger-soft)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn.ghost{border-color:transparent;background:none}.btn.ghost:hover{background:var(--surface2)}
+.btn:disabled,.btn.dis{opacity:.5;pointer-events:none}
+.icon-btn{width:34px;height:34px;display:inline-grid;place-items:center;border:1px solid var(--border);background:var(--surface);border-radius:9px;cursor:pointer}
+.icon-btn:hover{background:var(--surface2)}
+input[type=text],input[type=number],input[type=tel],input[type=email],input[type=password],input[type=search],input[type=date],input[type=time],input[type=datetime-local],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+textarea{resize:vertical;min-height:70px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+label.f>input,label.f>select,label.f>textarea{font-weight:400;color:var(--text);font-size:14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--brand)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+.card>.hd{display:flex;align-items:center;gap:8px;padding:14px 16px 0;font-weight:700}
+.card>.hd .sub{font-weight:400;color:var(--muted);font-size:12px}
+.card>.bd{padding:14px 16px 16px}
+.page-h{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.page-h h2{margin:0;font-size:20px}
+.kpi{padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.kpi .l{color:var(--muted);font-size:12px;font-weight:600;display:flex;gap:6px;align-items:center}
+.kpi .v{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.clk{cursor:pointer}.kpi.clk:hover{border-color:var(--brand)}
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;white-space:nowrap;background:var(--gray-soft);color:var(--gray)}
+.b-New{background:var(--gray-soft);color:var(--gray)}.b-Inquiry{background:var(--info-soft);color:var(--info)}
+.b-Interested{background:var(--brand-soft);color:var(--brand)}.b-Quotation-Sent{background:var(--purple-soft);color:var(--purple)}
+.b-Callback{background:var(--warn-soft);color:var(--warn)}.b-Needs-Human{background:var(--danger-soft);color:var(--danger)}
+.b-Booked{background:var(--ok-soft);color:var(--ok)}.b-Closed{background:var(--gray-soft);color:var(--muted);text-decoration:line-through}
+.b-ok{background:var(--ok-soft);color:var(--ok)}.b-bad{background:var(--danger-soft);color:var(--danger)}.b-warn{background:var(--warn-soft);color:var(--warn)}.b-info{background:var(--info-soft);color:var(--info)}.b-pur{background:var(--purple-soft);color:var(--purple)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--gray)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;flex:none}
+.av.sm{width:28px;height:28px;font-size:11px}
+/* table */
+.tbl-wrap{overflow:auto}
+table.t{width:100%;border-collapse:collapse}
+table.t th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);position:sticky;top:0}
+table.t th.sortable{cursor:pointer}
+table.t td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t tbody tr.clk{cursor:pointer}table.t tbody tr.clk:hover{background:var(--surface2)}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.tabs{display:flex;gap:4px;background:var(--gray-soft);padding:3px;border-radius:10px;width:fit-content;flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.tabs .n{font-size:11px;color:var(--muted);margin-left:4px}
+.pill{display:inline-flex;gap:6px;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--gray-soft);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--danger-soft);color:var(--danger)}.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.chip{display:inline-block;padding:1px 8px;border-radius:6px;font-size:11px;background:var(--gray-soft);color:var(--muted);margin:1px 3px 1px 0}
+.chip.tag{background:var(--info-soft);color:var(--info)}
+.bar{height:8px;border-radius:99px;background:var(--gray-soft);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s}
+.hbar{display:grid;grid-template-columns:110px 1fr 34px;gap:8px;align-items:center;margin:7px 0;font-size:12.5px}
+/* inbox */
+.inbox{display:grid;grid-template-columns:320px minmax(0,1fr) 290px;height:calc(100vh - 118px);min-height:520px;overflow:hidden}
+.inbox.noinfo{grid-template-columns:320px minmax(0,1fr)}
+.inbox>div{min-width:0;min-height:0;display:flex;flex-direction:column}
+.chat-list{border-right:1px solid var(--border)}
+.cl-top{padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.cl-items{overflow:auto;flex:1}
+.cl-i{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start}
+.cl-i:hover{background:var(--surface2)}.cl-i.on{background:var(--brand-soft)}
+.cl-i .nm{font-weight:600;display:flex;gap:6px;align-items:center}
+.cl-i .pv{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-i .tm{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.unread{background:var(--accent);color:#06361d;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;text-align:center}
+.chat{background:var(--surface)}
+.chat-h{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.chat-msgs{flex:1;overflow:auto;padding:14px 5%;background:var(--chat-bg);display:flex;flex-direction:column;gap:3px}
+.dsep{align-self:center;background:var(--surface);color:var(--muted);font-size:11px;padding:3px 10px;border-radius:8px;margin:8px 0;box-shadow:var(--shadow)}
+.bub{max-width:min(78%,520px);padding:6px 9px 4px;border-radius:9px;box-shadow:0 1px 1px rgba(0,0,0,.12);color:var(--bub-text);word-wrap:break-word;overflow-wrap:anywhere;position:relative}
+.bub.in{align-self:flex-start;background:var(--bub-in);border-top-left-radius:2px}
+.bub.out{align-self:flex-end;background:var(--bub-out);border-top-right-radius:2px}
+.bub .who{font-size:11px;font-weight:700;color:var(--brand);display:flex;gap:4px;align-items:center;margin-bottom:1px}
+.bub.in .who{color:var(--purple)}
+.bub .tx{white-space:pre-wrap}
+.bub .meta{display:flex;gap:4px;justify-content:flex-end;align-items:center;font-size:10.5px;color:var(--muted);margin-top:1px}
+.bub .tool{display:inline-flex;gap:3px;align-items:center;font-size:10.5px;background:rgba(0,0,0,.07);border-radius:5px;padding:0 5px;margin:3px 3px 0 0;color:var(--muted)}
+.tick{width:15px;height:11px;stroke-width:2.4}.tick.read{color:#34a7f5}
+.typing{align-self:flex-start;background:var(--bub-in);padding:9px 12px;border-radius:9px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bl 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.composer{border-top:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.composer .line{display:flex;gap:8px;align-items:flex-end}
+.composer textarea{min-height:40px;max-height:120px;resize:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--border);background:var(--surface2);border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--text)}
+.chips button:hover{border-color:var(--brand);color:var(--brand)}
+.notice{padding:8px 12px;border-radius:9px;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}.notice.bad{background:var(--danger-soft);color:var(--danger)}.notice.info{background:var(--info-soft);color:var(--info)}.notice.ok{background:var(--ok-soft);color:var(--ok)}
+.info-p{border-left:1px solid var(--border);overflow:auto;padding:14px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 8px;font-size:13px;margin:10px 0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;word-break:break-word}
+/* kanban */
+.kanban{display:flex;gap:12px;overflow:auto;padding-bottom:10px;align-items:flex-start}
+.kcol{flex:0 0 250px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;max-height:calc(100vh - 190px)}
+.kcol.over{outline:2px dashed var(--brand);background:var(--brand-soft)}
+.kcol .kh{padding:10px 12px;font-weight:700;display:flex;gap:6px;align-items:center}
+.kcol .kb{padding:0 8px 8px;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:60px}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:grab;box-shadow:var(--shadow)}
+.kcard.drag{opacity:.4}
+.kcard .nm{font-weight:600}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cal .dh{background:var(--surface2);padding:6px;text-align:center;font-size:11.5px;color:var(--muted);font-weight:600}
+.cal .dc{background:var(--surface);min-height:84px;padding:4px 5px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cal .dc:hover{background:var(--surface2)}
+.cal .dc.out{background:var(--surface2);color:var(--muted)}
+.cal .dc.today .dn{background:var(--brand);color:#fff}
+.cal .dc.sel{outline:2px solid var(--brand);outline-offset:-2px}
+.cal .dc.closed{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 6px,var(--surface) 6px,var(--surface) 12px)}
+.dn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600}
+.ev{font-size:11px;background:var(--brand-soft);color:var(--brand);border-radius:4px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev.x{background:var(--gray-soft);color:var(--muted);text-decoration:line-through}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.slot{padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center;font-size:12.5px;cursor:pointer;background:var(--surface)}
+.slot:hover{border-color:var(--brand)}.slot.sel{background:var(--brand);color:#fff;border-color:var(--brand)}
+.slot.busy{opacity:.4;pointer-events:none;text-decoration:line-through;background:var(--gray-soft)}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(8,14,22,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;animation:fi .15s}
+.ov.drawer{justify-content:flex-end;padding:0}
+@keyframes fi{from{opacity:0}}
+.md{background:var(--surface);border-radius:14px;width:min(560px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.md.wide{width:min(880px,100%)}
+.ov.drawer .md{border-radius:0;height:100vh;max-height:100vh;width:min(520px,100%)}
+.md>.mh{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:16px}
+.md>.mb{padding:16px 18px;overflow:auto;flex:1}
+.md>.mf{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+#toasts{position:fixed;top:70px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:200;width:max-content;max-width:min(420px,calc(100vw - 32px));pointer-events:none}
+.toast{background:var(--text);color:var(--bg);padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:13px;animation:fi .2s;display:flex;gap:8px;align-items:flex-start}
+.toast.err{background:var(--danger);color:#fff}.toast.ok{background:var(--ok);color:#fff}
+/* misc */
+.wa-prev{background:var(--chat-bg);border-radius:12px;padding:14px}
+.wa-prev .bub{max-width:100%;align-self:stretch}
+.wa-prev .hd2{font-weight:700;margin-bottom:3px}
+.wa-prev .ft{color:var(--muted);font-size:12px;margin-top:4px}
+.wa-prev .btns{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.wa-prev .btns span{background:var(--bub-in);color:var(--info);text-align:center;border-radius:8px;padding:7px;font-weight:600;font-size:13px;box-shadow:0 1px 1px rgba(0,0,0,.12)}
+.var{background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 3px}
+pre.json{margin:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;overflow:auto;font-size:12px;max-height:340px;white-space:pre-wrap;word-break:break-word}
+.feed{display:flex;flex-direction:column}
+.feed>div{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.feed>div:last-child{border:0}
+.feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--gray-soft);color:var(--muted)}
+.feed .ic.k-ok{background:var(--ok-soft);color:var(--ok)}.feed .ic.k-bad{background:var(--danger-soft);color:var(--danger)}.feed .ic.k-info{background:var(--info-soft);color:var(--info)}.feed .ic.k-pur{background:var(--purple-soft);color:var(--purple)}.feed .ic.k-warn{background:var(--warn-soft);color:var(--warn)}
+.list-i{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}.list-i:last-child{border:0}
+.scroll-y{max-height:340px;overflow:auto}
+.qline{display:grid;grid-template-columns:minmax(0,1fr) 64px 92px 28px;gap:6px;margin-bottom:6px;align-items:center}
+.sw{position:relative;width:38px;height:22px;flex:none}.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw i{position:absolute;inset:0;background:var(--border);border-radius:99px;transition:.2s;cursor:pointer}
+.sw i:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked+i{background:var(--brand)}.sw input:checked+i:before{transform:translateX(16px)}
+.back-m{display:none}
+@media (max-width:1180px){.inbox{grid-template-columns:300px minmax(0,1fr)}.inbox .info-p{display:none}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s;width:250px;box-shadow:var(--shadow)}
+  .side.open{transform:none}
+  .menu-btn{display:grid}.top{padding:10px 14px}#view{padding:14px 14px 40px}
+  .search{display:none}.g2,.g3{grid-template-columns:1fr}
+  .inbox{grid-template-columns:1fr;height:calc(100vh - 100px)}
+  .inbox .chat{display:none}.inbox.show-chat .chat-list{display:none}.inbox.show-chat .chat{display:flex}
+  .back-m{display:grid}
+  .hide-m{display:none}
+  .kcol{flex-basis:230px}
+  .cal .dc{min-height:60px}.ev{font-size:10px}
+}
+@media (max-width:520px){.g4{grid-template-columns:1fr 1fr}.kpi .v{font-size:22px}.top h1{font-size:16px}.btn{padding:7px 10px}.bub{max-width:90%}.qline{grid-template-columns:minmax(0,1fr) 54px 78px 24px}}
+.inbox.noinfo .info-p{display:none}
+.inbox.noinfo{grid-template-columns:320px minmax(0,1fr)}
+@media (max-width:900px){.inbox.noinfo{grid-template-columns:1fr}}
+
+.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.ev.d{background:var(--gray-soft);color:var(--muted)}
+@media (max-width:900px){.g21{grid-template-columns:1fr}}
+
+/* ===== Kurta Kingdom theme ===== */
+:root{--bg:#f7f3ee;--surface:#fff;--surface2:#fbf8f4;--border:#eadfd2;--text:#2b1b17;--muted:#86705f;--brand:#8c1d40;--brand-d:#6b1230;--brand-soft:#fbe6ec;--gold:#c8962e;--gold-soft:#fbf0d8;--c1:#8c1d40;--c2:#c8962e;--c3:#2f6fe0;--c4:#7c4ddb;--c5:#dc3f45;--c6:#86705f;--shadow:0 1px 2px rgba(60,30,20,.06),0 4px 16px rgba(60,30,20,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150f0e;--surface:#201615;--surface2:#281c1a;--border:#3a2926;--text:#f3e9e4;--muted:#b09a8e;--brand:#e0728f;--brand-d:#c85a78;--brand-soft:#3a1a24;--gold:#e0b04e;--gold-soft:#3a2d12;--c1:#e0728f;--c2:#e0b04e;--c3:#6ea0ff;--c4:#a98bff;--c5:#ff6b70;--c6:#b09a8e;--chat-bg:#0e0a09}}
+:root[data-theme="dark"]{--bg:#150f0e;--surface:#201615;--surface2:#281c1a;--border:#3a2926;--text:#f3e9e4;--muted:#b09a8e;--brand:#e0728f;--brand-d:#c85a78;--brand-soft:#3a1a24;--gold:#e0b04e;--gold-soft:#3a2d12;--c1:#e0728f;--c2:#e0b04e;--c3:#6ea0ff;--c4:#a98bff;--c5:#ff6b70;--c6:#b09a8e;--chat-bg:#0e0a09}
+.logo{background:linear-gradient(135deg,#8c1d40,#c8962e)!important;font-family:Georgia,serif}
+.btn.pri{color:#fff}
+:root[data-theme="dark"] .btn.pri,:root[data-theme="dark"] .nav-i .cnt{color:#1a0d10}
+.pp{display:inline-flex;align-items:center;gap:4px;padding:1px 8px 1px 6px;border-radius:99px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.pp .i{width:12px;height:12px}
+.pp.ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}.pp.fb{background:#1877f2}.pp.wa{background:#1fa855}.pp.web{background:#6b7280}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.pcard .pb{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pimg{display:block;width:100%;height:auto;aspect-ratio:1/1}
+.sz{display:inline-block;min-width:26px;text-align:center;padding:1px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;margin:0 3px 3px 0}
+.sz.off{opacity:.4;text-decoration:line-through}
+.price{font-weight:700}.mrp{color:var(--muted);text-decoration:line-through;font-size:12px;margin-left:6px}
+.carousel{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;background:var(--chat-bg);border-radius:12px;padding:12px}
+.ccard{flex:0 0 190px;scroll-snap-align:start;background:var(--bub-in);color:var(--bub-text);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.ccard .ct{padding:8px 10px 2px;font-weight:600;font-size:13px;line-height:1.25}.ccard .cs{padding:0 10px 8px;font-size:11.5px;color:var(--muted)}
+.ccard .cb{border-top:1px solid var(--border);padding:8px;text-align:center;color:var(--info);font-weight:600;font-size:12.5px;cursor:pointer;display:block;width:100%;background:none;border-left:0;border-right:0;border-bottom:0}
+.ccard .cb:hover{background:var(--surface2)}
+.trace{display:flex;flex-direction:column;gap:0;margin:6px 0}
+.trace>div{display:flex;gap:10px;padding:5px 0;position:relative;font-size:12.5px}
+.trace>div:before{content:"";position:absolute;left:8px;top:22px;bottom:-5px;width:2px;background:var(--border)}
+.trace>div:last-child:before{display:none}
+.trace .tn{width:18px;height:18px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;flex:none;z-index:1}
+.trace .tn.skip{background:var(--gray-soft);color:var(--muted)}.trace .tn.bad{background:var(--danger-soft);color:var(--danger)}.trace .tn.warn{background:var(--warn-soft);color:var(--warn)}
+.trace .tn .i{width:11px;height:11px;stroke-width:3}
+.trace .tt{font-weight:600}.trace .td{color:var(--muted)}
+.cm-list .cl-i{align-items:flex-start}
+.kw{background:var(--gold-soft);color:var(--warn);border-radius:4px;padding:0 3px;font-weight:700}
+.steps{display:flex;align-items:flex-start;margin:6px 0 14px}
+.step{flex:1;text-align:center;font-size:11px;color:var(--muted);position:relative}
+.step:before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--border)}
+.step:first-child:before{display:none}
+.step .sc{width:24px;height:24px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:grid;place-items:center;margin:0 auto 4px;position:relative;z-index:1}
+.step.done{color:var(--text)}.step.done .sc{background:var(--ok);border-color:var(--ok);color:#fff}.step.done:before{background:var(--ok)}
+.step.cur .sc{border-color:var(--brand);color:var(--brand)}
+.step .sc .i{width:12px;height:12px;stroke-width:3}
+.swatch{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15);vertical-align:middle}
+.b-processing,.b-Open{background:var(--warn-soft);color:var(--warn)}.b-shipped,.b-In-progress{background:var(--info-soft);color:var(--info)}.b-out_for_delivery{background:var(--purple-soft);color:var(--purple)}
+.b-delivered,.b-Resolved{background:var(--ok-soft);color:var(--ok)}.b-cancelled{background:var(--danger-soft);color:var(--danger)}.b-draft{background:var(--gray-soft);color:var(--gray);border:1px dashed var(--border)}
+.b-APPROVED{background:var(--ok-soft);color:var(--ok)}.b-high{background:var(--danger-soft);color:var(--danger)}.b-normal{background:var(--gray-soft);color:var(--gray)}.b-low{background:var(--info-soft);color:var(--info)}
+.hl-box{border:1px dashed var(--border);border-radius:10px;padding:10px;background:var(--surface2)}
+.flow-fig{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px}
+.flow-fig span.n{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px 8px}
+.flow-fig i{color:var(--muted);font-style:normal}
+.inbox.three{grid-template-columns:340px minmax(0,1fr)}
+.cm-wrap{display:grid;grid-template-columns:380px minmax(0,1fr);height:calc(100vh - 118px);min-height:520px;overflow:hidden}
+.cm-wrap>div{min-width:0;min-height:0;display:flex;flex-direction:column}
+.cm-detail{overflow:auto;padding:16px 18px;border-left:1px solid var(--border)}
+@media (max-width:900px){.cm-wrap{grid-template-columns:1fr;height:auto}.cm-wrap .cm-detail{display:none;border-left:0}.cm-wrap.show-d .cm-list{display:none}.cm-wrap.show-d .cm-detail{display:block}}
+.cm-detail>*{flex:none}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-kanban" viewBox="0 0 24 24"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></symbol>
+<symbol id="i-tpl" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="i-checks" viewBox="0 0 24 14"><path d="M1 8l4 4L14 2M10 10l2 2L21 2"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M14 9l2 2"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M22 6l-10 7L2 6"/></symbol>
+<symbol id="i-insta" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+<symbol id="i-fb" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+<symbol id="i-shirt" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></symbol>
+<symbol id="i-support" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+</defs>
+</svg>
+<div class="app" id="app">
+  <aside class="side" id="side">
+    <div class="brand"><div class="logo">K</div><div><b>Kurta Kingdom</b><small>Social Commerce CRM</small></div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot"><div class="row"><span class="dot" style="background:var(--accent)"></span><b style="color:var(--text)">Demo mode</b></div><div class="xs-t" style="margin-top:3px">All data is mock &amp; saved in your browser only. Nothing is sent to Instagram, Facebook or WhatsApp.</div></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <button class="icon-btn menu-btn" data-act="toggleSide" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="search"><svg class="i"><use href="#i-search"/></svg><input id="gsearch" type="search" placeholder="Search customers, orders, products…" autocomplete="off" data-in="gsearch"><div id="gsResults" class="gs-results hide"></div></div>
+      <div class="sp"></div>
+      <button class="btn pri sm" data-act="newComment"><svg class="i sm"><use href="#i-plus"/></svg><span class="hide-m">Simulate comment</span></button>
+      <button class="icon-btn" data-act="theme" aria-label="Toggle theme" id="themeBtn"><svg class="i"><use href="#i-moon"/></svg></button>
+    </header>
+    <main id="view"></main>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* ============ CORE UTILS ============ */
+const KEY='kurta_kingdom_crm_demo_v1';
+const MIN=60000,HR=3600000,DAY=86400000;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=(p='id')=>p+'_'+Math.random().toString(36).slice(2,9);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const digits=s=>String(s==null?'':s).replace(/\D/g,'');
+const pad=n=>String(n).padStart(2,'0');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const iso=ms=>new Date(ms).toISOString();
+const money=n=>'Rs '+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0);
+const slug=s=>String(s).replace(/\s+/g,'-');
+const icon=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
+
+let DB=null;
+const UI={tab:'dashboard',typing:null,chat:null,chatFilter:'all',chatMode:'team',chatSearch:'',info:true,cmtSel:null,cmtFilter:'all',cmtPlat:'',cmtQ:'',ordTab:'all',ordQ:'',prodQ:'',prodFilter:'all',custQ:'',tkTab:'open',wbType:'meta_verify',mobileChat:false,sideOpen:false};
+
+/* ---- timezone helpers ---- */
+const TZ=()=>(DB&&DB.config&&DB.config.timezone)||'Asia/Kolkata';
+const _fc={};
+function tzParts(ms,tz){
+  tz=tz||TZ();
+  let f=_fc[tz];
+  if(!f)f=_fc[tz]=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',weekday:'short'});
+  const o={};for(const p of f.formatToParts(new Date(ms)))o[p.type]=p.value;
+  return {y:+o.year,m:+o.month,d:+o.day,h:+o.hour%24,min:+o.minute,s:+o.second,wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday)};
+}
+function fromWall(y,m,d,h,mi,tz){
+  const guess=Date.UTC(y,m-1,d,h,mi);
+  const p=tzParts(guess,tz);
+  const asUtc=Date.UTC(p.y,p.m-1,p.d,p.h,p.min,p.s);
+  return guess-(asUtc-guess);
+}
+const dayKey=ms=>{const p=tzParts(ms);return `${p.y}-${pad(p.m)}-${pad(p.d)}`;};
+function dayAt(offsetDays,h,mi=0){const p=tzParts(Date.now()+offsetDays*DAY);return fromWall(p.y,p.m,p.d,h,mi);}
+const tomorrow11=()=>iso(dayAt(1,11,0));
+function toLocalInput(v){if(!v)return '';const t=Date.parse(v);if(isNaN(t))return '';const p=tzParts(t);return `${p.y}-${pad(p.m)}-${pad(p.d)}T${pad(p.h)}:${pad(p.min)}`;}
+function fromLocalInput(s){if(!s)return '';const m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);if(!m)return '';return iso(fromWall(+m[1],+m[2],+m[3],+m[4],+m[5]));}
+
+/* ---- formatters ---- */
+function fmtDT(v){if(!v)return '—';const d=new Date(v);if(isNaN(d))return '—';return d.toLocaleString('en-IN',{timeZone:TZ(),day:'2-digit',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}
+function fmtTime(v){if(!v)return '';const d=new Date(v);if(isNaN(d))return '';return d.toLocaleTimeString('en-IN',{timeZone:TZ(),hour:'numeric',minute:'2-digit',hour12:true});}
+function fmtDate(v){if(!v)return '—';const d=new Date(v);if(isNaN(d))return '—';return d.toLocaleDateString('en-IN',{timeZone:TZ(),weekday:'short',day:'2-digit',month:'short'});}
+function fmtSlot(ms){return new Date(ms).toLocaleString('en-IN',{timeZone:TZ(),weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}
+function rel(v){
+  if(!v)return '—';const t=typeof v==='number'?v:Date.parse(v);if(isNaN(t))return '—';
+  const diff=t-Date.now(),a=Math.abs(diff),fut=diff>0;
+  let s;if(a<45e3)return fut?'in a few sec':'just now';
+  if(a<HR)s=Math.round(a/MIN)+'m';else if(a<DAY)s=Math.round(a/HR)+'h';else s=Math.round(a/DAY)+'d';
+  return fut?'in '+s:s+' ago';
+}
+function fmtPhone(p){p=digits(p);if(p.length===12&&p.startsWith('91'))return '+91 '+p.slice(2,7)+' '+p.slice(7);return '+'+p;}
+function initials(n){const w=String(n||'?').trim().split(/\s+/);return ((w[0]||'?')[0]+(w[1]?w[1][0]:'')).toUpperCase();}
+const AVC=['#0f8b7d','#2f6fe0','#d98a06','#7c4ddb','#dc3f45','#0e8aa8','#a0522d','#5b6878','#c2185b','#388e3c'];
+function avatar(name,phone,cls=''){const k=String(name||phone||'?');let h=0;for(const ch of k)h=(h*31+ch.charCodeAt(0))>>>0;return `<div class="av ${cls}" style="background:${AVC[h%AVC.length]}">${esc(initials(name||'#'))}</div>`;}
+function waFmt(t){return esc(t).replace(/\*([^*\n]+)\*/g,'<b>$1</b>').replace(/(^|[\s(])_([^_\n]+)_(?=[\s.,!?)]|$)/g,'$1<i>$2</i>').replace(/(https?:\/\/[^\s<]+)/g,'<span style="color:var(--info);word-break:break-all">$1</span>');}
+
+/* ---- toast / modal ---- */
+function toast(msg,type=''){
+  const el=document.createElement('div');el.className='toast '+type;el.innerHTML=(type==='err'?icon('alert','sm'):type==='ok'?icon('check','sm'):icon('info','sm'))+`<span>${esc(msg)}</span>`;
+  const tb=$('#toasts');while(tb.children.length>=3)tb.firstChild.remove();tb.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},3600);
+}
+let MODAL=null;
+function openModal({title,body,actions=[],wide=false,drawer=false,onMount}){
+  closeModal();
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="ov ${drawer?'drawer':''}" data-ov><div class="md ${wide?'wide':''}" role="dialog" aria-modal="true"><div class="mh"><span>${title}</span><span class="sp"></span><button class="icon-btn" data-act="closeModal" aria-label="Close">${icon('x')}</button></div><div class="mb" id="mdBody">${body}</div>${actions.length?`<div class="mf">${actions.map((a,i)=>`<button class="btn ${a.cls||''}" data-mact="${i}">${a.label}</button>`).join('')}</div>`:''}</div></div>`;
+  MODAL={actions};
+  if(onMount)onMount($('#mdBody'));
+  const f=$('#mdBody input:not([type=hidden]),#mdBody select,#mdBody textarea');if(f&&!drawer&&matchMedia('(hover:hover)').matches)f.focus();
+}
+function closeModal(){$('#modalRoot').innerHTML='';MODAL=null;}
+const formData=root=>{const o={};$$('[name]',root||$('#mdBody')).forEach(el=>{o[el.name]=el.type==='checkbox'?el.checked:el.value;});return o;};
+function confirmBox(msg,onYes,label='Delete'){openModal({title:'Please confirm',body:`<p style="margin:0">${msg}</p>`,actions:[{label:'Cancel',onClick:closeModal},{label:label,cls:'dng',onClick:()=>{closeModal();onYes();}}]});}
+
+/* ---- persistence ---- */
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}}
+function load(){
+  try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);if(d&&d.contacts&&d.config){DB=d;return;}}}catch(e){}
+  DB=seedData();
+}
+let _rt=null;
+function touch(){save();clearTimeout(_rt);_rt=setTimeout(()=>{try{refresh();}catch(e){console.error(e);}},60);}
+function logEvent(kind,text,tone=''){DB.events.unshift({id:uid('e'),kind,text,tone,at:iso(Date.now())});if(DB.events.length>120)DB.events.length=120;}
+
+/* ============ ENGINE — mirrors the 3 n8n flows (Comment→DM carousel, WhatsApp order desk, status updates) ============ */
+const DEF_KEYWORDS=['price','prize','rate','cost','kitne','kitna','kitni','kimat','keemat','daam','details','detail','info','link','buy','order','size','available','availability','chahiye','chaiye','dm','how much','amount','cod','book','booking'];
+const DEF_TRACK=['track','status','kahan','kaha','where','delivery','deliver','shipment','parcel','courier','dispatch','aayega','pahunch','pohch'];
+const DEF_SUPPORT=['cancel','return','refund','exchange','wapas','replace','complaint','damage','wrong'];
+const ORDER_LABEL={draft:'📝 Draft (awaiting details)',processing:'📦 Packing in progress',shipped:'🚚 Shipped',out_for_delivery:'🛵 Out for Delivery',delivered:'✅ Delivered',cancelled:'❌ Cancelled'};
+const ORDER_SHORT={draft:'Draft',processing:'Processing',shipped:'Shipped',out_for_delivery:'Out for delivery',delivered:'Delivered',cancelled:'Cancelled'};
+const STEPS=[['placed','Order placed'],['packed','Packed'],['shipped','Shipped'],['out','Out for delivery'],['delivered','Delivered']];
+const COURIERS={Delhivery:'https://www.delhivery.com/track/package/',Bluedart:'https://www.bluedart.com/tracking?awb=',Shiprocket:'https://shiprocket.co/tracking/','Ecom Express':'https://ecomexpress.in/tracking/?awb='};
+const TPL_MAP={confirmed:'order_confirmed_v1',shipped:'order_shipped_v1',out_for_delivery:'order_out_for_delivery_v1',delivered:'order_delivered_v1'};
+const AGENTS=['Riya','Arjun','Meera'];
+const inr=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+const slugify=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const PRODUCT=h=>DB.products.find(p=>p.handle===h&&!p.deleted);
+const liveProducts=()=>DB.products.filter(p=>!p.deleted);
+const sizesOf=p=>(p.variants||[]).filter(v=>v.stock>0).map(v=>v.size);
+const inStock=p=>p.active!==false&&((p.variants||[]).length===0||sizesOf(p).length>0);
+const productUrl=(p,platform)=>`https://${DB.config.shop_domain}/products/${p.handle}?utm_source=${platform}&utm_medium=comment_dm&utm_campaign=${DB.config.utm_campaign}`;
+const waLink=h=>`https://wa.me/${DB.config.wa_number}?text=${encodeURIComponent('ORDER '+h)}`;
+const fmtShort=v=>new Date(v).toLocaleString('en-IN',{timeZone:TZ(),day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true}).replace(/am|pm/,m=>m.toUpperCase());
+const fmtDay=v=>new Date(v).toLocaleDateString('en-IN',{timeZone:TZ(),day:'2-digit',month:'short',year:'numeric'});
+const platPill=p=>p==='instagram'?`<span class="pp ig">${icon('insta')} Instagram</span>`:p==='facebook'?`<span class="pp fb">${icon('fb')} Facebook</span>`:p==='whatsapp'?`<span class="pp wa">${icon('chat')} WhatsApp</span>`:`<span class="pp web">${icon('link')} ${esc(p||'Direct')}</span>`;
+const stBadge=(s,label)=>`<span class="badge b-${slug(s)}">${esc(label||ORDER_SHORT[s]||s)}</span>`;
+
+/* ---- customers ---- */
+const custById=id=>DB.customers.find(c=>c.id===id);
+const custByPhone=p=>DB.customers.find(c=>c.phone===p);
+function upsertCustomer({phone,name,handle,platform,at}){
+  let c=phone?custByPhone(phone):(handle?DB.customers.find(x=>x.handle===handle&&x.platform===platform):null);
+  if(!c&&phone&&handle){c=DB.customers.find(x=>x.handle===handle&&!x.phone);if(c)c.phone=phone;}
+  if(!c){c={id:uid('cu'),name:name||handle||'Customer',phone:phone||'',handle:handle||'',platform:platform||'whatsapp',tags:[],notes:'',created_at:iso(at||Date.now()),last_inbound_at:'',unread:0};DB.customers.push(c);}
+  if(name&&(!c.name||c.name==='there'||c.name===c.handle))c.name=name;
+  return c;
+}
+const ordersOf=phone=>DB.orders.filter(o=>o.phone===phone&&o.status!=='draft').sort((a,b)=>Date.parse(b.placed_at)-Date.parse(a.placed_at));
+const custOrders=c=>DB.orders.filter(o=>o.customer_id===c.id||(c.phone&&o.phone===c.phone));
+const custLtv=c=>sum(custOrders(c).filter(o=>!['draft','cancelled'].includes(o.status)),o=>o.total);
+const windowOpen=c=>!!c&&!!c.last_inbound_at&&Date.parse(c.last_inbound_at)>Date.now()-DAY;
+const waMsgsOf=phone=>DB.messages.filter(m=>m.phone===phone).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));
+function lastWaMsg(phone){let l=null;for(const m of DB.messages)if(m.phone===phone&&(!l||m.at>l.at))l=m;return l;}
+function addWaMsg(m){const msg=Object.assign({id:uid('m'),wa_id:'wamid.'+Math.random().toString(36).slice(2,12).toUpperCase(),at:iso(Date.now()),type:'text',status:m.direction==='in'?'received':'sent',intent:'',template:''},m);DB.messages.push(msg);if(msg.direction==='out'&&msg.status==='sent'&&!m.noProgress)progressMsg(msg);return msg;}
+function progressMsg(msg){setTimeout(()=>{if(msg.status==='sent'){msg.status='delivered';touch();}},rnd(700,1500));if(Math.random()<.8)setTimeout(()=>{if(msg.status==='delivered'){msg.status='read';touch();}},rnd(2500,6000));}
+
+/* ---- order helpers ---- */
+const nextOrderNo=()=>'ORD-'+(Math.max(10000,...DB.orders.filter(o=>/^ORD-/.test(o.id)).map(o=>+String(o.id).replace(/\D/g,'')||0))+1);
+function timelineOf(o){
+  const t=STEPS.map(([k,l])=>({label:l,done:!!o.ts[k],at:o.ts[k]?fmtShort(o.ts[k]):'Pending'}));
+  if(o.status==='cancelled')return [t[0],{label:'Cancelled',done:true,at:o.ts.cancelled?fmtShort(o.ts.cancelled):''}];
+  return t;
+}
+function etaFor(status,courier){
+  const d=n=>fmtDay(Date.now()+n*DAY).replace(/ \d{4}$/,'');
+  return {processing:'Dispatch '+d(1)+' tak',shipped:d(3)+' tak',out_for_delivery:'Aaj shaam 8 baje tak',delivered:'Delivered '+d(0),draft:''}[status]||'';
+}
+function newAwb(courier){return ({Delhivery:'DLV',Bluedart:'BD',Shiprocket:'SR','Ecom Express':'EE'}[courier]||'AWB')+rnd(10000000,99999999);}
+/* Order Status Webhook -> Normalize Status Update -> Send Status Template */
+function orderStatusWebhook(b,{order=null,quiet=false}={}){
+  b=b||{};const status=b.status,tpl=TPL_MAP[status];
+  if(!tpl||!b.phone)return {status:200,json:{ok:true,sent:0,note:'ignored: unknown status or missing phone'}};
+  const phone=digits(b.phone);
+  let detail;
+  if(status==='confirmed')detail=b.itemTitle||'your order';
+  else if(status==='shipped')detail=(b.courier||'Courier')+' | AWB '+(b.awb||'-')+' | '+(b.trackingUrl||'');
+  else if(status==='out_for_delivery')detail='ETA: '+(b.eta||'today');
+  else detail='Delivered '+(b.deliveredAt||'today');
+  const params=[b.customerName||'Customer',b.orderId||'-',detail];
+  const o=order||DB.orders.find(x=>x.id===b.orderId);
+  if(o){applyStatus(o,status,b);}
+  const t=DB.templates.find(x=>x.name===tpl);
+  addWaMsg({phone,direction:'out',sender:'bot',type:'template',template:tpl,intent:'status_update',body:renderTpl(t?t.body:'{{1}} {{2}} {{3}}',params)});
+  const c=custByPhone(phone);
+  if(!quiet)logEvent('status',`WhatsApp template ${tpl} sent to ${(c&&c.name)||fmtPhone(phone)} for ${b.orderId||'order'}`,'info');
+  logWebhook('order_status',200,`${status} → ${tpl} sent to ${(c&&c.name)||fmtPhone(phone)} (${b.orderId||'-'})`,null,null);
+  touch();return {status:200,json:{ok:true,sent:1,template:tpl,params}};
+}
+function applyStatus(o,status,b={}){
+  const now=iso(Date.now());
+  if(status==='confirmed'){o.status='processing';if(!o.ts.placed)o.ts.placed=now;o.ts.packed=o.ts.packed||'';}
+  if(status==='shipped'){o.status='shipped';o.ts.placed=o.ts.placed||now;o.ts.packed=o.ts.packed||now;o.ts.shipped=now;if(b.courier)o.courier=b.courier;if(b.awb)o.awb=b.awb;if(b.trackingUrl)o.tracking_url=b.trackingUrl;}
+  if(status==='out_for_delivery'){o.status='out_for_delivery';o.ts.packed=o.ts.packed||now;o.ts.shipped=o.ts.shipped||now;o.ts.out=now;}
+  if(status==='delivered'){o.status='delivered';o.ts.packed=o.ts.packed||now;o.ts.shipped=o.ts.shipped||now;o.ts.out=o.ts.out||now;o.ts.delivered=now;if(o.payment==='COD')o.paid=true;}
+  if(b.eta)o.eta=b.eta;else o.eta=etaFor(o.status,o.courier);
+  logEvent('order',`${o.id} → ${ORDER_SHORT[o.status]}`,o.status==='delivered'?'ok':'info');
+}
+/* CRM-side status change: builds the same payload the Shopify/courier webhook would send */
+function changeOrderStatus(o,target,{courier,awb,notify=true}={}){
+  const c=custByPhone(o.phone)||custById(o.customer_id)||{};
+  if(target==='cancelled'){o.status='cancelled';o.ts.cancelled=iso(Date.now());o.eta='Cancelled';logEvent('order',`${o.id} cancelled`,'bad');touch();return;}
+  const status=target==='processing'?'confirmed':target;
+  const body={status,phone:o.phone,customerName:o.name||c.name,orderId:o.id,itemTitle:o.items.map(i=>i.title).join(', '),courier:courier||o.courier||'Delhivery',awb:awb||o.awb,trackingUrl:'',eta:'',deliveredAt:fmtDay(Date.now())};
+  if(status==='shipped'){body.courier=courier||o.courier||'Delhivery';body.awb=awb||o.awb||newAwb(body.courier);body.trackingUrl=(COURIERS[body.courier]||'https://track.example.com/')+body.awb;}
+  if(!o.phone||!notify){applyStatus(o,status,body);touch();return;}
+  orderStatusWebhook(body,{order:o});
+}
+function createOrderFromDraft(o,{notify=true}={}){o.status='processing';o.ts.placed=iso(Date.now());o.ts.packed='';o.eta=etaFor('processing');if(o.id.startsWith('DRAFT'))o.id=nextOrderNo();if(o.comment_id){const cm=DB.comments.find(x=>x.id===o.comment_id);if(cm)cm.order_id=o.id;}if(notify&&o.phone)orderStatusWebhook({status:'confirmed',phone:o.phone,customerName:o.name,orderId:o.id,itemTitle:o.items.map(i=>i.title).join(', ')},{order:o});else{logEvent('order',`${o.id} confirmed`,'ok');touch();}}
+
+/* ---- support tickets ---- */
+function slaDue(startMs){
+  const cfg=DB.config,hs=cfg.support_start,he=cfg.support_end;let rem=(cfg.sla_hours||2)*HR,t=startMs;
+  const wall=ms=>{const p=tzParts(ms);return p;};
+  for(let i=0;i<10;i++){
+    const p=wall(t),open=fromWall(p.y,p.m,p.d,hs,0),close=fromWall(p.y,p.m,p.d,he,0);
+    if(t<open)t=open;
+    if(t>=close){const n=tzParts(t+DAY);t=fromWall(n.y,n.m,n.d,hs,0);continue;}
+    if(close-t>=rem)return t+rem;
+    rem-=close-t;const n=tzParts(t+DAY);t=fromWall(n.y,n.m,n.d,hs,0);
+  }
+  return t;
+}
+const ticketBreached=t=>t.status!=='Resolved'&&Date.now()>Date.parse(t.due_at);
+function createTicket({phone,name,orderId,text,word,at}){
+  const w=String(word||'').toLowerCase();
+  const category=/cancel/.test(w)?'Cancellation':/return|refund|wapas/.test(w)?'Return / Refund':/exchange|replace/.test(w)?'Exchange / Replacement':'Complaint';
+  const high=/damage|wrong|complaint|refund/.test(w);
+  const t0=at||Date.now();
+  const tk={id:'TKT-'+(Math.max(1000,...DB.tickets.map(t=>+String(t.id).replace(/\D/g,'')||0))+1),phone,name,order_id:orderId||'',category,priority:high?'high':'normal',status:'Open',assignee:'',text,created_at:iso(t0),due_at:iso(slaDue(t0)),notes:[]};
+  DB.tickets.unshift(tk);logEvent('ticket',`Support ticket ${tk.id} (${category}) opened for ${name||fmtPhone(phone)}`,'warn');return tk;
+}
+
+/* ============ FLOW 2: WhatsApp order desk ============ */
+function parseWA(raw){
+  const cfg=DB.config,lower=String(raw).trim().toLowerCase(),r=String(raw).trim();
+  const idMatch=r.match(/ord[- ]?#?([0-9]{4,})/i)||r.match(/#([0-9]{4,})/);
+  const orderId=idMatch?'ORD-'+idMatch[1]:null;
+  const orderCmd=r.match(/^order[ ]+([a-z0-9-]+)$/i);
+  let intent='menu',handle=null,word='';
+  if(orderCmd&&!idMatch){intent='new_order';handle=orderCmd[1].toLowerCase();}
+  else if((word=cfg.support_words.find(w=>lower.includes(w))||'')){intent='support';}
+  else if(orderId||(word=cfg.track_words.find(w=>lower.includes(w))||'')){intent='track';}
+  else if(lower.includes('my order')||lower.includes('orders')||lower.includes('history'))intent='my_orders';
+  return {intent,orderId,handle,word,text:r};
+}
+const fill=(s,o)=>String(s).replace(/\{(\w+)\}/g,(m,k)=>o[k]!=null?o[k]:m);
+function replyTracking(c,p){
+  const orders=ordersOf(c.phone);const o=p.orderId?orders.find(x=>x.id===p.orderId):orders[0];
+  if(!o)return `Hi ${c.name}! 🙏 ${p.orderId?p.orderId+' is number pe nahi mila.':'Is number pe koi order nahi mila.'}\nOrder number check karke dobara bhejiye (e.g. ${(orders[0]||{id:'ORD-10452'}).id}) ya *MENU* likhiye.`;
+  const items=o.items.map(i=>'• '+i.title+(i.size?' ('+i.size+')':'')+' x'+i.qty).join('\n');
+  const tl=timelineOf(o).map(t=>(t.done?'✅ ':'⏳ ')+t.label+' - '+t.at).join('\n');
+  const lines=['📦 *Order '+o.id+'*','Status: '+(ORDER_LABEL[o.status]||o.status),'',items,'Total: '+inr(o.total)+' ('+o.payment+')'];
+  if(o.courier)lines.push('Courier: '+o.courier+' | AWB: '+o.awb);
+  if(o.eta)lines.push('ETA: '+o.eta);
+  if(o.tracking_url)lines.push('🔗 Live tracking: '+o.tracking_url);
+  lines.push('','*Timeline*',tl,'','Cancel / return ke liye *CANCEL '+o.id+'* likhiye. Menu ke liye *MENU*.');
+  return lines.join('\n');
+}
+function replyMyOrders(c){
+  const orders=ordersOf(c.phone).slice(0,5);
+  if(!orders.length)return `Hi ${c.name}! Is number pe abhi tak koi order nahi hai. Instagram pe kisi post pe *price* comment karke product dekh sakte hain 🛍️`;
+  const L={processing:'📦 Packing',shipped:'🚚 Shipped',out_for_delivery:'🛵 Out for delivery',delivered:'✅ Delivered',cancelled:'❌ Cancelled'};
+  return `Hi ${c.name}! Aapke recent orders:\n\n`+orders.map(o=>'*'+o.id+'* - '+fmtDay(o.placed_at).replace(/ \d{4}$/,'')+'\n'+(L[o.status]||o.status)+' | '+inr(o.total)).join('\n\n')+'\n\nKisi order ko track karne ke liye order number bhejiye (e.g. *'+orders[0].id+'*).';
+}
+function replyNewOrder(c,p,ctx){
+  const pr=PRODUCT(p.handle);
+  if(!pr)return {text:`Hi ${c.name}! Yeh product abhi catalog mein nahi mila. Please post pe dobara *price* comment karein ya *MENU* likhiye.`};
+  let d=DB.orders.find(o=>o.status==='draft'&&o.phone===c.phone&&o.items[0]&&o.items[0].handle===pr.handle);
+  if(!d){
+    let ref;do{ref='DRAFT-'+rnd(100000,999999);}while(DB.orders.some(x=>x.id===ref));
+    d={id:ref,phone:c.phone,customer_id:c.id,name:c.name,placed_at:iso(ctx.at||Date.now()),status:'draft',items:[{title:pr.title,handle:pr.handle,size:'',qty:1,price:pr.price}],total:pr.price,payment:'Prepaid (pending)',paid:false,courier:'',awb:'',tracking_url:'',eta:'',ts:{placed:''},source:ctx.commentId?(DB.comments.find(x=>x.id===ctx.commentId)||{}).platform||'whatsapp':'whatsapp',comment_id:ctx.commentId||'',address:'',pincode:'',details_received:false,notes:''};
+    DB.orders.unshift(d);logEvent('order',`Draft ${ref} created from WhatsApp — ${pr.title}`,'pur');
+    if(ctx.commentId){const cm=DB.comments.find(x=>x.id===ctx.commentId);if(cm){cm.order_id=ref;cm.converted=true;}}
+  }
+  return {text:['Great choice, '+c.name+'! 🎉','','🛍️ *'+pr.title+'*','Price: '+inr(pr.price),'','Order confirm karne ke liye ek message mein bhejiye:','1) Size','2) Full delivery address with pincode','','Draft ref: '+d.id,'Pay online: https://pay.'+DB.config.shop_domain.replace('.myshopify.com','')+'.com/'+d.id].join('\n'),draft:d};
+}
+function waProcess(phone,name,text,ctx={}){
+  const at=ctx.at||Date.now();
+  const c=upsertCustomer({phone,name,platform:'whatsapp',at});
+  if(!c.name||c.name==='Customer')c.name=name||'there';
+  c.last_inbound_at=iso(at);c.unread=(c.unread||0)+1;
+  addWaMsg({phone,direction:'in',sender:'customer',body:text,at:iso(at)});
+  const p=parseWA(text);let reply,extra={};
+  const cfg=DB.config;
+  if(p.intent==='track')reply=replyTracking(c,p);
+  else if(p.intent==='my_orders')reply=replyMyOrders(c);
+  else if(p.intent==='new_order'){const r=replyNewOrder(c,p,ctx);reply=r.text;}
+  else if(p.intent==='support'){
+    const ord=p.orderId&&ordersOf(c.phone).find(o=>o.id===p.orderId);
+    const tk=createTicket({phone,name:c.name,orderId:ord?p.orderId:(p.orderId?p.orderId+' (unverified)':''),text:p.text,word:p.word,at});
+    reply=fill(cfg.support_reply,{name:c.name,ref:p.orderId?' ('+p.orderId+')':'',ticket:tk.id});
+  }else{
+    const draft=cfg.capture_details&&DB.orders.find(o=>o.status==='draft'&&o.phone===phone);
+    const pin=String(text).match(/\b[1-9]\d{5}\b/);
+    if(draft&&pin){
+      const sz=String(text).match(/\b(XXL|XL|L|M|S)\b/i);
+      draft.size_ok=true;draft.items[0].size=sz?sz[1].toUpperCase():'';draft.address=String(text).trim();draft.pincode=pin[0];draft.details_received=true;
+      p.intent='details';
+      reply=`Thanks ${c.name}! 🙏 Size ${draft.items[0].size||'(not mentioned)'} aur address note kar liya hai.\nHamari team payment confirm karke aapka order jald process karegi.\nRef: ${draft.id}`;
+      logEvent('order',`${draft.id}: size & address received on WhatsApp — ready to confirm`,'pur');
+    }else reply=fill(cfg.menu_reply,{name:c.name,brand:cfg.brand_name,sample:(ordersOf(phone)[0]||{id:'ORD-10452'}).id});
+  }
+  return {text:reply,intent:p.intent,parsed:p};
+}
+function waSendReply(phone,r,at){addWaMsg({phone,direction:'out',sender:'bot',body:r.text,intent:r.intent,at:iso(at||Date.now()),status:(at&&at<Date.now()-6e4)?'read':'sent'});}
+async function waInbound(phone,name,text,ctx={}){
+  phone=digits(phone);if(!phone)return;
+  const known=custByPhone(phone);
+  const r=waProcess(phone,known?known.name:(name||'there'),text,ctx);
+  logWebhook('wa_inbound',200,`WhatsApp message from ${fmtPhone(phone)} → intent: ${r.intent}`,null,null);
+  touch();
+  UI.typing=phone;touch();await sleep(rnd(800,1400));UI.typing=null;
+  waSendReply(phone,r);logEvent('wa',`Order desk replied to ${(custByPhone(phone)||{}).name||fmtPhone(phone)} (${r.intent})`,'info');touch();
+  return r;
+}
+
+/* ============ FLOW 1: Comment -> DM carousel ============ */
+function detectIntent(text){
+  const lower=String(text).toLowerCase(),words=lower.split(/[^a-z0-9]+/);
+  const hit=DB.config.keywords.find(k=>k.indexOf(' ')>-1?lower.includes(k):words.includes(k));
+  return {buyingIntent:!!hit,matchedKeyword:hit||null};
+}
+function buildCarousel(ctx,products){
+  const els=[],lines=[];
+  products.forEach(p=>{
+    const url=productUrl(p,ctx.platform),sizes=sizesOf(p),stock=inStock(p);
+    const mrp=Number(p.mrp)>Number(p.price)?' (MRP '+inr(p.mrp)+')':'';
+    els.push({_handle:p.handle,title:String(p.title).slice(0,80),subtitle:(inr(p.price)+mrp+' • '+(stock?'Sizes: '+sizes.join('/'):'Sold out')).slice(0,80),image_url:`https://${DB.config.shop_domain}/cdn/shop/files/${p.handle}.jpg`,default_action:{type:'web_url',url},buttons:[{type:'web_url',url,title:stock?'Buy Now':'View Product'},{type:'web_url',url:waLink(p.handle),title:'Order on WhatsApp'}]});
+    lines.push('• '+p.title+' - '+inr(p.price)+'\n'+url);
+  });
+  return {
+    productCount:els.length,
+    carouselBody:{recipient:{comment_id:ctx.commentId},message:{attachment:{type:'template',payload:{template_type:'generic',elements:els.slice(0,10)}}}},
+    fallbackBody:{recipient:{comment_id:ctx.commentId},message:{text:'Hi '+(ctx.fromName||'')+'! 👋 Aapne '+DB.config.brand_name+' ki post pe poocha tha. Yeh rahe details:\n\n'+lines.join('\n\n')}},
+    publicReplyText:fill(DB.config.public_reply,{name:ctx.fromName||''})
+  };
+}
+const idFor=(platform,postId)=>platform==='instagram'?'179'+String(rnd(1e13,9e13)):String(postId||'10000000001_20000000002').split('_')[0]+'_'+rnd(1e10,9e10);
+/* whole pipeline for one normalized comment event */
+function processComment(rec,opts={}){
+  const cfg=DB.config,at=opts.at||Date.now(),trace=[];
+  const T=(step,detail,state='ok')=>trace.push({step,detail:detail||'',state});
+  rec=Object.assign({mediaType:'FEED'},rec);
+  if(!rec.commentId)rec.commentId=idFor(rec.platform,rec.postId);
+  if(!rec.accountId)rec.accountId=rec.platform==='instagram'?cfg.ig_account_id:cfg.fb_page_id;
+  if(!rec.fromId)rec.fromId=String(rnd(1e15,9e15));
+  if(String(rec.fromId)===String(rec.accountId))return {skipped:'own comment (fromId equals account id)'};
+  if(!opts.forceIntent&&DB.comments.some(x=>x.comment_id===rec.commentId))return {skipped:'duplicate comment_id (already processed)'};
+  const cust=upsertCustomer({handle:rec.fromName,name:rec.fromName,platform:rec.platform,at});
+  const intent=opts.forceIntent?{buyingIntent:true,matchedKeyword:'manual override'}:detectIntent(rec.commentText);
+  const c={id:uid('cm'),comment_id:rec.commentId,platform:rec.platform,account_id:rec.accountId,post_id:rec.postId,media_type:rec.mediaType,text:rec.commentText,from_id:rec.fromId,from_name:rec.fromName,customer_id:cust.id,at:iso(at),buying_intent:intent.buyingIntent,keyword:intent.matchedKeyword,status:'no_intent',products:[],mapped_by:'',carousel:null,fallback:null,public_reply:'',public_endpoint:'',clicks:0,converted:false,order_id:'',ignored:false,error:'',trace};
+  T('Meta Comment Events (POST)',`${rec.platform} comment ${rec.commentId}`);
+  T('Normalize Comment Events',`from @${rec.fromName}${rec.mediaType?' · '+rec.mediaType:''}`);
+  if(!intent.buyingIntent){T('Buying Intent?','No keyword matched → workflow ends, no DM','skip');DB.comments.unshift(c);return {comment:c};}
+  T('Buying Intent?',`Matched keyword “${intent.matchedKeyword}”`);
+  T('Store Config',`${cfg.brand_name} · ${cfg.shop_domain} · useMock=${cfg.use_mock}`);
+  const post=DB.posts.find(p=>p.id===rec.postId);
+  const mapped=post&&post.handles&&post.handles.length;
+  const handles=(mapped?post.handles:cfg.fallback_bestsellers).slice(0,10);
+  c.mapped_by=mapped?'post_map':'fallback_bestsellers';
+  T('Resolve Products for Post',`${handles.length} product(s) via ${c.mapped_by}`,mapped?'ok':'warn');
+  const prods=[];handles.forEach(h=>{const p=PRODUCT(h);if(p&&p.active!==false)prods.push(p);});
+  T(cfg.use_mock?'Mock Shopify Catalog':'Fetch Product from Shopify Store',`${prods.length} of ${handles.length} found${prods.length<handles.length?' (missing handles skipped)':''}`,prods.length?'ok':'bad');
+  if(!prods.length){c.status='failed';c.error='No products resolved — nothing to send';T('Build Product Carousel','No elements built','bad');DB.comments.unshift(c);return {comment:c};}
+  c.products=prods.map(p=>p.handle);
+  const b=buildCarousel({platform:rec.platform,commentId:rec.commentId,fromName:rec.fromName},prods);
+  c.carousel=b.carouselBody;c.fallback=b.fallbackBody;c.public_reply=b.publicReplyText;
+  T('Build Product Carousel',`${b.productCount} card(s) · generic template`);
+  const fail=opts.failCarousel!=null?opts.failCarousel:Math.random()<(DB.settings.fail_rate||0);
+  c.dm_at=iso(at+rnd(2,9)*1000);
+  if(!fail){c.status='dm_carousel';T('Send Product Carousel DM',`POST /${rec.accountId}/messages · recipient.comment_id (private reply)`);}
+  else{
+    c.status='dm_fallback';c.error=pick(['(#100) Generic template not supported for this comment surface','(#10903) Private reply window closed for media type','(#200) Attachment URL could not be fetched']);
+    T('Send Product Carousel DM',c.error,'bad');T('Fallback Text DM with Links','Plain-text DM with product links sent instead','warn');
+  }
+  c.public_endpoint=`POST /${rec.commentId}/${rec.platform==='instagram'?'replies':'comments'}`;
+  T('Public Reply on Comment',`${c.public_endpoint} → “${c.public_reply.slice(0,48)}…”`);
+  DB.comments.unshift(c);
+  if(!opts.silent)logEvent('comment',`@${rec.fromName} asked “${intent.matchedKeyword}” on ${rec.platform} → ${c.status==='dm_carousel'?'carousel DM':'fallback DM'} sent (${b.productCount} product${b.productCount>1?'s':''})`,c.status==='dm_carousel'?'ok':'warn');
+  return {comment:c};
+}
+/* Meta webhook: GET verify + POST normalize (same logic as the Code node) */
+function metaVerify(q){
+  q=q||{};
+  const ok=q['hub.verify_token']===DB.config.verify_token;
+  logWebhook('meta_verify',ok?200:403,ok?'Verification passed — challenge echoed':'Verification failed — token mismatch',q,ok?String(q['hub.challenge']||''):'Forbidden');
+  return ok?{status:200,text:String(q['hub.challenge']||'')}:{status:403,text:'Forbidden'};
+}
+function normalizeMeta(body){
+  const out=[];
+  for(const entry of (body.entry||[]))for(const ch of (entry.changes||[])){
+    const v=ch.value||{};let rec=null;
+    if(body.object==='instagram'&&ch.field==='comments'){
+      if(v.parent_id)continue;
+      rec={platform:'instagram',accountId:entry.id,commentId:v.id,postId:v.media&&v.media.id,mediaType:(v.media&&v.media.media_product_type)||'FEED',commentText:v.text||'',fromId:v.from&&v.from.id,fromName:v.from&&(v.from.username||v.from.name)};
+    }else if(body.object==='page'&&ch.field==='feed'){
+      if(v.item!=='comment'||v.verb!=='add')continue;
+      if(v.parent_id&&v.parent_id!==v.post_id)continue;
+      rec={platform:'facebook',accountId:entry.id,commentId:v.comment_id,postId:v.post_id,mediaType:'POST',commentText:v.message||'',fromId:v.from&&v.from.id,fromName:v.from&&v.from.name};
+    }
+    if(!rec||!rec.commentId||!rec.fromId)continue;
+    out.push(rec);
+  }
+  return out;
+}
+function metaPost(body){
+  const recs=normalizeMeta(body||{}),res=[];
+  recs.forEach(r=>{const x=processComment(r);res.push(x.skipped?`skipped: ${x.skipped}`:`${r.platform} comment ${r.commentId} → ${x.comment.status}`);});
+  const out={status:200,json:{ok:true,received:recs.length,results:res}};
+  logWebhook('meta_comment',200,`${recs.length} comment event(s) → ${res.join('; ')||'nothing to process'}`,body,out.json);
+  touch();return out;
+}
+/* mock tap on a carousel button */
+function tapCarousel(commentId,handle,btn){
+  const c=DB.comments.find(x=>x.id===commentId);if(!c)return;
+  if(btn==='buy'){c.clicks=(c.clicks||0)+1;logEvent('click',`@${c.from_name} opened ${handle} on the store (UTM ${c.platform})`,'info');touch();toast('Opened product page (click tracked)','ok');return;}
+  const cu=custById(c.customer_id)||upsertCustomer({handle:c.from_name,platform:c.platform});
+  if(!cu.phone){cu.phone='9198'+String(rnd(10000000,99999999));}
+  c.clicks=(c.clicks||0)+1;
+  waInbound(cu.phone,cu.name,'ORDER '+handle,{commentId:c.id});
+  toast(`WhatsApp opened for ${cu.name} — message “ORDER ${handle}” sent`,'ok');
+}
+
+/* ---- webhook log ---- */
+function logWebhook(type,status,summary,payload,response){DB.webhooks.unshift({id:uid('w'),type,status,summary,payload,response,at:iso(Date.now())});if(DB.webhooks.length>80)DB.webhooks.length=80;}
+
+const tplVars=t=>[...new Set((String(t).match(/\{\{\s*(\d+)\s*\}\}/g)||[]).map(x=>+x.replace(/\D/g,'')))].sort((a,b)=>a-b);
+function renderTpl(body,params){return String(body||'').replace(/\{\{\s*(\d+)\s*\}\}/g,(m,n)=>params&&params[n-1]!=null&&params[n-1]!==''?params[n-1]:m);}
+
+/* ============ MOCK DATA ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function seedData(){
+  const R=mulberry32(2026),ri=(a,b)=>Math.floor(R()*(b-a+1))+a,rp=a=>a[Math.floor(R()*a.length)];
+  const now=Date.now(),ago=(h)=>now-h*HR;
+  const d={config:{
+    brand_name:'Kurta Kingdom',shop_domain:'demo-kurta-store.myshopify.com',wa_number:'919999999999',use_mock:true,verify_token:'replora_meta_verify',phone_number_id:'1073227029211574',ig_account_id:'17841400000000001',fb_page_id:'10000000001',
+    timezone:'Asia/Kolkata',support_start:10,support_end:20,sla_hours:2,utm_campaign:'comment_to_dm',capture_details:true,
+    keywords:[...DEF_KEYWORDS],track_words:[...DEF_TRACK],support_words:[...DEF_SUPPORT],
+    fallback_bestsellers:['classic-cotton-kurta-blue','chikankari-kurta-white','printed-anarkali-kurta'],
+    public_reply:'Hi {name}! Details aapke DM mein bhej diye hain 📩 (Message requests bhi check kar lijiye)',
+    support_reply:'Hi {name}! 🙏 Aapki request{ref} note kar li gayi hai.\nHamari support team 2 ghante ke andar (10am-8pm) aapse isi chat pe contact karegi.\n\nOrder status ke liye *TRACK* likhiye.',
+    menu_reply:'Namaste {name}! 👋 Main {brand} ka order assistant hoon.\n\nAap yeh kar sakte hain:\n📦 *TRACK {sample}* - live order tracking\n🧾 *MY ORDERS* - recent orders\n🛍️ *ORDER <product-code>* - naya order\n↩️ *CANCEL / RETURN* - support request'},
+    settings:{fail_rate:0.1},products:[],posts:[],comments:[],customers:[],messages:[],orders:[],tickets:[],templates:[],webhooks:[],events:[]};
+  DB=d;
+  /* products */
+  const V=(o)=>Object.entries(o).map(([size,stock])=>({size,stock}));
+  const P=(handle,title,price,mrp,color,pattern,cat,vars)=>d.products.push({id:9000+d.products.length+1,handle,title,price,mrp,color,pattern,category:cat,active:true,variants:V(vars),created_at:iso(ago(24*40))});
+  P('classic-cotton-kurta-blue','Classic Cotton Kurta - Indigo Blue',1299,1699,'#2f4a8a','plain','Men',{S:12,M:20,L:8,XL:0});
+  P('chikankari-kurta-white','Lucknowi Chikankari Kurta - Ivory',2499,2999,'#e6dcc8','chikan','Women',{S:5,M:9,L:6});
+  P('printed-anarkali-kurta','Printed Anarkali Kurta Set - Rani Pink',1899,0,'#d6336c','print','Women',{M:7,L:10,XL:4});
+  P('festive-silk-kurta-maroon','Festive Silk Kurta - Maroon',3499,4299,'#7a1731','silk','Men',{M:6,L:9,XL:3});
+  P('linen-kurta-sage','Linen Kurta - Sage Green',1599,1999,'#7f9a6e','plain','Men',{S:10,M:14,L:11,XL:6,XXL:2});
+  P('pathani-suit-charcoal','Pathani Suit Set - Charcoal',2799,3299,'#3b3f46','plain','Men',{M:2,L:5,XL:5});
+  P('palazzo-set-mustard','Cotton Palazzo Set - Mustard',1999,0,'#d9a21b','print','Women',{S:4,M:8,L:6});
+  P('nehru-jacket-set-cream','Nehru Jacket Set - Cream',3999,4999,'#efe3c6','plain','Men',{M:0,L:0,XL:0});
+  /* posts */
+  const POST=(id,platform,mediaType,caption,handles,daysAgo,likes)=>d.posts.push({id,platform,media_type:mediaType,caption,handles,created_at:iso(ago(24*daysAgo)),likes});
+  POST('17900001000000001','instagram','FEED','Everyday classic — our indigo cotton kurta is back 💙 Comment PRICE for details',['classic-cotton-kurta-blue'],16,1840);
+  POST('17900001000000002','instagram','FEED','Chikankari + Anarkali edit for the wedding season ✨',['chikankari-kurta-white','printed-anarkali-kurta'],12,2630);
+  POST('10000000001_20000000002','facebook','POST','Festive silk in deep maroon — limited stock! Comment "link" to shop 🛍️',['festive-silk-kurta-maroon'],9,640);
+  POST('17900001000000003','instagram','REELS','Diwali lookbook 🪔 (reel) — which one is your pick?',[],7,5120);
+  POST('17900001000000004','instagram','FEED','New drop: breathable linen kurta in sage green 🌿',['linen-kurta-sage'],5,1275);
+  POST('10000000001_20000000005','facebook','POST','Pathani suit set is here. Sizes M-XL.',['pathani-suit-charcoal'],3,410);
+  /* people */
+  const CU=(name,phone,handle,platform,tags,daysAgo)=>{const c=upsertCustomer({phone,name,handle,platform,at:ago(24*daysAgo)});c.tags=tags;return c;};
+  const riya=CU('Riya Sharma','919876543210','riya.sharma_','instagram',['VIP','Repeat'],30);
+  const karan=CU('Karan Verma','919811122233','karan.v.official','instagram',['Repeat'],26);
+  const priya=CU('Priya Nair','919820011122','priyanair.styles','instagram',['VIP'],22);
+  const aman=CU('Aman Gupta','919830022233','aman_k_07','instagram',[],15);
+  const sneha=CU('Sneha Patil','919840033344','sneha.patil.in','facebook',[],14);
+  const vikram=CU('Vikram Rathore','919850044455','vikram.rathore','facebook',['COD'],20);
+  const fatima=CU('Fatima Sheikh','919860055566','fatima.sheikh.9','instagram',['VIP'],18);
+  const rahul=CU('Rahul Mehta','919870066677','',' whatsapp'.trim(),[],6);
+  const anjali=CU('Anjali Desai','919880077788','anjali_desai_','instagram',['Repeat'],25);
+  const deepa=CU('Deepa Iyer','919890088899','deepa.iyer','facebook',[],11);
+  /* orders */
+  const O=(id,cu,hAgo,items,payment,status,courier,source)=>{
+    const its=items.map(([h,size,qty])=>{const p=PRODUCT(h);return {title:p.title,handle:h,size,qty:qty||1,price:p.price};});
+    const placed=ago(hAgo),offs={placed:0,packed:6*HR,shipped:22*HR,out:46*HR,delivered:54*HR},reach={processing:['placed'],shipped:['placed','packed','shipped'],out_for_delivery:['placed','packed','shipped','out'],delivered:['placed','packed','shipped','out','delivered'],cancelled:['placed']}[status];
+    const ts={};reach.forEach(k=>{ts[k]=iso(Math.min(placed+offs[k],now-20*MIN));});
+    const awb=courier?{Delhivery:'DLV',Bluedart:'BD',Shiprocket:'SR','Ecom Express':'EE'}[courier]+rnd(10000000,99999999):'';
+    const o={id,phone:cu.phone,customer_id:cu.id,name:cu.name,placed_at:iso(placed),status,items:its,total:sum(its,i=>i.price*i.qty),payment,paid:!/COD|pending/.test(payment)||status==='delivered',courier:courier||'',awb,tracking_url:courier&&reach.includes('shipped')?COURIERS[courier]+awb:'',eta:'',ts,source:source||'whatsapp',comment_id:'',address:'',pincode:'',details_received:true,notes:''};
+    if(status==='cancelled')o.ts.cancelled=iso(placed+3*HR);
+    o.eta=status==='delivered'?'Delivered '+fmtDay(ts.delivered).replace(/ \d{4}$/,''):status==='out_for_delivery'?'Aaj shaam 8 baje tak':status==='shipped'?fmtDay(placed+3*DAY).replace(/ \d{4}$/,'')+' tak':status==='processing'?'Dispatch '+fmtDay(placed+DAY).replace(/ \d{4}$/,'')+' tak':'';
+    d.orders.push(o);return o;
+  };
+  O('ORD-10460',riya,3,[['printed-anarkali-kurta','L'],['festive-silk-kurta-maroon','XL']],'Prepaid (Card)','processing','','instagram');
+  O('ORD-10452',riya,52,[['classic-cotton-kurta-blue','M']],'Prepaid (UPI)','out_for_delivery','Delhivery','instagram');
+  O('ORD-10431',riya,24*8+2,[['chikankari-kurta-white','M']],'COD','delivered','Bluedart','instagram');
+  O('ORD-10399',karan,24*12,[['festive-silk-kurta-maroon','L']],'Prepaid (UPI)','shipped','Shiprocket','facebook');
+  O('ORD-10458',priya,30,[['linen-kurta-sage','M',2]],'Prepaid (UPI)','shipped','Delhivery','instagram');
+  O('ORD-10455',aman,26,[['classic-cotton-kurta-blue','L'],['linen-kurta-sage','L']],'COD','processing','','whatsapp');
+  O('ORD-10449',vikram,24*4,[['pathani-suit-charcoal','XL']],'COD','delivered','Bluedart','facebook');
+  O('ORD-10441',vikram,24*7,[['classic-cotton-kurta-blue','XL']],'COD','delivered','Delhivery','facebook');
+  O('ORD-10444',fatima,24*5,[['chikankari-kurta-white','S'],['palazzo-set-mustard','S']],'Prepaid (Card)','delivered','Delhivery','instagram');
+  O('ORD-10437',anjali,24*6,[['printed-anarkali-kurta','M']],'Prepaid (UPI)','delivered','Ecom Express','instagram');
+  O('ORD-10421',anjali,24*10,[['linen-kurta-sage','S']],'Prepaid (UPI)','delivered','Delhivery','website');
+  O('ORD-10416',deepa,24*11,[['palazzo-set-mustard','M']],'COD','cancelled','','facebook');
+  O('ORD-10425',rahul,24*9,[['festive-silk-kurta-maroon','M']],'Prepaid (Card)','delivered','Bluedart','whatsapp');
+  O('ORD-10407',priya,24*13,[['chikankari-kurta-white','M']],'Prepaid (UPI)','delivered','Delhivery','instagram');
+  O('ORD-10409',karan,24*13+5,[['pathani-suit-charcoal','L']],'Prepaid (UPI)','delivered','Delhivery','website');
+  O('ORD-10461',deepa,9,[['linen-kurta-sage','L'],['classic-cotton-kurta-blue','M']],'Prepaid (UPI)','processing','','facebook');
+  O('ORD-10462',fatima,5,[['printed-anarkali-kurta','M']],'Prepaid (Card)','processing','','instagram');
+  /* template messages for order lifecycle (Flow 3 history) */
+  const T4={confirmed:['order_confirmed_v1','placed'],shipped:['order_shipped_v1','shipped'],out_for_delivery:['order_out_for_delivery_v1','out'],delivered:['order_delivered_v1','delivered']};
+  /* templates */
+  d.templates.push(
+    {id:'t1',name:'order_confirmed_v1',language:'en',category:'UTILITY',status:'APPROVED',body:'Hi {{1}}! 🎉 Your order {{2}} is confirmed. Items: {{3}}. We will update you as soon as it ships.',vars:['Customer name','Order ID','Item titles'],trigger:'status = confirmed'},
+    {id:'t2',name:'order_shipped_v1',language:'en',category:'UTILITY',status:'APPROVED',body:'Hi {{1}}, your order {{2}} has shipped 🚚\n{{3}}',vars:['Customer name','Order ID','Courier | AWB | tracking link'],trigger:'status = shipped'},
+    {id:'t3',name:'order_out_for_delivery_v1',language:'en',category:'UTILITY',status:'APPROVED',body:'Hi {{1}}, your order {{2}} is out for delivery today 🛵 {{3}}',vars:['Customer name','Order ID','ETA'],trigger:'status = out_for_delivery'},
+    {id:'t4',name:'order_delivered_v1',language:'en',category:'UTILITY',status:'APPROVED',body:'Hi {{1}}, your order {{2}} was delivered ✅ {{3}}. Loved it? Reply here with feedback — it means a lot!',vars:['Customer name','Order ID','Delivered on'],trigger:'status = delivered'});
+  d.orders.forEach(o=>{
+    if(!o.phone||o.status==='cancelled')return;
+    const prog={processing:['confirmed'],shipped:['confirmed','shipped'],out_for_delivery:['confirmed','shipped','out_for_delivery'],delivered:['confirmed','shipped','out_for_delivery','delivered']}[o.status]||[];
+    prog.forEach(st=>{
+      const [tn,k]=T4[st],t=d.templates.find(x=>x.name===tn);
+      const detail=st==='confirmed'?o.items.map(i=>i.title).join(', '):st==='shipped'?o.courier+' | AWB '+o.awb+' | '+o.tracking_url:st==='out_for_delivery'?'ETA: Aaj shaam 8 baje tak':'Delivered '+fmtDay(o.ts.delivered||now);
+      const at=Date.parse(o.ts[k]||o.placed_at)+MIN*3;
+      d.messages.push({id:uid('m'),wa_id:'wamid.T'+uid('x'),phone:o.phone,direction:'out',sender:'bot',type:'template',template:tn,intent:'status_update',body:renderTpl(t.body,[o.name,o.id,detail]),at:iso(at),status:'read'});
+    });
+  });
+  /* WhatsApp conversations (run through the real order-desk logic) */
+  const conv=(c,steps)=>steps.forEach(([h,text])=>{const at=ago(h);const r=waProcess(c.phone,c.name,text,{at});waSendReply(c.phone,r,at+2500);});
+  conv(riya,[[50,'hi'],[49.5,'TRACK ORD-10452'],[26,'Mera order kahan hai?'],[2,'CANCEL ORD-10460']]);
+  conv(karan,[[30,'Order 10399 kab tak aayega?']]);
+  conv(priya,[[8,'MY ORDERS']]);
+  conv(aman,[[27,'ORDER pathani-suit-charcoal'],[26.5,'Size L, Aman Gupta, Flat 4B Sunrise Apts, Andheri West, Mumbai 400053']]);
+  conv(sneha,[[5,'ORDER festive-silk-kurta-maroon'],[4.5,'COD available hai?']]);
+  conv(vikram,[[20,'wrong size mila hai, exchange chahiye ORD-10441']]);
+  conv(fatima,[[14,'refund kab milega? damage kurta aaya tha']]);
+  conv(rahul,[[40,'hi']]);
+  conv(deepa,[[3,'ORDER nehru-jacket-set-cream']]);
+  d.customers.forEach(c=>{c.unread=0;});
+  riya.unread=1;sneha.unread=1;
+  /* tickets: progress some */
+  d.tickets.forEach(t=>{if(t.name==='Vikram Rathore'){t.status='In progress';t.assignee='Arjun';t.notes.push({by:'Arjun',text:'Reverse pickup scheduled for exchange.',at:iso(ago(15))});}if(t.name==='Fatima Sheikh'){t.priority='high';t.assignee='Riya';}});
+  d.tickets.push({id:'TKT-1000',phone:'919820011122',name:'Priya Nair',order_id:'ORD-10407',category:'Return / Refund',priority:'normal',status:'Resolved',assignee:'Meera',text:'return karna hai, size chhota hai',created_at:iso(ago(24*5)),due_at:iso(ago(24*5-2)),notes:[{by:'Meera',text:'Exchange processed with size L.',at:iso(ago(24*5-3))}]});
+  /* comments (real pipeline, historic timestamps) */
+  const intentTexts=['Price?','kitna hai','Price please 🙏','Size M available?','Ye kitne ka hai bhai','details','DM me the link','COD available?','how much','chahiye 2 pieces','link','rate kya hai','Order kaise karu','available in L?','Price pls','kitne ka hai ye','Cost?','book kar do','info pls','size chart?? price bhi batao'];
+  const noIntent=['Beautiful ❤️','Love this 😍','So pretty!','Which fabric is this?','🔥🔥🔥','Nice collection','Follow back please','Gorgeous!! 😍','Do you ship to Dubai?','Is it breathable in summer?','Stunning colour','Wow'];
+  const handles=['aarav.k','meena_rao_22','simran.kaur.official','jay_patel_99','neha.designs','kurtalover_pooja','rohan.sethi','ishita_m','tanvi.sharma.7','arjun.nair.k','zoya.khan.insta','kabir_singh_1','ananya.styles','dev.malhotra','shruti_joshi_','harsh.vora','mehak.arora','nikhil.p.07','sana.shaikh','pallavi.d','yash_thakur','divya.menon','tarun.bhatia','kriti.sinha','sameer.ali.77'];
+  const posts=d.posts,pw=[1,2,2,1,3,2,1];
+  const pickPost=()=>posts[Math.floor(R()*posts.length)];
+  for(let i=0;i<46;i++){
+    const post=pickPost(),intent=R()<.5,h=rp(handles),hrsAgo=Math.max(.3,Math.pow(R(),1.6)*24*Math.min(14,Math.max(1,(now-Date.parse(post.created_at))/DAY)));
+    processComment({platform:post.platform,postId:post.id,mediaType:post.media_type,commentText:intent?rp(intentTexts):rp(noIntent),fromName:h,fromId:String(ri(1e15,9e15))},{at:ago(hrsAgo),failCarousel:R()<.1,silent:true});
+  }
+  /* linked comments that converted into orders */
+  const link=(cust,handle,postId,text,hrs,orderId)=>{const post=posts.find(p=>p.id===postId);const r=processComment({platform:post.platform,postId:post.id,mediaType:post.media_type,commentText:text,fromName:cust.handle,fromId:'u'+cust.id,commentId:'lk'+(orderId||uid('x'))},{at:ago(hrs),failCarousel:false,silent:true});const c=r.comment;c.customer_id=cust.id;c.clicks=2;c.converted=true;c.order_id=orderId;const o=d.orders.find(x=>x.id===orderId);if(o)o.comment_id=c.id;};
+  link(riya,'classic-cotton-kurta-blue','17900001000000001','Price?',24*3+6,'ORD-10452');
+  link(riya,'festive-silk-kurta-maroon','17900001000000002','kitna hai ye anarkali?',3.6,'ORD-10460');
+  link(priya,'linen-kurta-sage','17900001000000004','price please',32,'ORD-10458');
+  link(fatima,'printed-anarkali-kurta','17900001000000002','size M available?',24*2+10,'ORD-10462');
+  link(sneha,'festive-silk-kurta-maroon','10000000001_20000000002','link',6,'');
+  link(deepa,'nehru','10000000001_20000000005','details',3.5,'');
+  /* sort comments newest first */
+  d.comments.sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+  /* sprinkle clicks */
+  d.comments.forEach(c=>{if(c.status==='dm_carousel'&&!c.clicks&&R()<.35)c.clicks=ri(1,3);});
+  /* webhook log + activity feed */
+  const W=(type,status,summary,hAgo)=>d.webhooks.push({id:uid('w'),type,status,summary,payload:null,response:null,at:iso(ago(hAgo))});
+  W('meta_verify',200,'Verification passed — challenge echoed',24*40);W('wa_inbound',200,'WhatsApp message from +91 98765 43210 → intent: support',2);W('meta_comment',200,'1 comment event(s) → instagram comment → dm_carousel',3.6);
+  d.events=[];
+  const EV=(kind,text,tone,h)=>d.events.push({id:uid('e'),kind,text,tone,at:iso(ago(h))});
+  EV('wa','Order desk replied to Riya Sharma (support)','info',1.9);EV('ticket','Support ticket TKT-1001 (Cancellation) opened for Riya Sharma','warn',2);EV('order','ORD-10460 confirmed — template order_confirmed_v1 sent','ok',2.9);
+  EV('comment','@riya.sharma_ asked “kitna” on instagram → carousel DM sent (2 products)','ok',3.6);EV('order','DRAFT created from WhatsApp — Nehru Jacket Set - Cream','pur',3);EV('order','ORD-10452 → Out for delivery','info',6);
+  EV('status','WhatsApp template order_shipped_v1 sent to Priya Nair for ORD-10458','info',22);EV('comment','@aarav.k asked “price” on instagram → fallback DM sent (1 product)','warn',27);
+  d.events.sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+  return d;
+}
+
+/* ============ UI CORE ============ */
+const VIEWS={},ACT={},INP={};
+const NAV=[['dashboard','Dashboard','dashboard'],['comments','Comment → DM','msg'],['posts','Posts & Mapping','insta'],['catalog','Catalog','shirt'],['whatsapp','WhatsApp Desk','chat'],['orders','Orders','box'],['customers','Customers','users'],['tickets','Support Tickets','support'],['templates','WA Templates','tpl'],['automation','Automation Rules','zap'],['webhooks','Webhooks & Logs','activity'],['settings','Settings','settings']];
+function navHTML(){
+  const unread=DB.customers.filter(c=>c.unread>0).length;
+  const act=DB.orders.filter(o=>o.status==='draft'&&o.details_received||o.status==='processing').length;
+  const open=DB.tickets.filter(t=>t.status!=='Resolved'),br=open.filter(ticketBreached).length;
+  return NAV.map(([k,l,ic])=>{
+    let b='';
+    if(k==='whatsapp'&&unread)b=`<span class="cnt">${unread}</span>`;
+    if(k==='orders'&&act)b=`<span class="cnt soft">${act}</span>`;
+    if(k==='tickets'&&open.length)b=`<span class="cnt ${br?'':'soft'}">${open.length}</span>`;
+    return `<button class="nav-i ${UI.tab===k?'on':''}" data-act="go" data-tab="${k}">${icon(ic)}<span>${l}</span>${b}</button>`;
+  }).join('');
+}
+function go(tab){
+  if(!VIEWS[tab])tab='dashboard';
+  UI.tab=tab;UI.sideOpen=false;$('#side').classList.remove('open');
+  try{history.replaceState(null,'','#'+tab);}catch(e){}
+  render();window.scrollTo(0,0);
+}
+function render(){
+  const v=VIEWS[UI.tab];
+  $('#pageTitle').textContent=v.title;$('#nav').innerHTML=navHTML();
+  $('#view').innerHTML=v.render();
+  if(v.mount)v.mount();
+}
+function refresh(){
+  const v=VIEWS[UI.tab];if(!v)return;
+  if(typeof _dragProd!=='undefined'&&_dragProd)return;
+  $('#nav').innerHTML=navHTML();
+  if(v.update)v.update();else{const y=window.scrollY;$('#view').innerHTML=v.render();if(v.mount)v.mount();window.scrollTo(0,y);}
+}
+ACT.go=el=>go(el.dataset.tab);
+ACT.toggleSide=()=>{$('#side').classList.toggle('open');};
+ACT.closeModal=()=>closeModal();
+ACT.theme=()=>{
+  const root=document.documentElement;
+  const cur=root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  const next=cur==='dark'?'light':'dark';root.dataset.theme=next;
+  try{localStorage.setItem('kk_theme',next);}catch(e){}
+  $('#themeBtn').innerHTML=icon(next==='dark'?'sun':'moon');
+};
+document.addEventListener('click',e=>{
+  const mb=e.target.closest('[data-mact]');
+  if(mb&&MODAL){const a=MODAL.actions[+mb.dataset.mact];if(a&&a.onClick)a.onClick();return;}
+  if(e.target.matches('[data-ov]')){closeModal();return;}
+  const t=e.target.closest('[data-act]');
+  if(t&&ACT[t.dataset.act])ACT[t.dataset.act](t,e);
+  if(!e.target.closest('.search'))$('#gsResults').classList.add('hide');
+});
+document.addEventListener('input',e=>{const t=e.target.closest('[data-in]');if(t&&INP[t.dataset.in])INP[t.dataset.in](t,e);});
+document.addEventListener('change',e=>{const t=e.target.closest('[data-ch]');if(t&&INP[t.dataset.ch])INP[t.dataset.ch](t,e);});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();$('#gsResults').classList.add('hide');}
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){const t=e.target.closest('[data-enter]');if(t&&ACT[t.dataset.enter]){e.preventDefault();ACT[t.dataset.enter](t,e);}}
+});
+
+/* ---- global search: customers, orders, products ---- */
+INP.gsearch=el=>{
+  const q=el.value.trim().toLowerCase(),box=$('#gsResults');
+  if(!q){box.classList.add('hide');return;}
+  const cs=DB.customers.filter(c=>(c.name+' '+c.phone+' '+c.handle).toLowerCase().includes(q)).slice(0,4).map(c=>`<button data-act="openCustomer" data-id="${c.id}">${avatar(c.name,c.phone,'sm')}<span><b>${esc(c.name)}</b> <span class="muted xs-t">${c.phone?fmtPhone(c.phone):'@'+esc(c.handle)}</span></span></button>`);
+  const os=DB.orders.filter(o=>(o.id+' '+o.name+' '+o.items.map(i=>i.title).join(' ')).toLowerCase().includes(q)).slice(0,4).map(o=>`<button data-act="openOrder" data-id="${o.id}"><span class="av sm" style="background:var(--brand)">${icon('box','sm')}</span><span><b>${o.id}</b> <span class="muted xs-t">${esc(o.name)} · ${inr(o.total)}</span><br>${stBadge(o.status)}</span></button>`);
+  const ps=liveProducts().filter(p=>p.title.toLowerCase().includes(q)).slice(0,3).map(p=>`<button data-act="editProduct" data-h="${p.handle}"><span style="width:28px;height:28px;border-radius:6px;overflow:hidden;display:block">${prodArt(p)}</span><span><b>${esc(p.title)}</b> <span class="muted xs-t">${inr(p.price)}</span></span></button>`);
+  const all=[...cs,...os,...ps];
+  box.innerHTML=all.length?all.join(''):'<div class="empty">No matches</div>';box.classList.remove('hide');
+};
+
+/* ---- product art (inline SVG, no external images) ---- */
+let _pid=0;
+function shade(hex,amt){const h=hex.replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);let r=n>>16,g=(n>>8)&255,b=n&255;const f=v=>Math.max(0,Math.min(255,Math.round(amt>=0?v+(255-v)*amt/100:v*(1+amt/100))));return '#'+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('');}
+function prodArt(p){
+  const id='pt'+(++_pid),c=p.color||'#3b4d8f',dark=shade(c,-30),light=shade(c,45),bg=shade(c,88),pat=p.pattern||'plain';
+  const defs=pat==='chikan'?`<pattern id="${id}" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.2" fill="#b8a98a" opacity=".8"/></pattern>`:pat==='print'?`<pattern id="${id}" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M9 2l2.2 4.4 4.8.7-3.5 3.4.8 4.8L9 13l-4.3 2.3.8-4.8L2 7.1l4.8-.7z" fill="${light}" opacity=".6"/></pattern>`:pat==='silk'?`<pattern id="${id}" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10L10 0" stroke="#fff" stroke-width="1.2" opacity=".14"/></pattern>`:'';
+  const body='M72 44 L128 44 L152 62 L162 108 L148 112 L144 86 L144 180 L56 180 L56 86 L52 112 L38 108 L48 62 Z';
+  return `<svg class="pimg" viewBox="0 0 200 200" role="img" aria-label="${esc(p.title||'product')}"><defs>${defs}<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="${shade(c,70)}"/></linearGradient></defs><rect width="200" height="200" fill="url(#${id}g)"/><path d="M100 14v14M100 28c-10 0-18 6-22 16M100 28c10 0 18 6 22 16" stroke="#8a7566" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="${body}" fill="${c}" stroke="${dark}" stroke-width="2" stroke-linejoin="round"/>${pat!=='plain'?`<path d="${body}" fill="url(#${id})"/>`:''}<path d="M88 44 Q100 64 112 44" fill="${dark}" stroke="${dark}" stroke-width="2"/><path d="M100 60 V118" stroke="${dark}" stroke-width="2"/><circle cx="100" cy="74" r="2.4" fill="${light}"/><circle cx="100" cy="92" r="2.4" fill="${light}"/><circle cx="100" cy="110" r="2.4" fill="${light}"/><rect x="56" y="170" width="88" height="10" fill="${dark}" opacity=".55"/><path d="M38 108l14 4M162 108l-14 4" stroke="${dark}" stroke-width="3"/></svg>`;
+}
+const artFor=handle=>{const p=PRODUCT(handle);return p?prodArt(p):'<div class="pimg" style="background:var(--gray-soft)"></div>';};
+
+/* ---- shared widgets ---- */
+function niceMax(m){if(m<=5)return 5;const p=Math.pow(10,Math.floor(Math.log10(m)));return Math.ceil(m/p)*p>m*1.6?Math.ceil(m/(p/2))*(p/2):Math.ceil(m/p)*p;}
+function barChart(labels,series,colors,names,H=190){
+  const W=620,pl=34,pb=26,pt=10,max=niceMax(Math.max(1,...series.flat()));
+  const gw=(W-pl)/labels.length,bw=Math.min(20,gw/(series.length+1.2)),ih=H-pb-pt;
+  let g='';for(let i=0;i<=4;i++){const y=pt+ih-ih*i/4;g+=`<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--border)" stroke-width="1"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${Math.round(max*i/4)}</text>`;}
+  let bars='';labels.forEach((l,i)=>{
+    const cx=pl+gw*i+gw/2,tot=bw*series.length+3*(series.length-1);
+    series.forEach((s,j)=>{const h=ih*s[i]/max,x=cx-tot/2+j*(bw+3);bars+=`<rect x="${x}" y="${pt+ih-h}" width="${bw}" height="${Math.max(h,s[i]?1.5:0)}" rx="3" fill="${colors[j]}"><title>${esc(l)} · ${names[j]}: ${s[i]}</title></rect>`;});
+    bars+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${esc(l)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${names.join(' vs ')} per day">${g}${bars}</svg>`;
+}
+function donut(items,centerLabel){
+  const total=sum(items,i=>i.v),r=52,C2=2*Math.PI*r;let off=0,arcs='';
+  if(!total)arcs=`<circle r="${r}" cx="70" cy="70" fill="none" stroke="var(--border)" stroke-width="18"/>`;
+  items.forEach(i=>{if(!i.v)return;const len=C2*i.v/total;arcs+=`<circle r="${r}" cx="70" cy="70" fill="none" stroke="${i.color}" stroke-width="18" stroke-dasharray="${len} ${C2-len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"><title>${esc(i.l)}: ${i.v}</title></circle>`;off+=len;});
+  return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="${esc(centerLabel)}">${arcs}<text x="70" y="68" text-anchor="middle" font-size="24" font-weight="700" fill="var(--text)">${total}</text><text x="70" y="86" text-anchor="middle" font-size="10.5" fill="var(--muted)">${esc(centerLabel)}</text></svg>`;
+}
+function csvDownload(name,rows){
+  const csv=rows.map(r=>r.map(v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function jsonDownload(name,obj){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+
+const EV_ICON={comment:'msg',click:'link',wa:'chat',order:'box',status:'truck',ticket:'support',webhook:'activity'};
+const feedHTML=(n=12)=>DB.events.length?`<div class="feed">${DB.events.slice(0,n).map(e=>`<div><span class="ic k-${({ok:'ok',bad:'bad',info:'info',pur:'pur',warn:'warn'})[e.tone]||'info'}">${icon(EV_ICON[e.kind]||'info','sm')}</span><div class="sp"><div>${esc(e.text)}</div><div class="xs-t muted">${rel(e.at)}</div></div></div>`).join('')}</div>`:'<div class="empty">No activity yet</div>';
+function carouselHTML(commentId,els,interactive){
+  return `<div class="carousel">${els.map(e=>`<div class="ccard"><div style="aspect-ratio:1/1">${artFor(e._handle)}</div><div class="ct">${esc(e.title)}</div><div class="cs">${esc(e.subtitle)}</div>${e.buttons.map((b,i)=>`<button class="cb" ${interactive?`data-act="tapBtn" data-c="${commentId}" data-h="${e._handle}" data-b="${i===0?'buy':'wa'}"`:''}>${esc(b.title)}</button>`).join('')}</div>`).join('')}</div>`;
+}
+
+/* ============ DASHBOARD ============ */
+VIEWS.dashboard={title:'Dashboard',render(){
+  const now=Date.now(),D14=now-14*DAY;
+  const cm=DB.comments.filter(c=>Date.parse(c.at)>D14),intent=cm.filter(c=>c.buying_intent);
+  const sent=intent.filter(c=>c.status==='dm_carousel'||c.status==='dm_fallback'),car=sent.filter(c=>c.status==='dm_carousel');
+  const ords=DB.orders.filter(o=>o.status!=='draft'&&o.status!=='cancelled'&&Date.parse(o.placed_at)>D14);
+  const rev=sum(ords,o=>o.total),social=ords.filter(o=>o.comment_id||o.source==='instagram'||o.source==='facebook');
+  const socialRev=sum(social,o=>o.total);
+  const openT=DB.tickets.filter(t=>t.status!=='Resolved'),br=openT.filter(ticketBreached).length;
+  const drafts=DB.orders.filter(o=>o.status==='draft'),ready=drafts.filter(o=>o.details_received);
+  const active=DB.customers.filter(windowOpen).length;
+  const k=(l,v,s,tab,ic)=>`<div class="card kpi ${tab?'clk':''}" ${tab?`data-act="go" data-tab="${tab}"`:''}><div class="l">${icon(ic,'sm')} ${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  /* charts */
+  const labels=[],ig=[],fb=[],rv=[];
+  for(let i=13;i>=0;i--){const t=now-i*DAY,key=dayKey(t);labels.push(new Date(t).toLocaleDateString('en-IN',{timeZone:TZ(),day:'numeric',month:'short'}).replace(' ',''));const day=DB.comments.filter(c=>dayKey(Date.parse(c.at))===key);ig.push(day.filter(c=>c.platform==='instagram').length);fb.push(day.filter(c=>c.platform==='facebook').length);rv.push(Math.round(sum(DB.orders.filter(o=>o.status!=='draft'&&o.status!=='cancelled'&&dayKey(Date.parse(o.placed_at))===key),o=>o.total)/100)/10);}
+  const kw={};intent.forEach(c=>{kw[c.keyword]=(kw[c.keyword]||0)+1;});const kws=Object.entries(kw).sort((a,b)=>b[1]-a[1]).slice(0,7),kmax=Math.max(1,...kws.map(x=>x[1]));
+  const pm={};cm.filter(c=>c.status==='dm_carousel'||c.status==='dm_fallback').forEach(c=>c.products.forEach(h=>{pm[h]=(pm[h]||0)+1;}));const pms=Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,5),pmax=Math.max(1,...pms.map(x=>x[1]));
+  const stc=['processing','shipped','out_for_delivery','delivered','cancelled'].map((s,i)=>({l:ORDER_SHORT[s],v:DB.orders.filter(o=>o.status===s).length,color:['var(--c2)','var(--c3)','var(--c4)','var(--ok)','var(--c5)'][i]}));
+  const funnel=[['Comments',cm.length],['Buying intent',intent.length],['DMs sent',sent.length],['Link clicks',intent.filter(c=>c.clicks>0).length],['Orders from comments',cm.filter(c=>c.converted).length]];
+  const todo=[...ready.map(o=>({o,t:'Confirm order — size & address received'})),...DB.orders.filter(o=>o.status==='processing'&&Date.now()-Date.parse(o.placed_at)>DAY).map(o=>({o,t:'Processing > 24h — ship it'}))].slice(0,6);
+  return `
+  <div class="grid g4" style="margin-bottom:14px">
+   ${k('Comments (14 d)',cm.length,`${cm.filter(c=>c.platform==='instagram').length} Instagram · ${cm.filter(c=>c.platform==='facebook').length} Facebook`,'comments','msg')}
+   ${k('Buying-intent rate',cm.length?Math.round(100*intent.length/cm.length)+'%':'—',`${intent.length} comments matched a keyword`,'automation','zap')}
+   ${k('Carousel DMs',sent.length,`${sent.length?Math.round(100*car.length/sent.length):0}% carousel · ${sent.length-car.length} used text fallback`,'comments','send')}
+   ${k('Orders (14 d)',ords.length,`${inr(rev)} revenue`,'orders','box')}
+   ${k('Social-sourced revenue',inr(socialRev),`${social.length} orders from IG / FB`,'orders','heart')}
+   ${k('Drafts to confirm',ready.length,`${drafts.length} open drafts in total`,'orders','cart')}
+   ${k('Open tickets',openT.length,br?`<span style="color:var(--danger)">${br} past SLA</span>`:'All within SLA','tickets','support')}
+   ${k('Active WA chats (24h)',active,`${DB.customers.filter(c=>c.unread>0).length} unread`,'whatsapp','chat')}
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="bd"><div class="flow-fig"><b>Live flows</b><span class="n">${platPill('instagram')} ${platPill('facebook')} comment</span><i>→</i><span class="n">keyword match</span><i>→</i><span class="n">product carousel DM</span><i>→</i><span class="n">${platPill('whatsapp')} ORDER &lt;code&gt;</span><i>→</i><span class="n">draft → confirmed order</span><i>→</i><span class="n">status templates</span></div></div></div>
+  <div class="grid g21" style="margin-bottom:14px">
+   <div class="card"><div class="hd">Comments per day <span class="sub">Instagram vs Facebook</span></div><div class="bd">${barChart(labels,[ig,fb],['var(--c1)','var(--c3)'],['Instagram','Facebook'])}<div class="row sm-t muted" style="gap:14px"><span><span class="dot" style="background:var(--c1)"></span> Instagram</span><span><span class="dot" style="background:var(--c3)"></span> Facebook</span></div></div></div>
+   <div class="card"><div class="hd">Comment → order funnel <span class="sub">14 days</span></div><div class="bd">${funnel.map((f,i)=>`<div class="hbar" style="grid-template-columns:120px 1fr 34px"><span>${f[0]}</span><div class="bar" style="height:14px"><i style="width:${100*f[1]/Math.max(1,funnel[0][1])}%;background:var(--c${[3,2,1,4,1][i]});opacity:${1-i*.1}"></i></div><b>${f[1]}</b></div>`).join('')}<div class="sm-t muted" style="margin-top:8px">${intent.length?Math.round(100*cm.filter(c=>c.converted).length/intent.length):0}% of buying-intent comments became orders.</div></div></div>
+  </div>
+  <div class="grid g3" style="margin-bottom:14px">
+   <div class="card"><div class="hd">Revenue per day <span class="sub">₹ thousand</span></div><div class="bd">${barChart(labels,[rv],['var(--c2)'],['Revenue (₹k)'],170)}</div></div>
+   <div class="card"><div class="hd">Orders by status</div><div class="bd row" style="gap:16px;flex-wrap:wrap">${donut(stc,'orders')}<div class="sm-t" style="flex:1;min-width:120px">${stc.map(o=>`<div class="row"><span class="dot" style="background:${o.color}"></span><span class="sp">${o.l}</span><b>${o.v}</b></div>`).join('')}</div></div></div>
+   <div class="card"><div class="hd">Top trigger keywords</div><div class="bd">${kws.map(([w,n])=>`<div class="hbar" style="grid-template-columns:80px 1fr 28px"><span class="mono">${esc(w)}</span><div class="bar"><i style="width:${100*n/kmax}%;background:var(--c2)"></i></div><b>${n}</b></div>`).join('')||'<div class="empty">No data</div>'}</div></div>
+  </div>
+  <div class="grid g3">
+   <div class="card"><div class="hd">Most-sent products <span class="sub">in carousels</span></div><div class="bd">${pms.map(([h,n])=>{const p=PRODUCT(h);return p?`<div class="list-i"><div style="width:42px;height:42px;border-radius:8px;overflow:hidden;flex:none">${prodArt(p)}</div><div class="sp" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</b><div class="bar" style="margin-top:4px"><i style="width:${100*n/pmax}%"></i></div></div><b>${n}</b></div>`:'';}).join('')||'<div class="empty">No data</div>'}</div></div>
+   <div class="card"><div class="hd">Needs action <span class="sp"></span><button class="btn sm ghost" data-act="go" data-tab="orders">Orders</button></div><div class="bd">${todo.map(x=>`<div class="list-i"><span class="av sm" style="background:var(--gold)">${icon('box','sm')}</span><div class="sp"><b>${x.o.id}</b> <span class="muted">· ${esc(x.o.name)}</span><div class="xs-t muted">${x.t}</div></div><button class="btn sm" data-act="openOrder" data-id="${x.o.id}">Open</button></div>`).join('')||'<div class="empty">All caught up 🎉</div>'}${openT.slice(0,3).map(t=>`<div class="list-i"><span class="av sm" style="background:var(--danger)">${icon('support','sm')}</span><div class="sp"><b>${t.id}</b> <span class="muted">· ${esc(t.category)}</span><div class="xs-t ${ticketBreached(t)?'':'muted'}" style="${ticketBreached(t)?'color:var(--danger)':''}">${esc(t.name)} · due ${rel(t.due_at)}</div></div><button class="btn sm" data-act="openTicket" data-id="${t.id}">Open</button></div>`).join('')}</div></div>
+   <div class="card"><div class="hd">Live activity</div><div class="bd scroll-y">${feedHTML(14)}</div></div>
+  </div>`;
+}};
+
+/* ============ COMMENT → DM ============ */
+function hlKeyword(text,kw){let h=esc(text);if(!kw||kw==='manual override')return h;const e=esc(kw).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return h.replace(new RegExp('(^|[^a-z0-9])('+e+')(?![a-z0-9])','i'),'$1<span class="kw">$2</span>');}
+const CM_ST={dm_carousel:['b-ok','Carousel DM sent'],dm_fallback:['b-warn','Fallback text DM'],no_intent:['','No buying intent'],failed:['b-bad','Failed']};
+function cmFiltered(){
+  const q=UI.cmtQ.trim().toLowerCase();
+  return DB.comments.filter(c=>{
+    if(UI.cmtPlat&&c.platform!==UI.cmtPlat)return false;
+    if(UI.cmtFilter==='intent'&&!c.buying_intent)return false;
+    if(UI.cmtFilter==='no_intent'&&c.buying_intent)return false;
+    if(UI.cmtFilter==='fallback'&&c.status!=='dm_fallback')return false;
+    if(UI.cmtFilter==='failed'&&c.status!=='failed')return false;
+    if(UI.cmtFilter==='converted'&&!c.converted)return false;
+    return !q||(c.text+' '+c.from_name).toLowerCase().includes(q);
+  }).sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+}
+function cmListHTML(){
+  const l=cmFiltered();if(!l.length)return '<div class="empty">No comments match</div>';
+  return l.slice(0,120).map(c=>{const st=CM_ST[c.status];return `<div class="cl-i ${UI.cmtSel===c.id?'on':''}" data-act="cmOpen" data-id="${c.id}">${avatar(c.from_name,c.id)}<div class="sp" style="min-width:0"><div class="nm"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@${esc(c.from_name)}</span><span class="tm">${rel(c.at)}</span></div><div class="pv" style="white-space:normal;color:var(--text)">${hlKeyword(c.text,c.keyword)}</div><div class="row wrap" style="margin-top:4px;gap:4px">${platPill(c.platform)}<span class="badge ${st[0]}">${st[1]}</span>${c.converted?'<span class="badge b-delivered">Ordered</span>':''}${c.ignored?'<span class="chip">ignored</span>':''}</div></div></div>`;}).join('');
+}
+function traceHTML(c){return `<div class="trace">${c.trace.map(t=>`<div><span class="tn ${t.state==='skip'?'skip':t.state==='bad'?'bad':t.state==='warn'?'warn':''}">${icon(t.state==='bad'?'x':t.state==='skip'?'x':'check')}</span><div><div class="tt">${esc(t.step)}</div><div class="td">${esc(t.detail)}</div></div></div>`).join('')}</div>`;}
+const jsonStr=o=>JSON.stringify(o,(k,v)=>k.startsWith('_')?undefined:v,2);
+function cmDetailHTML(c){
+  if(!c)return '<div class="empty" style="margin:auto">Select a comment to see how the automation handled it</div>';
+  const post=DB.posts.find(p=>p.id===c.post_id),st=CM_ST[c.status],cu=custById(c.customer_id);
+  const els=c.carousel?c.carousel.message.attachment.payload.elements:[];
+  return `<div class="row" style="margin-bottom:10px">${avatar(c.from_name,c.id)}<div class="sp"><div class="b">@${esc(c.from_name)} ${platPill(c.platform)}</div><div class="xs-t muted">${fmtShort(c.at)} · ${c.media_type} · ${post?esc(post.caption.slice(0,60)):esc(c.post_id)}</div></div><span class="badge ${st[0]}">${st[1]}</span></div>
+  <div class="bub in" style="max-width:100%;margin-bottom:12px"><div class="tx" style="font-size:15px">${hlKeyword(c.text,c.keyword)}</div><div class="meta">${c.keyword?`matched “${esc(c.keyword)}”`:'no keyword'}</div></div>
+  <div class="row wrap" style="margin-bottom:12px">${c.mapped_by?`<span class="chip">${c.mapped_by==='post_map'?'Mapped to post':'Fallback bestsellers'}</span>`:''}${c.products.map(h=>`<span class="chip tag">${esc(h)}</span>`).join('')}<span class="chip">${c.clicks||0} click${c.clicks===1?'':'s'}</span>${c.converted?`<a href="#orders" data-act="openOrder" data-id="${c.order_id}" class="badge b-delivered" style="text-decoration:none">Order ${esc(c.order_id)}</a>`:''}${cu?`<button class="btn sm ghost" data-act="openCustomer" data-id="${cu.id}">${icon('user','sm')} ${esc(cu.name)}</button>`:''}</div>
+  <div class="b" style="margin:6px 0 2px">Pipeline trace</div>${traceHTML(c)}
+  ${c.status==='dm_carousel'?`<div class="b" style="margin:12px 0 6px">${icon('send','sm')} Private-reply DM (carousel) <span class="muted sm-t" style="font-weight:400">— tap the buttons to simulate the customer</span></div>${carouselHTML(c.id,els,true)}`:''}
+  ${c.status==='dm_fallback'?`<div class="notice warn" style="margin:12px 0 8px">${icon('alert','sm')}<span>Carousel rejected: <b>${esc(c.error)}</b>. Plain-text DM with links was sent instead.</span></div><div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="who">${icon('send','sm')} Fallback text DM</div><div class="tx">${waFmt(c.fallback.message.text)}</div></div></div><div style="margin-top:8px" class="row wrap">${els.map(e=>`<button class="btn sm" data-act="tapBtn" data-c="${c.id}" data-h="${e._handle}" data-b="wa">${icon('chat','sm')} Order ${esc(e._handle)} on WhatsApp</button>`).join('')}</div>`:''}
+  ${c.status==='failed'?`<div class="notice bad" style="margin:12px 0">${icon('alert','sm')}<span>${esc(c.error)} — map this post to a product in <a href="#posts" data-act="go" data-tab="posts">Posts &amp; Mapping</a>.</span></div>`:''}
+  ${c.public_reply?`<div class="b" style="margin:12px 0 6px">${icon('msg','sm')} Public reply on the comment</div><div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="tx">${waFmt(c.public_reply)}</div><div class="meta mono">${esc(c.public_endpoint)}</div></div></div>`:''}
+  ${c.carousel?`<details style="margin-top:12px"><summary class="b" style="cursor:pointer">Graph API payloads</summary><div class="xs-t muted" style="margin:6px 0 2px">carouselBody</div><pre class="json">${esc(jsonStr(c.carousel))}</pre><div class="xs-t muted" style="margin:6px 0 2px">fallbackBody</div><pre class="json">${esc(jsonStr(c.fallback))}</pre></details>`:''}
+  <div class="row wrap" style="margin-top:16px">${!c.buying_intent?`<button class="btn pri" data-act="cmForce" data-id="${c.id}">${icon('send','sm')} Send carousel anyway</button><button class="btn" data-act="cmKeyword" data-id="${c.id}">${icon('plus','sm')} Add keyword…</button>`:''}${c.status==='failed'?`<button class="btn pri" data-act="cmForce" data-id="${c.id}">${icon('refresh','sm')} Retry</button>`:''}<button class="btn" data-act="cmIgnore" data-id="${c.id}">${c.ignored?'Un-ignore':'Mark as spam / ignore'}</button></div>`;
+}
+VIEWS.comments={title:'Comment → DM Carousel',render(){
+  return `<div class="page-h"><h2>Social comments</h2><span class="muted sm-t">Every IG / FB comment that hits the webhook, and what the automation did with it</span><span class="sp"></span><button class="btn pri" data-act="newComment">${icon('plus','sm')} Simulate comment</button></div>
+  <div class="card cm-wrap ${UI.cmtSel?'show-d':''}" id="cmWrap"><div class="chat-list cm-list"><div class="cl-top"><div class="row"><input type="search" placeholder="Search comments…" value="${esc(UI.cmtQ)}" data-in="cmQ"><select style="width:auto" data-ch="cmPlat"><option value="">All</option><option value="instagram" ${UI.cmtPlat==='instagram'?'selected':''}>Instagram</option><option value="facebook" ${UI.cmtPlat==='facebook'?'selected':''}>Facebook</option></select></div><div class="tabs" id="cmTabs"></div></div><div class="cl-items" id="cmItems"></div></div><div class="cm-detail" id="cmDetail"></div></div>`;
+},mount(){if(!UI.cmtSel||!DB.comments.find(c=>c.id===UI.cmtSel)){const f=cmFiltered()[0];UI.cmtSel=f?f.id:null;}this.update();},update(){
+  if(!$('#cmItems'))return;
+  const cnt=f=>DB.comments.filter(c=>f==='intent'?c.buying_intent:f==='no_intent'?!c.buying_intent:f==='fallback'?c.status==='dm_fallback':f==='failed'?c.status==='failed':f==='converted'?c.converted:true).length;
+  $('#cmTabs').innerHTML=[['all','All'],['intent','Intent'],['no_intent','No intent'],['fallback','Fallback'],['converted','Ordered']].map(([k,l])=>`<button class="${UI.cmtFilter===k?'on':''}" data-act="cmFilter" data-f="${k}">${l}<span class="n">${cnt(k)}</span></button>`).join('');
+  $('#cmItems').innerHTML=cmListHTML();
+  const keep=$('#cmDetail').scrollTop;$('#cmDetail').innerHTML=cmDetailHTML(DB.comments.find(c=>c.id===UI.cmtSel));$('#cmDetail').scrollTop=keep;
+  $('#cmWrap').classList.toggle('show-d',!!UI.cmtSel&&UI.cmtMobile);
+}};
+INP.cmQ=el=>{UI.cmtQ=el.value;$('#cmItems').innerHTML=cmListHTML();};
+INP.cmPlat=el=>{UI.cmtPlat=el.value;VIEWS.comments.update();};
+ACT.cmFilter=el=>{UI.cmtFilter=el.dataset.f;VIEWS.comments.update();};
+ACT.cmOpen=el=>{UI.cmtSel=el.dataset.id;UI.cmtMobile=true;VIEWS.comments.update();};
+ACT.tapBtn=el=>tapCarousel(el.dataset.c,el.dataset.h,el.dataset.b);
+ACT.cmIgnore=el=>{const c=DB.comments.find(x=>x.id===el.dataset.id);c.ignored=!c.ignored;touch();};
+ACT.cmForce=el=>{
+  const old=DB.comments.find(x=>x.id===el.dataset.id);
+  DB.comments=DB.comments.filter(x=>x.id!==old.id);
+  const r=processComment({platform:old.platform,accountId:old.account_id,commentId:old.comment_id,postId:old.post_id,mediaType:old.media_type,commentText:old.text,fromId:old.from_id,fromName:old.from_name},{forceIntent:true,failCarousel:false});
+  if(r.comment){UI.cmtSel=r.comment.id;toast(r.comment.status==='failed'?r.comment.error:'Carousel DM sent','ok');}touch();
+};
+ACT.cmKeyword=el=>{
+  const c=DB.comments.find(x=>x.id===el.dataset.id);
+  const sug=[...new Set(c.text.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>2&&!DB.config.keywords.includes(w)))];
+  openModal({title:'Add trigger keyword',body:`<p class="muted sm-t" style="margin-top:0">Comment: “${esc(c.text)}”. Future comments containing this word will trigger the product carousel.</p><label class="f">Keyword<input name="kw" type="text" list="kwl" value="${esc(sug[0]||'')}"></label><datalist id="kwl">${sug.map(w=>`<option>${esc(w)}</option>`).join('')}</datalist>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Add & send carousel now',cls:'pri',onClick:()=>{const k=formData().kw.trim().toLowerCase();if(!k){toast('Enter a keyword','err');return;}if(!DB.config.keywords.includes(k))DB.config.keywords.push(k);closeModal();ACT.cmForce({dataset:{id:c.id}});}}]});
+};
+ACT.newComment=(el)=>{
+  const sample=['Price?','kitna hai ye','size M available?','cod available?','details please','Link bhejo','Beautiful ❤️','Which fabric is this?'];
+  const pid=el&&el.dataset&&el.dataset.post||DB.posts[0].id;
+  openModal({title:'Simulate a comment on a post',body:`<p class="muted sm-t" style="margin-top:0">Acts like Meta calling your <span class="mono">/meta-social-commerce</span> webhook — the real pipeline runs and the results appear in Comments.</p>
+   <div class="grid g2"><label class="f">Post<select name="post">${DB.posts.map(p=>`<option value="${p.id}" ${p.id===pid?'selected':''}>${p.platform==='instagram'?'IG':'FB'} · ${esc(p.caption.slice(0,42))}</option>`).join('')}</select></label>
+   <label class="f">Commenter name / handle<input name="from" type="text" value="${pick(['aarav.k','meena_rao_22','kriti.sinha','jay_patel_99'])}"></label></div>
+   <label class="f" style="margin-top:12px">Comment text<textarea name="text" rows="2">Price?</textarea></label>
+   <div class="chips" style="margin-top:8px">${sample.map(t=>`<button data-act="cmSample" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+   <label class="chk" style="margin-top:12px"><input type="checkbox" name="fail"> Force the carousel send to fail (shows the text-DM fallback)</label>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:'Post comment',cls:'pri',onClick:()=>{
+     const f=formData(),post=DB.posts.find(p=>p.id===f.post);if(!f.text.trim()||!f.from.trim()){toast('Enter a name and a comment','err');return;}
+     const r=processComment({platform:post.platform,postId:post.id,mediaType:post.media_type,commentText:f.text.trim(),fromName:f.from.trim()},{failCarousel:f.fail?true:null});
+     logWebhook('meta_comment',200,`1 comment event(s) → ${post.platform} comment → ${r.comment?r.comment.status:r.skipped}`,null,null);
+     closeModal();if(r.comment){UI.cmtSel=r.comment.id;UI.cmtMobile=true;UI.cmtFilter='all';toast(r.comment.status==='no_intent'?'No buying keyword — no DM sent':r.comment.status==='dm_carousel'?'Carousel DM + public reply sent':r.comment.status==='dm_fallback'?'Carousel failed → text DM sent':r.comment.error,r.comment.status==='dm_carousel'?'ok':r.comment.status==='no_intent'?'':'err');}else toast(r.skipped,'err');
+     go('comments');}}]});
+};
+ACT.cmSample=el=>{$('[name=text]').value=el.dataset.t;};
+
+/* ============ POSTS & MAPPING ============ */
+VIEWS.posts={title:'Posts & Product Mapping',render(){
+  const fb=DB.config.fallback_bestsellers;
+  return `<div class="page-h"><h2>Posts &amp; product mapping</h2><span class="muted sm-t">POST_MAP: which product(s) a comment on each post should send</span><span class="sp"></span><button class="btn pri" data-act="postNew">${icon('plus','sm')} Add post</button></div>
+  <div class="card" style="margin-bottom:14px"><div class="hd">Fallback bestsellers <span class="sub">used when a post has no mapping</span><span class="sp"></span><button class="btn sm" data-act="fbEdit">${icon('edit','sm')} Edit</button></div><div class="bd row wrap">${fb.map(h=>{const p=PRODUCT(h);return `<span class="row" style="gap:8px;border:1px solid var(--border);border-radius:10px;padding:4px 10px 4px 4px"><span style="width:32px;height:32px;border-radius:6px;overflow:hidden;display:block">${p?prodArt(p):''}</span>${esc(p?p.title:h)}</span>`;}).join('')||'<span class="muted">None — unmapped posts will fail</span>'}</div></div>
+  <div class="pgrid">${DB.posts.map(po=>{
+    const cs=DB.comments.filter(c=>c.post_id===po.id),it=cs.filter(c=>c.buying_intent),first=PRODUCT(po.handles[0]||fb[0]);
+    return `<div class="pcard"><div style="position:relative">${first?prodArt(first):''}<div style="position:absolute;left:8px;top:8px">${platPill(po.platform)}</div><span class="badge" style="position:absolute;right:8px;top:8px;background:rgba(0,0,0,.55);color:#fff">${po.media_type}</span></div><div class="pb"><div class="sm-t" style="min-height:2.6em">${esc(po.caption)}</div><div class="mono muted" style="font-size:10.5px;word-break:break-all">${esc(po.id)}</div>
+     <div>${po.handles.length?po.handles.map(h=>`<span class="chip tag">${esc(h)}</span>`).join(''):'<span class="badge b-warn">Unmapped → fallback bestsellers</span>'}</div>
+     <div class="row sm-t muted" style="gap:12px"><span>${cs.length} comments</span><span>${it.length} intent</span><span>${cs.filter(c=>c.converted).length} orders</span></div>
+     <div class="row wrap"><button class="btn sm pri" data-act="postMap" data-id="${po.id}">${icon('link','sm')} Map products</button><button class="btn sm" data-act="newComment" data-post="${po.id}">${icon('msg','sm')} Comment</button><span class="sp"></span><button class="btn sm ghost dng" data-act="postDel" data-id="${po.id}">${icon('trash','sm')}</button></div></div></div>`;}).join('')}</div>`;
+}};
+function productPicker(selected,max){return `<div class="scroll-y" style="max-height:46vh">${liveProducts().map(p=>`<label class="list-i" style="cursor:pointer"><input type="checkbox" name="p_${p.handle}" ${selected.includes(p.handle)?'checked':''} style="width:16px;height:16px;accent-color:var(--brand)"><div style="width:40px;height:40px;border-radius:8px;overflow:hidden;flex:none">${prodArt(p)}</div><div class="sp"><b>${esc(p.title)}</b><div class="xs-t muted">${inr(p.price)} · ${inStock(p)?'Sizes '+sizesOf(p).join('/'):'<span style="color:var(--danger)">Sold out</span>'}</div></div></label>`).join('')}</div><div class="xs-t muted" style="margin-top:6px">Up to ${max} products (Messenger carousel limit).</div>`;}
+const pickedHandles=()=>liveProducts().filter(p=>formData()['p_'+p.handle]).map(p=>p.handle);
+ACT.postMap=el=>{const po=DB.posts.find(p=>p.id===el.dataset.id);openModal({title:'Map products to this post',body:`<p class="muted sm-t" style="margin-top:0">${esc(po.caption)}</p>${productPicker(po.handles,10)}`,actions:[{label:'Cancel',onClick:closeModal},{label:'Save mapping',cls:'pri',onClick:()=>{const h=pickedHandles();if(h.length>10){toast('Max 10 products','err');return;}po.handles=h;closeModal();logEvent('post',`Mapping updated for post ${po.id}`,'info');touch();toast(h.length?`${h.length} product(s) mapped`:'Unmapped — fallback bestsellers will be used','ok');}}]});};
+ACT.fbEdit=()=>openModal({title:'Fallback bestsellers',body:productPicker(DB.config.fallback_bestsellers,10),actions:[{label:'Cancel',onClick:closeModal},{label:'Save',cls:'pri',onClick:()=>{DB.config.fallback_bestsellers=pickedHandles();closeModal();touch();toast('Fallback updated','ok');}}]});
+ACT.postDel=el=>confirmBox('Remove this post and its mapping? Existing comments stay.',()=>{DB.posts=DB.posts.filter(p=>p.id!==el.dataset.id);touch();});
+ACT.postNew=()=>openModal({title:'Add a post',body:`<div class="grid g2"><label class="f">Platform<select name="platform"><option value="instagram">Instagram</option><option value="facebook">Facebook</option></select></label><label class="f">Type<select name="mt"><option>FEED</option><option>REELS</option><option>POST</option></select></label></div><label class="f" style="margin-top:12px">Post / media ID<input name="id" type="text" value="179${rnd(1e12,9e12)}"></label><label class="f" style="margin-top:12px">Caption<textarea name="cap" rows="2" placeholder="New festive collection…"></textarea></label>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Add post',cls:'pri',onClick:()=>{const f=formData();if(!f.id.trim()||DB.posts.some(p=>p.id===f.id.trim())){toast('Enter a unique post ID','err');return;}DB.posts.unshift({id:f.id.trim(),platform:f.platform,media_type:f.mt,caption:f.cap||'(no caption)',handles:[],created_at:iso(Date.now()),likes:0});closeModal();touch();}}]});
+
+/* ============ CATALOG ============ */
+const SIZES=['S','M','L','XL','XXL'];
+function prodCard(p){
+  const total=sum(p.variants,v=>v.stock),low=inStock(p)&&p.variants.some(v=>v.stock>0&&v.stock<=3);
+  const posts=DB.posts.filter(x=>x.handles.includes(p.handle)).length,men=DB.comments.filter(c=>c.products.includes(p.handle)).length,sold=sum(DB.orders.filter(o=>!['draft','cancelled'].includes(o.status)),o=>sum(o.items.filter(i=>i.handle===p.handle),i=>i.qty));
+  const off=p.mrp>p.price?Math.round(100*(p.mrp-p.price)/p.mrp):0;
+  return `<div class="pcard" style="${p.active===false?'opacity:.6':''}"><div style="position:relative">${prodArt(p)}<span class="badge ${!inStock(p)?'b-bad':low?'b-warn':'b-ok'}" style="position:absolute;left:8px;top:8px">${p.active===false?'Hidden':!inStock(p)?'Sold out':low?'Low stock':'In stock'}</span>${off?`<span class="badge" style="position:absolute;right:8px;top:8px;background:var(--brand);color:#fff">${off}% off</span>`:''}</div>
+  <div class="pb"><div class="b" style="line-height:1.25">${esc(p.title)}</div><div><span class="price">${inr(p.price)}</span>${p.mrp>p.price?`<span class="mrp">${inr(p.mrp)}</span>`:''}</div>
+  <div>${p.variants.map(v=>`<span class="sz ${v.stock>0?'':'off'}" title="${v.stock} in stock">${v.size}</span>`).join('')}</div>
+  <div class="xs-t muted">${total} units · ${posts} post${posts===1?'':'s'} · ${men} DM sends · ${sold} sold</div>
+  <div class="row wrap"><button class="btn sm" data-act="editProduct" data-h="${p.handle}">${icon('edit','sm')} Edit</button><button class="btn sm" data-act="prodToggle" data-h="${p.handle}">${p.active===false?'Show':'Hide'}</button><span class="sp"></span><button class="btn sm ghost dng" data-act="prodDel" data-h="${p.handle}">${icon('trash','sm')}</button></div></div></div>`;
+}
+function catalogGrid(){
+  const q=UI.prodQ.trim().toLowerCase();
+  const l=liveProducts().filter(p=>(!q||p.title.toLowerCase().includes(q)||p.category.toLowerCase().includes(q))&&(UI.prodFilter==='all'||(UI.prodFilter==='out'&&!inStock(p))||(UI.prodFilter==='in'&&inStock(p))||(UI.prodFilter==='low'&&inStock(p)&&p.variants.some(v=>v.stock>0&&v.stock<=3))));
+  return l.length?`<div class="pgrid">${l.map(prodCard).join('')}</div>`:'<div class="card"><div class="empty">No products match</div></div>';
+}
+VIEWS.catalog={title:'Catalog',render(){
+  return `<div class="page-h"><h2>Catalog <span class="muted sm-t">(mock Shopify store · ${esc(DB.config.shop_domain)})</span></h2><span class="sp"></span><button class="btn pri" data-act="prodNew">${icon('plus','sm')} Add product</button></div>
+  <div class="row wrap" style="margin-bottom:14px"><div style="flex:1;min-width:200px"><input type="search" placeholder="Search products…" value="${esc(UI.prodQ)}" data-in="prodQ"></div><div class="tabs">${[['all','All'],['in','In stock'],['low','Low stock'],['out','Sold out']].map(([k,l])=>`<button class="${UI.prodFilter===k?'on':''}" data-act="prodFilter" data-f="${k}">${l}</button>`).join('')}</div></div><div id="prodGrid">${catalogGrid()}</div>`;
+},update(){const g=$('#prodGrid');if(g)g.innerHTML=catalogGrid();}};
+INP.prodQ=el=>{UI.prodQ=el.value;VIEWS.catalog.update();};
+ACT.prodFilter=el=>{UI.prodFilter=el.dataset.f;render();};
+ACT.prodToggle=el=>{const p=PRODUCT(el.dataset.h);p.active=p.active===false;touch();};
+ACT.prodDel=el=>{const p=PRODUCT(el.dataset.h);confirmBox(`Delete <b>${esc(p.title)}</b>? It is also removed from post mappings.`,()=>{p.deleted=true;DB.posts.forEach(x=>{x.handles=x.handles.filter(h=>h!==p.handle);});DB.config.fallback_bestsellers=DB.config.fallback_bestsellers.filter(h=>h!==p.handle);touch();toast('Product deleted');});};
+ACT.prodNew=()=>openProductModal(null);
+ACT.editProduct=el=>{if(UI.tab!=='catalog')$('#gsResults').classList.add('hide');openProductModal(el.dataset.h);};
+function prodDraft(){const f=formData();return {title:f.title||'New product',handle:f.handle,price:+f.price||0,mrp:+f.mrp||0,color:f.color,pattern:f.pattern,category:f.category,active:f.active,variants:SIZES.filter(s=>f['s_'+s]!==''&&f['s_'+s]!=null).map(s=>({size:s,stock:+f['s_'+s]||0}))};}
+INP.prodDraw=()=>{const d=prodDraft();const n=$('[name=title]');if(!$('[name=handle]').readOnly)$('[name=handle]').value=slugify(d.title);const els=buildCarousel({platform:'instagram',commentId:'preview',fromName:'you'},[{...d,handle:slugify(d.title)}]).carouselBody.message.attachment.payload.elements;const p={...d};$('#prodPrev').innerHTML=`<div class="carousel"><div class="ccard"><div style="aspect-ratio:1/1">${prodArt(p)}</div><div class="ct">${esc(els[0].title)}</div><div class="cs">${esc(els[0].subtitle)}</div>${els[0].buttons.map(b=>`<button class="cb">${esc(b.title)}</button>`).join('')}</div></div>`;};
+function openProductModal(handle){
+  const p=handle?PRODUCT(handle):{title:'',handle:'',price:1499,mrp:1999,color:'#8c1d40',pattern:'plain',category:'Men',active:true,variants:[{size:'M',stock:10},{size:'L',stock:10}]};
+  openModal({title:handle?'Edit product':'Add product',wide:true,body:`<div class="grid g2"><div class="col">
+   <label class="f">Title<input name="title" type="text" value="${esc(p.title)}" data-in="prodDraw" placeholder="Classic Cotton Kurta - Indigo Blue"></label>
+   <div class="grid g2"><label class="f">Handle (URL slug)<input name="handle" type="text" value="${esc(p.handle)}" ${handle?'readonly':''}></label><label class="f">Category<select name="category" data-ch="prodDraw">${['Men','Women','Kids'].map(c=>`<option ${c===p.category?'selected':''}>${c}</option>`).join('')}</select></label></div>
+   <div class="grid g2"><label class="f">Price (₹)<input name="price" type="number" min="0" value="${p.price}" data-in="prodDraw"></label><label class="f">MRP / compare-at (₹)<input name="mrp" type="number" min="0" value="${p.mrp||0}" data-in="prodDraw"></label></div>
+   <div class="grid g2"><label class="f">Colour<input name="color" type="color" value="${p.color}" data-in="prodDraw" style="padding:2px;height:38px"></label><label class="f">Fabric pattern<select name="pattern" data-ch="prodDraw">${['plain','chikan','print','silk'].map(c=>`<option ${c===p.pattern?'selected':''}>${c}</option>`).join('')}</select></label></div>
+   <div class="b sm-t muted">Stock per size <span style="font-weight:400">(leave blank = size not offered)</span></div><div class="grid" style="grid-template-columns:repeat(5,1fr);gap:6px">${SIZES.map(s=>{const v=p.variants.find(x=>x.size===s);return `<label class="f" style="text-align:center">${s}<input name="s_${s}" type="number" min="0" value="${v?v.stock:''}" data-in="prodDraw"></label>`;}).join('')}</div>
+   <label class="chk"><input type="checkbox" name="active" ${p.active!==false?'checked':''} data-ch="prodDraw"> Published (can appear in carousels)</label></div>
+   <div><div class="b sm-t muted" style="margin-bottom:6px">How it appears in the DM carousel</div><div id="prodPrev"></div></div></div>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:handle?'Save product':'Add product',cls:'pri',onClick:()=>{
+     const d=prodDraft();if(!d.title.trim()||!d.price){toast('Title and price are required','err');return;}
+     d.handle=handle||slugify(d.title);if(!handle&&DB.products.some(x=>x.handle===d.handle&&!x.deleted)){toast('A product with this handle exists','err');return;}
+     if(handle)Object.assign(p,d);else DB.products.push({id:9000+DB.products.length+1,created_at:iso(Date.now()),...d});
+     closeModal();touch();toast(handle?'Product saved':'Product added','ok');}}],onMount:()=>INP.prodDraw()});
+}
+let _dragProd=null;
+
+/* ============ WHATSAPP ORDER DESK ============ */
+function waTick(m){
+  if(m.direction!=='out')return '';
+  if(m.status==='read')return `<svg class="i tick read"><use href="#i-checks"/></svg>`;
+  if(m.status==='delivered')return `<svg class="i tick"><use href="#i-checks"/></svg>`;
+  return `<svg class="i tick" style="width:12px"><use href="#i-check"/></svg>`;
+}
+const INTENT_CHIP={track:'📦 track',my_orders:'🧾 my orders',new_order:'🛍️ new order',support:'↩️ support',menu:'📋 menu',details:'📍 details captured',status_update:'🔔 status update'};
+function waBubble(m){
+  const out=m.direction==='out';
+  const who=m.sender==='bot'?`${icon('bot','sm')} Order desk`:m.sender==='agent'?`${icon('users','sm')} ${esc(m.agent||'Team')}`:'';
+  return `<div class="bub ${out?'out':'in'}">${who?`<div class="who">${who}</div>`:''}${m.type==='template'?`<div class="xs-t muted" style="margin-bottom:2px">${icon('tpl','sm')} Template · ${esc(m.template)}</div>`:''}<div class="tx">${waFmt(m.body)}</div>${m.intent&&out&&m.sender==='bot'?`<div><span class="tool">${INTENT_CHIP[m.intent]||esc(m.intent)}</span></div>`:''}<div class="meta">${fmtTime(m.at)} ${waTick(m)}</div></div>`;
+}
+const waChips=c=>{const o=ordersOf(c.phone)[0];return ['Hi','MENU','MY ORDERS',o?'TRACK '+o.id:'TRACK ORD-10452','Mera order kahan hai?','ORDER classic-cotton-kurta-blue','ORDER linen-kurta-sage',o?'CANCEL '+o.id:'CANCEL ORD-10452','Size L, Rohit Kumar, 12 MG Road, Pune 411001','COD available?'];};
+function waChatsFiltered(){
+  const q=UI.chatSearch.trim().toLowerCase();
+  let cs=DB.customers.filter(c=>c.phone&&(lastWaMsg(c.phone)||c.unread));
+  if(UI.chatFilter==='unread')cs=cs.filter(c=>c.unread>0);
+  if(UI.chatFilter==='support')cs=cs.filter(c=>DB.tickets.some(t=>t.phone===c.phone&&t.status!=='Resolved'));
+  if(q)cs=cs.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));
+  return cs.sort((a,b)=>Date.parse((lastWaMsg(b.phone)||{at:0}).at)-Date.parse((lastWaMsg(a.phone)||{at:0}).at));
+}
+function waListHTML(){
+  const cs=waChatsFiltered();if(!cs.length)return '<div class="empty">No conversations</div>';
+  return cs.map(c=>{const l=lastWaMsg(c.phone);const pv=l?((l.direction==='out'?(l.sender==='bot'?'🤖 ':'You: '):'')+l.body).replace(/\n/g,' '):'';const tk=DB.tickets.some(t=>t.phone===c.phone&&t.status!=='Resolved');
+    return `<div class="cl-i ${UI.chat===c.phone?'on':''}" data-act="waOpen" data-phone="${c.phone}">${avatar(c.name,c.phone)}<div class="sp" style="min-width:0"><div class="nm"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span>${tk?`<span title="Open support ticket" style="color:var(--danger)">${icon('support','sm')}</span>`:''}<span class="tm">${l?rel(l.at):''}</span></div><div class="row"><div class="pv sp">${esc(pv)}</div>${c.unread?`<span class="unread">${c.unread}</span>`:''}</div></div></div>`;}).join('');
+}
+function waHeadHTML(c){const open=windowOpen(c);return `<button class="icon-btn back-m" data-act="waBack">${icon('back')}</button>${avatar(c.name,c.phone)}<div class="sp" style="min-width:140px"><div class="b">${esc(c.name)} ${platPill(c.platform)}</div><div class="xs-t muted">${fmtPhone(c.phone)} · <span style="color:${open?'var(--ok)':'var(--danger)'};font-weight:600">${open?`24h window open · ${Math.max(1,Math.floor((Date.parse(c.last_inbound_at)+DAY-Date.now())/HR))}h left`:'24h window closed'}</span></div></div><button class="btn sm hide-m" data-act="orderNew" data-phone="${c.phone}">${icon('plus','sm')} Order</button><button class="icon-btn" data-act="waInfo" title="Customer info">${icon('info')}</button>`;}
+function waMsgsHTML(c){
+  const ms=waMsgsOf(c.phone);let last='',h='';
+  ms.forEach(m=>{const k=dayKey(Date.parse(m.at));if(k!==last){last=k;const t=dayKey(Date.now()),y=dayKey(Date.now()-DAY);h+=`<div class="dsep">${k===t?'Today':k===y?'Yesterday':fmtDate(m.at)}</div>`;}h+=waBubble(m);});
+  if(UI.typing===c.phone)h+='<div class="typing"><i></i><i></i><i></i></div>';
+  return h||'<div class="empty">No messages yet</div>';
+}
+function waComposerHTML(c){
+  const open=windowOpen(c);
+  const tabs=`<div class="tabs"><button class="${UI.chatMode==='team'?'on':''}" data-act="waMode" data-mode="team">Reply as team</button><button class="${UI.chatMode==='customer'?'on':''}" data-act="waMode" data-mode="customer">${icon('bot','sm')} Demo: reply as customer</button></div>`;
+  if(UI.chatMode==='customer')return `${tabs}<div class="chips">${waChips(c).map(t=>`<button data-act="waChip" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="line"><textarea id="cmpText" rows="1" placeholder="Type what the customer would send…" data-enter="waSendCustomer"></textarea><button class="btn pri" data-act="waSendCustomer">${icon('send','sm')} Send</button></div>`;
+  if(!open)return `${tabs}<div class="notice warn">${icon('clock','sm')}<span class="sp">Customer hasn't written in 24h — only approved templates can be sent.</span><button class="btn sm" data-act="waTpl" data-phone="${c.phone}">Send template</button></div>`;
+  return `${tabs}<div class="line"><textarea id="cmpText" rows="1" placeholder="Type a reply as the support team…" data-enter="waSendTeam"></textarea><button class="btn pri" data-act="waSendTeam">${icon('send','sm')} Send</button></div>`;
+}
+function waInfoHTML(c){
+  const os=custOrders(c).sort((a,b)=>Date.parse(b.placed_at)-Date.parse(a.placed_at)),tks=DB.tickets.filter(t=>t.phone===c.phone&&t.status!=='Resolved');
+  return `<div class="col" style="align-items:center;text-align:center">${avatar(c.name,c.phone)}<div class="b">${esc(c.name)}</div><div class="muted sm-t">${fmtPhone(c.phone)}</div><div>${platPill(c.platform)} ${c.handle?`<span class="chip">@${esc(c.handle)}</span>`:''}</div></div>
+  <dl class="kv"><dt>Orders</dt><dd>${os.filter(o=>o.status!=='draft').length}</dd><dt>Lifetime value</dt><dd><b>${inr(custLtv(c))}</b></dd><dt>Tags</dt><dd>${c.tags.map(t=>`<span class="chip tag">${esc(t)}</span>`).join('')||'—'}</dd></dl>
+  ${tks.length?`<div class="notice bad" style="margin-bottom:10px">${icon('support','sm')}<span class="sp">${tks.length} open ticket${tks.length>1?'s':''}</span><button class="btn sm" data-act="openTicket" data-id="${tks[0].id}">Open</button></div>`:''}
+  <div class="b sm-t" style="margin-bottom:4px">Orders</div>${os.map(o=>`<div class="list-i" style="cursor:pointer" data-act="openOrder" data-id="${o.id}"><div class="sp"><b class="sm-t">${esc(o.id)}</b><div class="xs-t muted">${inr(o.total)} · ${fmtDay(o.placed_at).replace(/ \d{4}$/,'')}</div></div>${stBadge(o.status)}</div>`).join('')||'<div class="muted sm-t">No orders yet</div>'}
+  <div class="col" style="margin-top:12px"><button class="btn" data-act="openCustomer" data-id="${c.id}">${icon('user','sm')} Open profile</button></div>`;
+}
+VIEWS.whatsapp={title:'WhatsApp Order Desk',render(){
+  return `<div class="card inbox ${UI.info?'':'noinfo'} ${UI.mobileChat?'show-chat':''}" id="inbox"><div class="chat-list"><div class="cl-top"><div class="row"><input type="search" placeholder="Search chats…" value="${esc(UI.chatSearch)}" data-in="waSearch"><button class="icon-btn" data-act="newWa" title="Simulate incoming WhatsApp message">${icon('plus')}</button></div><div class="tabs" id="chatTabs"></div></div><div class="cl-items" id="clItems"></div></div>
+  <div class="chat"><div class="chat-h" id="chatHead"></div><div class="chat-msgs" id="chatMsgs"></div><div class="composer" id="chatComposer"></div></div><div class="info-p" id="infoPane"></div></div>`;
+},mount(){if(!UI.chat||!custByPhone(UI.chat)){const f=waChatsFiltered()[0];UI.chat=f?f.phone:null;}UI._ckey='';this.update(true);},update(bottom){
+  const box=$('#inbox');if(!box)return;box.classList.toggle('noinfo',!UI.info);box.classList.toggle('show-chat',!!UI.mobileChat);
+  const nU=DB.customers.filter(c=>c.unread>0).length,nS=DB.customers.filter(c=>c.phone&&DB.tickets.some(t=>t.phone===c.phone&&t.status!=='Resolved')).length;
+  $('#chatTabs').innerHTML=[['all','All'],['unread','Unread'+(nU?` <span class="n">${nU}</span>`:'')],['support','Support'+(nS?` <span class="n">${nS}</span>`:'')]].map(([k,l])=>`<button class="${UI.chatFilter===k?'on':''}" data-act="waFilter" data-f="${k}">${l}</button>`).join('');
+  $('#clItems').innerHTML=waListHTML();
+  const c=UI.chat&&custByPhone(UI.chat);
+  if(!c){$('#chatHead').innerHTML='';$('#chatMsgs').innerHTML='<div class="empty">Select a conversation or simulate a message</div>';$('#chatComposer').innerHTML='';$('#infoPane').innerHTML='';return;}
+  if(c.unread){c.unread=0;save();$('#clItems').innerHTML=waListHTML();$('#nav').innerHTML=navHTML();}
+  const msgs=$('#chatMsgs'),near=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<120;
+  $('#chatHead').innerHTML=waHeadHTML(c);msgs.innerHTML=waMsgsHTML(c);if(bottom===true||near)msgs.scrollTop=msgs.scrollHeight;
+  const ck=[c.phone,UI.chatMode,windowOpen(c)].join('|');if(ck!==UI._ckey){UI._ckey=ck;$('#chatComposer').innerHTML=waComposerHTML(c);}
+  $('#infoPane').innerHTML=waInfoHTML(c);
+}};
+INP.waSearch=el=>{UI.chatSearch=el.value;$('#clItems').innerHTML=waListHTML();};
+ACT.waFilter=el=>{UI.chatFilter=el.dataset.f;VIEWS.whatsapp.update();};
+ACT.waMode=el=>{UI.chatMode=el.dataset.mode;UI._ckey='';VIEWS.whatsapp.update();setTimeout(()=>{const t=$('#cmpText');if(t)t.focus();},30);};
+ACT.waOpen=el=>{UI.chat=el.dataset.phone;UI.mobileChat=true;UI._ckey='';if(UI.tab!=='whatsapp')go('whatsapp');else VIEWS.whatsapp.update(true);};
+ACT.waBack=()=>{UI.mobileChat=false;VIEWS.whatsapp.update();};
+ACT.waInfo=()=>{const c=custByPhone(UI.chat);if(matchMedia('(max-width:1180px)').matches){openModal({title:'Customer',drawer:true,body:waInfoHTML(c),actions:[]});return;}UI.info=!UI.info;VIEWS.whatsapp.update();};
+ACT.waChip=el=>{const t=$('#cmpText');t.value=el.dataset.t;t.focus();};
+ACT.waSendCustomer=()=>{const t=$('#cmpText'),txt=t.value.trim();if(!txt)return;t.value='';const c=custByPhone(UI.chat);waInbound(c.phone,c.name,txt);setTimeout(()=>VIEWS.whatsapp.update(true),30);};
+ACT.waSendTeam=()=>{const t=$('#cmpText'),txt=t.value.trim();if(!txt)return;const c=custByPhone(UI.chat);if(!windowOpen(c)){toast('24h window closed — send a template','err');return;}addWaMsg({phone:c.phone,direction:'out',sender:'agent',agent:'Team',body:txt});t.value='';touch();setTimeout(()=>VIEWS.whatsapp.update(true),30);};
+ACT.newWa=()=>openModal({title:'Simulate an incoming WhatsApp message',body:`<p class="muted sm-t" style="margin-top:0">Acts like the <b>WhatsApp Message Trigger</b>: the intent is parsed (track / my orders / new order / support / menu) and the order desk replies. Tracking is phone-verified.</p><div class="grid g2"><label class="f">Customer phone<select name="phone">${DB.customers.filter(c=>c.phone).map(c=>`<option value="${c.phone}">${esc(c.name)} (${fmtPhone(c.phone)})</option>`).join('')}<option value="">➕ New number…</option></select></label><label class="f">New number (if chosen)<input name="nphone" type="tel" placeholder="919812345678"></label></div><label class="f" style="margin-top:12px">Message<input name="text" type="text" value="MY ORDERS"></label>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Send as customer',cls:'pri',onClick:()=>{const f=formData(),p=f.phone||digits(f.nphone);if(digits(p).length<8||!f.text.trim()){toast('Choose a number and write a message','err');return;}closeModal();UI.chat=digits(p);UI.mobileChat=true;waInbound(p,'',f.text.trim());go('whatsapp');}}]});
+ACT.waTpl=el=>{
+  const c=custByPhone(el.dataset.phone),os=custOrders(c).filter(o=>o.status!=='draft');
+  if(!os.length){toast('This customer has no orders to send a status template for','err');return;}
+  openModal({title:'Send status template',body:`<div class="notice warn" style="margin-bottom:12px">${icon('clock','sm')} Window closed — only approved templates are delivered.</div><div class="grid g2"><label class="f">Order<select name="order" data-ch="tsDraw">${os.map(o=>`<option>${o.id}</option>`).join('')}</select></label><label class="f">Template<select name="st" data-ch="tsDraw"><option value="confirmed">order_confirmed_v1</option><option value="shipped">order_shipped_v1</option><option value="out_for_delivery">order_out_for_delivery_v1</option><option value="delivered">order_delivered_v1</option></select></label></div><div id="tsPrev" style="margin-top:12px"></div>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:'Send template',cls:'pri',onClick:()=>{const f=formData(),o=DB.orders.find(x=>x.id===f.order);sendStatusTemplate(o,f.st);closeModal();toast('Template sent','ok');}}],onMount:()=>INP.tsDraw()});
+};
+function statusBody(o,st){const c=custByPhone(o.phone)||{};return {status:st,phone:o.phone,customerName:o.name||c.name,orderId:o.id,itemTitle:o.items.map(i=>i.title).join(', '),courier:o.courier||'Delhivery',awb:o.awb||'-',trackingUrl:o.tracking_url||'',eta:o.eta||'today',deliveredAt:o.ts.delivered?fmtDay(o.ts.delivered):'today'};}
+function sendStatusTemplate(o,st){
+  const b=statusBody(o,st),t=DB.templates.find(x=>x.name===TPL_MAP[st]);
+  const detail=st==='confirmed'?b.itemTitle:st==='shipped'?b.courier+' | AWB '+b.awb+' | '+b.trackingUrl:st==='out_for_delivery'?'ETA: '+b.eta:'Delivered '+b.deliveredAt;
+  addWaMsg({phone:o.phone,direction:'out',sender:'bot',type:'template',template:TPL_MAP[st],intent:'status_update',body:renderTpl(t.body,[b.customerName,o.id,detail])});touch();
+}
+INP.tsDraw=()=>{const f=formData(),o=DB.orders.find(x=>x.id===f.order),t=DB.templates.find(x=>x.name===TPL_MAP[f.st]),b=statusBody(o,f.st);const detail=f.st==='confirmed'?b.itemTitle:f.st==='shipped'?b.courier+' | AWB '+b.awb+' | '+b.trackingUrl:f.st==='out_for_delivery'?'ETA: '+b.eta:'Delivered '+b.deliveredAt;$('#tsPrev').innerHTML=`<div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="xs-t muted">${icon('tpl','sm')} ${t.name}</div><div class="tx">${waFmt(renderTpl(t.body,[b.customerName,o.id,detail]))}</div></div></div>`;};
+
+/* ============ ORDERS ============ */
+const ORD_TABS=[['all','All'],['draft','Drafts'],['processing','Processing'],['shipped','Shipped'],['out_for_delivery','Out for delivery'],['delivered','Delivered'],['cancelled','Cancelled']];
+function ordersFiltered(){
+  const q=UI.ordQ.trim().toLowerCase();
+  return DB.orders.filter(o=>(UI.ordTab==='all'||o.status===UI.ordTab)&&(!q||(o.id+' '+o.name+' '+o.phone+' '+o.awb+' '+o.items.map(i=>i.title).join(' ')).toLowerCase().includes(q))).sort((a,b)=>Date.parse(b.placed_at)-Date.parse(a.placed_at));
+}
+function ordersTableHTML(){
+  const l=ordersFiltered();
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Courier / AWB</th><th>Source</th><th>Placed</th></tr></thead><tbody>${l.map(o=>`<tr class="clk" data-act="openOrder" data-id="${o.id}"><td><b>${o.id}</b>${o.status==='draft'&&o.details_received?'<div><span class="badge b-warn">Ready to confirm</span></div>':''}</td><td>${esc(o.name)}<div class="xs-t muted">${o.phone?fmtPhone(o.phone):''}</div></td><td class="sm-t" style="max-width:230px">${esc(o.items.map(i=>i.title.split(' - ')[0]+(i.size?' ('+i.size+')':'')+(i.qty>1?' ×'+i.qty:'')).join(', '))}</td><td><b>${inr(o.total)}</b></td><td class="sm-t">${esc(o.payment)}</td><td>${stBadge(o.status)}</td><td class="sm-t">${o.courier?esc(o.courier)+'<div class="mono muted">'+esc(o.awb)+'</div>':'—'}</td><td>${platPill(o.source==='website'?'Website':o.source)}</td><td class="muted">${rel(o.placed_at)}</td></tr>`).join('')||'<tr><td colspan="9" class="empty">No orders</td></tr>'}</tbody></table></div>`;
+}
+VIEWS.orders={title:'Orders',render(){
+  const cnt=k=>k==='all'?DB.orders.length:DB.orders.filter(o=>o.status===k).length;
+  return `<div class="page-h"><h2>Orders</h2><span class="muted sm-t">Drafts come from “ORDER &lt;code&gt;” on WhatsApp; status changes fire the template webhook</span><span class="sp"></span><button class="btn" data-act="ordExport">${icon('download','sm')} Export CSV</button><button class="btn pri" data-act="orderNew">${icon('plus','sm')} New order</button></div>
+  <div class="card"><div class="bd row wrap" style="padding-bottom:12px"><div class="tabs" id="ordTabs"></div><span class="sp"></span><div style="min-width:220px;flex:1;max-width:340px"><input type="search" placeholder="Search order, customer, AWB…" value="${esc(UI.ordQ)}" data-in="ordQ"></div></div><div id="ordTbl"></div></div>`;
+},mount(){this.update();},update(){
+  if(!$('#ordTbl'))return;
+  const cnt=k=>k==='all'?DB.orders.length:DB.orders.filter(o=>o.status===k).length;
+  $('#ordTabs').innerHTML=ORD_TABS.map(([k,l])=>`<button class="${UI.ordTab===k?'on':''}" data-act="ordTab" data-t="${k}">${l}<span class="n">${cnt(k)}</span></button>`).join('');
+  $('#ordTbl').innerHTML=ordersTableHTML();
+}};
+INP.ordQ=el=>{UI.ordQ=el.value;$('#ordTbl').innerHTML=ordersTableHTML();};
+ACT.ordTab=el=>{UI.ordTab=el.dataset.t;VIEWS.orders.update();};
+ACT.ordExport=()=>{csvDownload('orders.csv',[['order_id','customer','phone','items','total','payment','status','courier','awb','source','placed_at'],...DB.orders.map(o=>[o.id,o.name,o.phone,o.items.map(i=>i.title+' ('+i.size+') x'+i.qty).join('; '),o.total,o.payment,o.status,o.courier,o.awb,o.source,o.placed_at])]);toast('orders.csv downloaded','ok');};
+const stepIndex=o=>({draft:-1,processing:0,shipped:2,out_for_delivery:3,delivered:4,cancelled:-1}[o.status]);
+function adjustStock(o,sign){o.items.forEach(i=>{const p=PRODUCT(i.handle),v=p&&p.variants.find(x=>x.size===i.size);if(v)v.stock=Math.max(0,v.stock+sign*i.qty);});o.stock_applied=sign<0;}
+function orderDrawerHTML(o){
+  const cu=custById(o.customer_id)||custByPhone(o.phone),si=stepIndex(o);
+  const st=STEPS.map(([k,l],i)=>{const done=o.status!=='cancelled'&&o.ts[k];return `<div class="step ${done?'done':''} ${i===si+1&&o.status!=='delivered'&&o.status!=='cancelled'&&o.status!=='draft'?'cur':''}"><div class="sc">${done?icon('check'):i+1}</div>${l}<div class="xs-t muted">${o.ts[k]?fmtShort(o.ts[k]).split(',')[0]:''}</div></div>`;}).join('');
+  const act=[];
+  if(o.status==='draft'){act.push(`<button class="btn pri" data-act="ordConfirm" data-id="${o.id}">${icon('check','sm')} Confirm order</button>`);}
+  if(o.status==='processing')act.push(`<button class="btn pri" data-act="ordShip" data-id="${o.id}">${icon('truck','sm')} Mark shipped</button>`);
+  if(o.status==='shipped')act.push(`<button class="btn pri" data-act="ordNext" data-id="${o.id}" data-s="out_for_delivery">${icon('truck','sm')} Out for delivery</button>`);
+  if(['shipped','out_for_delivery'].includes(o.status))act.push(`<button class="btn" data-act="ordNext" data-id="${o.id}" data-s="delivered">${icon('check','sm')} Mark delivered</button>`);
+  if(['draft','processing'].includes(o.status))act.push(`<button class="btn dng" data-act="ordCancel" data-id="${o.id}">Cancel order</button>`);
+  return `<div class="row wrap" style="margin-bottom:8px">${stBadge(o.status)}${platPill(o.source==='website'?'Website':o.source)}<span class="sp"></span><span class="muted sm-t">${fmtShort(o.placed_at)}</span></div>
+  ${o.status!=='draft'&&o.status!=='cancelled'?`<div class="steps">${st}</div>`:''}
+  ${o.status==='draft'?`<div class="notice ${o.details_received?'ok':'warn'}" style="margin-bottom:12px">${icon(o.details_received?'check':'clock','sm')}<span>${o.details_received?'Customer sent size & address on WhatsApp — review and confirm.':'Waiting for the customer to send size and delivery address.'}</span></div>`:''}
+  <div class="b" style="margin-bottom:4px">Items</div>${o.items.map(i=>{const p=PRODUCT(i.handle);return `<div class="list-i"><div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex:none">${p?prodArt(p):''}</div><div class="sp"><b>${esc(i.title)}</b><div class="xs-t muted">Size ${esc(i.size||'—')} · Qty ${i.qty}</div></div><b>${inr(i.price*i.qty)}</b></div>`;}).join('')}
+  <div class="row" style="justify-content:space-between;padding:8px 0;font-weight:700"><span>Total <span class="muted sm-t" style="font-weight:400">· ${esc(o.payment)}</span></span><span>${inr(o.total)}</span></div>
+  <dl class="kv"><dt>Customer</dt><dd>${cu?`<a href="#" data-act="openCustomer" data-id="${cu.id}">${esc(o.name)}</a>`:esc(o.name)} ${o.phone?`<span class="muted">${fmtPhone(o.phone)}</span>`:''}</dd><dt>Address</dt><dd>${esc(o.address)||'<span class="muted">—</span>'}${o.pincode?` <span class="chip">${o.pincode}</span>`:''}</dd><dt>Courier</dt><dd>${o.courier?`${esc(o.courier)} · <span class="mono">${esc(o.awb)}</span>`:'—'}</dd><dt>Tracking</dt><dd>${o.tracking_url?`<span class="mono" style="word-break:break-all">${esc(o.tracking_url)}</span>`:'—'}</dd><dt>ETA</dt><dd>${esc(o.eta)||'—'}</dd>${o.comment_id?`<dt>Came from</dt><dd><button class="btn sm" data-act="cmJump" data-id="${o.comment_id}">${icon('msg','sm')} Social comment</button></dd>`:''}</dl>
+  ${o.phone&&o.status!=='draft'?`<label class="chk" style="margin:8px 0"><input type="checkbox" id="ordNotify" checked> Notify customer on WhatsApp (template message)</label>`:''}
+  <div class="row wrap">${act.join('')}</div>
+  ${o.phone?`<div class="row wrap" style="margin-top:10px"><button class="btn sm" data-act="waOpen" data-phone="${o.phone}">${icon('chat','sm')} Open chat</button>${o.status!=='draft'?`<button class="btn sm" data-act="ordTrackMsg" data-id="${o.id}">${icon('send','sm')} Send tracking message</button>`:''}</div>`:''}`;
+}
+const notifyOn=()=>{const n=$('#ordNotify');return n?n.checked:true;};
+ACT.openOrder=el=>{const o=DB.orders.find(x=>x.id===el.dataset.id);if(!o){toast('Order not found','err');return;}$('#gsResults').classList.add('hide');openModal({title:`Order ${o.id}`,drawer:true,body:orderDrawerHTML(o),actions:[]});};
+ACT.cmJump=el=>{closeModal();UI.cmtSel=el.dataset.id;UI.cmtMobile=true;go('comments');};
+ACT.ordConfirm=el=>{const o=DB.orders.find(x=>x.id===el.dataset.id);if(!o.address&&!o.items[0].size){if(!confirm('No size/address captured yet. Confirm anyway?'))return;}createOrderFromDraft(o,{notify:true});if(!o.stock_applied)adjustStock(o,-1);ACT.openOrder({dataset:{id:o.id}});toast(`${o.id} confirmed — order_confirmed_v1 sent`,'ok');};
+ACT.ordNext=el=>{const o=DB.orders.find(x=>x.id===el.dataset.id),n=notifyOn();changeOrderStatus(o,el.dataset.s,{notify:n});ACT.openOrder({dataset:{id:o.id}});toast(`${o.id} → ${ORDER_SHORT[o.status]}${n&&o.phone?' · WhatsApp template sent':''}`,'ok');};
+ACT.ordCancel=el=>{const o=DB.orders.find(x=>x.id===el.dataset.id);confirmBox(`Cancel order <b>${o.id}</b>?`,()=>{if(o.stock_applied)adjustStock(o,1);changeOrderStatus(o,'cancelled');ACT.openOrder({dataset:{id:o.id}});toast('Order cancelled');},'Cancel order');};
+ACT.ordShip=el=>{
+  const o=DB.orders.find(x=>x.id===el.dataset.id),n=notifyOn();
+  openModal({title:`Ship ${o.id}`,body:`<div class="grid g2"><label class="f">Courier<select name="courier" data-ch="shipC">${Object.keys(COURIERS).map(c=>`<option>${c}</option>`).join('')}</select></label><label class="f">AWB number<input name="awb" type="text" value="${newAwb('Delhivery')}"></label></div><p class="muted sm-t">The customer gets <b>order_shipped_v1</b> with courier, AWB and tracking link${n?'':' (notification is OFF)'}.</p>`,actions:[{label:'Cancel',onClick:()=>ACT.openOrder({dataset:{id:o.id}})},{label:'Mark shipped',cls:'pri',onClick:()=>{const f=formData();changeOrderStatus(o,'shipped',{courier:f.courier,awb:f.awb.trim(),notify:n});ACT.openOrder({dataset:{id:o.id}});toast(`${o.id} shipped via ${f.courier}`,'ok');}}]});
+};
+INP.shipC=el=>{$('[name=awb]').value=newAwb(el.value);};
+ACT.ordTrackMsg=el=>{const o=DB.orders.find(x=>x.id===el.dataset.id),c=custByPhone(o.phone);if(!windowOpen(c)){toast('24h window closed — use a status template','err');return;}const r=replyTracking(c,{orderId:o.id});addWaMsg({phone:o.phone,direction:'out',sender:'agent',agent:'Team',body:r});touch();toast('Tracking message sent','ok');};
+ACT.orderNew=el=>{
+  const phone=el&&el.dataset&&el.dataset.phone||'';
+  const prods=liveProducts().filter(inStock);
+  const row=i=>`<div class="grid" style="grid-template-columns:minmax(0,1fr) 80px 60px;gap:6px;margin-bottom:6px"><select name="p${i}" data-ch="noSize" data-i="${i}">${i?'<option value="">— none —</option>':''}${prods.map(p=>`<option value="${p.handle}">${esc(p.title)} · ${inr(p.price)}</option>`).join('')}</select><select name="z${i}"></select><input name="q${i}" type="number" min="1" value="1"></div>`;
+  openModal({title:'New order',wide:true,body:`<div class="grid g2"><div class="col"><label class="f">Customer<select name="cust" data-ch="noCust"><option value="">➕ New customer…</option>${DB.customers.map(c=>`<option value="${c.id}" ${c.phone===phone?'selected':''}>${esc(c.name)} ${c.phone?'('+fmtPhone(c.phone)+')':''}</option>`).join('')}</select></label><div class="grid g2 ${phone?'hide':''}" id="noNew"><label class="f">Name<input name="nname" type="text"></label><label class="f">WhatsApp number<input name="nphone" type="tel" placeholder="919812345678"></label></div>
+   <div class="b sm-t muted">Items — product · size · qty</div>${row(0)}${row(1)}${row(2)}</div><div class="col"><div class="grid g2"><label class="f">Payment<select name="pay"><option>Prepaid (UPI)</option><option>Prepaid (Card)</option><option>COD</option></select></label><label class="f">Source<select name="src"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="website">Website</option></select></label></div><label class="f">Delivery address<textarea name="addr" rows="3"></textarea></label><label class="f">Pincode<input name="pin" type="text" maxlength="6"></label><label class="chk"><input type="checkbox" name="notify" checked> Send order_confirmed_v1 on WhatsApp</label></div></div>`,
+   actions:[{label:'Cancel',onClick:closeModal},{label:'Create order',cls:'pri',onClick:()=>{
+     const f=formData();let cu=f.cust?custById(f.cust):null;
+     if(!cu){if(!f.nname.trim()){toast('Enter the customer name','err');return;}cu=upsertCustomer({phone:digits(f.nphone),name:f.nname.trim(),platform:f.nphone?'whatsapp':f.src==='website'?'whatsapp':f.src});}
+     const items=[0,1,2].map(i=>{const h=f['p'+i];if(!h)return null;const p=PRODUCT(h);return {title:p.title,handle:h,size:f['z'+i],qty:Math.max(1,+f['q'+i]||1),price:p.price};}).filter(Boolean);
+     if(!items.length){toast('Add at least one item','err');return;}
+     const o={id:nextOrderNo(),phone:cu.phone,customer_id:cu.id,name:cu.name,placed_at:iso(Date.now()),status:'processing',items,total:sum(items,i=>i.price*i.qty),payment:f.pay,paid:!/COD/.test(f.pay),courier:'',awb:'',tracking_url:'',eta:etaFor('processing'),ts:{placed:iso(Date.now())},source:f.src,comment_id:'',address:f.addr,pincode:f.pin,details_received:true,notes:''};
+     DB.orders.unshift(o);adjustStock(o,-1);logEvent('order',`${o.id} created manually for ${cu.name}`,'ok');
+     if(f.notify&&o.phone)orderStatusWebhook({status:'confirmed',phone:o.phone,customerName:o.name,orderId:o.id,itemTitle:items.map(i=>i.title).join(', ')},{order:o});
+     closeModal();touch();toast(`${o.id} created`,'ok');}}],onMount:()=>{[0,1,2].forEach(i=>INP.noSize({dataset:{i},value:$(`[name=p${i}]`).value}));}});
+};
+INP.noCust=el=>{$('#noNew').classList.toggle('hide',!!el.value);};
+INP.noSize=el=>{const i=el.dataset.i,p=PRODUCT(el.value),s=$(`[name=z${i}]`);s.innerHTML=p?sizesOf(p).map(z=>`<option>${z}</option>`).join(''):'<option></option>';};
+
+/* ============ CUSTOMERS ============ */
+function custFiltered(){
+  const q=UI.custQ.trim().toLowerCase();
+  return DB.customers.filter(c=>!q||(c.name+' '+c.phone+' '+c.handle+' '+c.tags.join(' ')).toLowerCase().includes(q)).sort((a,b)=>custLtv(b)-custLtv(a));
+}
+function custTableHTML(){
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Customer</th><th>Channel</th><th>Orders</th><th>Lifetime value</th><th>Tags</th><th>Last activity</th><th></th></tr></thead><tbody>${custFiltered().map(c=>{const os=custOrders(c).filter(o=>o.status!=='draft'),l=c.phone&&lastWaMsg(c.phone);return `<tr class="clk" data-act="openCustomer" data-id="${c.id}"><td><div class="row">${avatar(c.name,c.phone||c.id,'sm')}<div><b>${esc(c.name)}</b><div class="xs-t muted">${c.phone?fmtPhone(c.phone):'@'+esc(c.handle)+' · no WhatsApp yet'}</div></div></div></td><td>${platPill(c.platform)}</td><td>${os.length}</td><td><b>${inr(custLtv(c))}</b></td><td>${c.tags.map(t=>`<span class="chip tag">${esc(t)}</span>`).join('')}</td><td class="muted">${l?rel(l.at):rel(c.created_at)}</td><td>${c.phone?`<button class="icon-btn" data-act="waOpenBtn" data-phone="${c.phone}" title="Open chat">${icon('chat','sm')}</button>`:''}</td></tr>`;}).join('')||'<tr><td colspan="7" class="empty">No customers</td></tr>'}</tbody></table></div>`;
+}
+VIEWS.customers={title:'Customers',render(){
+  return `<div class="page-h"><h2>Customers <span class="muted sm-t">(${DB.customers.length})</span></h2><span class="sp"></span><button class="btn" data-act="custExport">${icon('download','sm')} Export CSV</button><button class="btn pri" data-act="custNew">${icon('plus','sm')} Add customer</button></div><div class="card"><div class="bd" style="padding-bottom:12px"><input type="search" placeholder="Search name, phone, @handle, tag…" value="${esc(UI.custQ)}" data-in="custQ"></div><div id="custTbl">${custTableHTML()}</div></div>`;
+},update(){const t=$('#custTbl');if(t)t.innerHTML=custTableHTML();}};
+INP.custQ=el=>{UI.custQ=el.value;VIEWS.customers.update();};
+ACT.waOpenBtn=(el,e)=>{e.stopPropagation();ACT.waOpen(el);};
+ACT.custExport=()=>{csvDownload('customers.csv',[['name','phone','handle','channel','orders','ltv','tags'],...DB.customers.map(c=>[c.name,c.phone,c.handle,c.platform,custOrders(c).filter(o=>o.status!=='draft').length,custLtv(c),c.tags.join('|')])]);toast('customers.csv downloaded','ok');};
+ACT.custNew=()=>openCustomerDrawer(null);
+ACT.openCustomer=el=>{$('#gsResults').classList.add('hide');openCustomerDrawer(el.dataset.id);};
+function openCustomerDrawer(id){
+  const isNew=!id,c=isNew?{id:'',name:'',phone:'',handle:'',platform:'whatsapp',tags:[],notes:''}:custById(id);if(!c){toast('Customer not found','err');return;}
+  const os=isNew?[]:custOrders(c).sort((a,b)=>Date.parse(b.placed_at)-Date.parse(a.placed_at)),cms=isNew?[]:DB.comments.filter(x=>x.customer_id===c.id).slice(0,5),tks=isNew||!c.phone?[]:DB.tickets.filter(t=>t.phone===c.phone);
+  openModal({title:isNew?'Add customer':esc(c.name),drawer:true,body:`<div class="grid g2"><label class="f">Name<input name="name" type="text" value="${esc(c.name)}"></label><label class="f">WhatsApp number<input name="phone" type="tel" value="${esc(c.phone)}" placeholder="919812345678"></label><label class="f">Instagram / Facebook handle<input name="handle" type="text" value="${esc(c.handle)}"></label><label class="f">Channel<select name="platform">${['whatsapp','instagram','facebook'].map(p=>`<option ${p===c.platform?'selected':''}>${p}</option>`).join('')}</select></label></div><label class="f" style="margin-top:12px">Tags (comma separated)<input name="tags" type="text" value="${esc(c.tags.join(', '))}" placeholder="VIP, Repeat, COD"></label><label class="f" style="margin-top:12px">Notes<textarea name="notes">${esc(c.notes)}</textarea></label>
+  ${isNew?'':`<div class="grid g3" style="margin:16px 0 8px"><div class="card kpi"><div class="l">Orders</div><div class="v">${os.filter(o=>o.status!=='draft').length}</div></div><div class="card kpi"><div class="l">LTV</div><div class="v" style="font-size:20px">${inr(custLtv(c))}</div></div><div class="card kpi"><div class="l">Tickets</div><div class="v">${tks.length}</div></div></div>
+  <div class="b" style="margin:12px 0 4px">Orders</div>${os.map(o=>`<div class="list-i" style="cursor:pointer" data-act="openOrder" data-id="${o.id}"><div class="sp"><b>${o.id}</b> <span class="muted sm-t">${inr(o.total)} · ${fmtDay(o.placed_at).replace(/ \d{4}$/,'')}</span></div>${stBadge(o.status)}</div>`).join('')||'<div class="muted sm-t">No orders</div>'}
+  <div class="b" style="margin:12px 0 4px">Social comments</div>${cms.map(x=>`<div class="list-i"><div class="sp"><div class="sm-t">“${esc(x.text)}”</div><div class="xs-t muted">${platPill(x.platform)} ${rel(x.at)} · ${CM_ST[x.status][1]}</div></div></div>`).join('')||'<div class="muted sm-t">No comments</div>'}`}`,
+  actions:[...(isNew?[]:[{label:'Delete',cls:'dng',onClick:()=>confirmBox(`Delete <b>${esc(c.name)}</b>? Orders stay.`,()=>{DB.customers=DB.customers.filter(x=>x.id!==c.id);if(UI.chat===c.phone)UI.chat=null;closeModal();touch();})}]),{label:'Cancel',onClick:closeModal},{label:isNew?'Add customer':'Save',cls:'pri',onClick:()=>{
+    const f=formData(),ph=digits(f.phone);if(!f.name.trim()){toast('Enter a name','err');return;}
+    if(ph&&DB.customers.some(x=>x.phone===ph&&x.id!==c.id)){toast('Another customer has this number','err');return;}
+    const t=isNew?upsertCustomer({name:f.name.trim(),phone:ph,handle:f.handle.trim(),platform:f.platform}):c;
+    Object.assign(t,{name:f.name.trim(),phone:ph,handle:f.handle.trim(),platform:f.platform,notes:f.notes,tags:f.tags.split(',').map(s=>s.trim()).filter(Boolean)});closeModal();touch();toast('Saved','ok');}}]});
+}
+
+/* ============ SUPPORT TICKETS ============ */
+function ticketsFiltered(){return DB.tickets.filter(t=>UI.tkTab==='all'||(UI.tkTab==='open'&&t.status==='Open')||(UI.tkTab==='prog'&&t.status==='In progress')||(UI.tkTab==='done'&&t.status==='Resolved')).sort((a,b)=>(a.status==='Resolved')-(b.status==='Resolved')||Date.parse(a.due_at)-Date.parse(b.due_at));}
+function slaCell(t){if(t.status==='Resolved')return '<span class="muted">—</span>';const b=ticketBreached(t);return `<span style="color:${b?'var(--danger)':'var(--ok)'};font-weight:600">${b?'Overdue '+rel(t.due_at).replace(' ago',''):'Due '+rel(t.due_at)}</span>`;}
+function ticketTableHTML(){
+  return `<div class="tbl-wrap"><table class="t"><thead><tr><th>Ticket</th><th>Customer</th><th>Category</th><th>Order</th><th>Priority</th><th>Status</th><th>Assignee</th><th>SLA</th></tr></thead><tbody>${ticketsFiltered().map(t=>`<tr class="clk" data-act="openTicket" data-id="${t.id}"><td><b>${t.id}</b><div class="xs-t muted">${rel(t.created_at)}</div></td><td>${esc(t.name)}<div class="xs-t muted">${fmtPhone(t.phone)}</div></td><td>${esc(t.category)}<div class="xs-t muted" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.text)}</div></td><td class="mono">${esc(t.order_id)||'—'}</td><td><span class="badge b-${t.priority}">${t.priority}</span></td><td><span class="badge b-${slug(t.status)}">${t.status}</span></td><td>${esc(t.assignee)||'<span class="muted">Unassigned</span>'}</td><td>${slaCell(t)}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No tickets here 🎉</td></tr>'}</tbody></table></div>`;
+}
+VIEWS.tickets={title:'Support Tickets',render(){
+  return `<div class="page-h"><h2>Support tickets</h2><span class="muted sm-t">Auto-created when a customer writes cancel / return / refund / exchange / damage… · SLA ${DB.config.sla_hours}h within ${DB.config.support_start}:00–${DB.config.support_end}:00</span><span class="sp"></span><button class="btn pri" data-act="tkNew">${icon('plus','sm')} New ticket</button></div><div class="card"><div class="bd" style="padding-bottom:12px"><div class="tabs" id="tkTabs"></div></div><div id="tkTbl"></div></div>`;
+},mount(){this.update();},update(){
+  if(!$('#tkTbl'))return;const n=f=>DB.tickets.filter(t=>f==='all'||(f==='open'&&t.status==='Open')||(f==='prog'&&t.status==='In progress')||(f==='done'&&t.status==='Resolved')).length;
+  $('#tkTabs').innerHTML=[['open','Open'],['prog','In progress'],['done','Resolved'],['all','All']].map(([k,l])=>`<button class="${UI.tkTab===k?'on':''}" data-act="tkTab" data-t="${k}">${l}<span class="n">${n(k)}</span></button>`).join('');
+  $('#tkTbl').innerHTML=ticketTableHTML();
+}};
+ACT.tkTab=el=>{UI.tkTab=el.dataset.t;VIEWS.tickets.update();};
+ACT.tkNew=()=>openModal({title:'New support ticket',body:`<label class="f">Customer<select name="cust">${DB.customers.filter(c=>c.phone).map(c=>`<option value="${c.id}">${esc(c.name)} (${fmtPhone(c.phone)})</option>`).join('')}</select></label><div class="grid g2" style="margin-top:12px"><label class="f">Category<select name="cat">${['Cancellation','Return / Refund','Exchange / Replacement','Complaint'].map(x=>`<option>${x}</option>`).join('')}</select></label><label class="f">Order ID<input name="oid" type="text" placeholder="ORD-10452"></label></div><label class="f" style="margin-top:12px">Issue<textarea name="text" rows="3"></textarea></label>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Create ticket',cls:'pri',onClick:()=>{const f=formData(),c=custById(f.cust);if(!f.text.trim()){toast('Describe the issue','err');return;}const t=createTicket({phone:c.phone,name:c.name,orderId:f.oid.trim().toUpperCase(),text:f.text.trim(),word:f.cat==='Cancellation'?'cancel':f.cat.startsWith('Return')?'return':f.cat.startsWith('Exchange')?'exchange':'complaint'});closeModal();touch();toast(t.id+' created','ok');}}]});
+ACT.openTicket=el=>{$('#gsResults').classList.add('hide');openTicketDrawer(el.dataset.id);};
+function openTicketDrawer(id){
+  const t=DB.tickets.find(x=>x.id===id);if(!t)return;const c=custByPhone(t.phone),o=DB.orders.find(x=>x.id===t.order_id);
+  const msgs=waMsgsOf(t.phone).slice(-5);
+  openModal({title:`${t.id} · ${esc(t.category)}`,drawer:true,body:`<div class="row wrap" style="margin-bottom:10px"><span class="badge b-${slug(t.status)}">${t.status}</span><span class="badge b-${t.priority}">${t.priority} priority</span><span class="sp"></span>${slaCell(t)}</div>
+   <div class="bub in" style="max-width:100%;margin-bottom:10px"><div class="who">${esc(t.name)} · ${fmtPhone(t.phone)}</div><div class="tx">${esc(t.text)}</div><div class="meta">${fmtShort(t.created_at)}</div></div>
+   ${o?`<div class="list-i" style="cursor:pointer" data-act="openOrder" data-id="${o.id}">${icon('box')}<div class="sp"><b>${o.id}</b> <span class="muted sm-t">${inr(o.total)} · ${o.items.length} item(s)</span></div>${stBadge(o.status)}</div>`:t.order_id?`<div class="notice warn">${icon('alert','sm')} ${esc(t.order_id)} — not verified against this phone number.</div>`:''}
+   <div class="grid g3" style="margin:12px 0"><label class="f">Status<select data-ch="tkField" data-id="${t.id}" data-k="status">${['Open','In progress','Resolved'].map(s=>`<option ${s===t.status?'selected':''}>${s}</option>`).join('')}</select></label><label class="f">Priority<select data-ch="tkField" data-id="${t.id}" data-k="priority">${['low','normal','high'].map(s=>`<option ${s===t.priority?'selected':''}>${s}</option>`).join('')}</select></label><label class="f">Assignee<select data-ch="tkField" data-id="${t.id}" data-k="assignee"><option value="">Unassigned</option>${AGENTS.map(s=>`<option ${s===t.assignee?'selected':''}>${s}</option>`).join('')}</select></label></div>
+   <div class="b" style="margin-bottom:4px">Recent chat</div><div class="wa-prev" style="max-height:200px;overflow:auto">${msgs.map(m=>`<div class="bub ${m.direction==='out'?'out':'in'}" style="max-width:100%;margin-bottom:4px"><div class="tx sm-t">${waFmt(m.body.slice(0,220))}</div></div>`).join('')}</div>
+   <div class="b" style="margin:12px 0 4px">Internal notes</div>${t.notes.map(n=>`<div class="list-i"><div class="sp"><div class="sm-t">${esc(n.text)}</div><div class="xs-t muted">${esc(n.by)} · ${rel(n.at)}</div></div></div>`).join('')||'<div class="muted sm-t">No notes yet</div>'}
+   <div class="row" style="margin-top:8px"><input id="tkNote" type="text" placeholder="Add internal note…" data-enter="tkAddNote" data-id="${t.id}"><button class="btn" data-act="tkAddNote" data-id="${t.id}">Add</button></div>
+   <div class="b" style="margin:14px 0 4px">Reply to customer on WhatsApp</div><div class="chips" style="margin-bottom:6px">${['Hi {n}, we have received your request and are checking it now.','Hi {n}, a reverse pickup has been scheduled. Please keep the item unused with tags.','Hi {n}, your refund has been initiated — it will reflect in 3-5 working days.'].map(x=>`<button data-act="tkQuick" data-t="${esc(x.replace('{n}',(t.name||'').split(' ')[0]))}">${esc(x.replace('{n}',(t.name||'').split(' ')[0]).slice(0,36))}…</button>`).join('')}</div><textarea id="tkReply" rows="2" placeholder="Type a reply…"></textarea>`,
+   actions:[{label:'Close',onClick:closeModal},{label:'Send reply',onClick:()=>ACT.tkReply({dataset:{id:t.id,resolve:'0'}})},{label:'Send & resolve',cls:'pri',onClick:()=>ACT.tkReply({dataset:{id:t.id,resolve:'1'}})}]});
+}
+INP.tkField=el=>{const t=DB.tickets.find(x=>x.id===el.dataset.id);t[el.dataset.k]=el.value;if(el.dataset.k==='status')logEvent('ticket',`${t.id} → ${el.value}`,el.value==='Resolved'?'ok':'info');touch();toast('Ticket updated','ok');};
+ACT.tkAddNote=el=>{const t=DB.tickets.find(x=>x.id===el.dataset.id),i=$('#tkNote');if(!i.value.trim())return;t.notes.push({by:t.assignee||'You',text:i.value.trim(),at:iso(Date.now())});save();openTicketDrawer(t.id);};
+ACT.tkQuick=el=>{$('#tkReply').value=el.dataset.t;};
+ACT.tkReply=el=>{
+  const t=DB.tickets.find(x=>x.id===el.dataset.id),c=custByPhone(t.phone),txt=($('#tkReply')||{}).value||'';
+  if(txt.trim()){if(!windowOpen(c)){toast('24h window closed — send a template from WhatsApp Desk','err');return;}addWaMsg({phone:t.phone,direction:'out',sender:'agent',agent:t.assignee||'Team',body:txt.trim()});}
+  else if(el.dataset.resolve!=='1'){toast('Type a reply first','err');return;}
+  if(el.dataset.resolve==='1'){t.status='Resolved';logEvent('ticket',`${t.id} resolved`,'ok');}else if(t.status==='Open')t.status='In progress';
+  closeModal();touch();toast(el.dataset.resolve==='1'?'Replied & resolved':'Reply sent','ok');
+};
+
+/* ============ WA TEMPLATES ============ */
+function sampleFor(t){
+  const st={t1:'confirmed',t2:'shipped',t3:'out_for_delivery',t4:'delivered'}[t.id]||'confirmed';
+  const want={confirmed:'processing',shipped:'shipped',out_for_delivery:'out_for_delivery',delivered:'delivered'}[st];const o=DB.orders.find(x=>x.status===want&&x.phone)||DB.orders.find(x=>x.status!=='draft'&&x.phone)||DB.orders[0];if(!o)return [];
+  const b=statusBody(o,st);return [b.customerName,o.id,st==='confirmed'?b.itemTitle:st==='shipped'?b.courier+' | AWB '+b.awb+' | '+b.trackingUrl:st==='out_for_delivery'?'ETA: '+b.eta:'Delivered '+b.deliveredAt];
+}
+VIEWS.templates={title:'WhatsApp Templates',render(){
+  const sent=n=>DB.messages.filter(m=>m.template===n).length;
+  return `<div class="page-h"><h2>Order-status templates</h2><span class="muted sm-t">Flow 3 — sent proactively when Shopify / the courier calls <span class="mono">POST /order-status-update</span></span><span class="sp"></span><button class="btn pri" data-act="tplNew">${icon('plus','sm')} New template</button></div>
+  <div class="grid g2">${DB.templates.map(t=>`<div class="card"><div class="hd"><span class="mono" style="font-size:13px">${esc(t.name)}</span><span class="sp"></span><span class="badge b-${t.status}">${t.status}</span></div><div class="bd col">
+    <div class="row wrap"><span class="chip">${t.category}</span><span class="chip">${t.language}</span><span class="chip">${esc(t.trigger)}</span><span class="chip">${sent(t.name)} sent</span></div>
+    <div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="tx">${waFmt(renderTpl(t.body,sampleFor(t)))}</div><div class="meta">${fmtTime(Date.now())} ${icon('check','sm')}</div></div></div>
+    <div class="xs-t muted">${t.vars.map((v,i)=>`<span class="chip">{{${i+1}}} ${esc(v)}</span>`).join('')}</div>
+    <div class="row wrap"><button class="btn sm" data-act="tplTest" data-id="${t.id}">${icon('send','sm')} Send test</button><button class="btn sm" data-act="tplEdit" data-id="${t.id}">${icon('edit','sm')} Edit body</button></div></div></div>`).join('')}</div>
+  <div class="card" style="margin-top:14px"><div class="hd">Recent template messages</div><div class="tbl-wrap"><table class="t"><thead><tr><th>Sent</th><th>To</th><th>Template</th><th>Message</th><th>Status</th></tr></thead><tbody>${DB.messages.filter(m=>m.type==='template').sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)).slice(0,12).map(m=>{const c=custByPhone(m.phone)||{};return `<tr><td class="muted">${rel(m.at)}</td><td>${esc(c.name||fmtPhone(m.phone))}</td><td class="mono">${esc(m.template)}</td><td class="sm-t" style="max-width:380px">${esc(m.body.replace(/\n/g,' ').slice(0,110))}</td><td><span class="badge ${m.status==='read'?'b-info':m.status==='delivered'?'b-ok':''}">${m.status}</span></td></tr>`;}).join('')||'<tr><td colspan="5" class="empty">None yet</td></tr>'}</tbody></table></div></div>`;
+}};
+ACT.tplEdit=el=>{const t=DB.templates.find(x=>x.id===el.dataset.id);openModal({title:`Edit ${t.name}`,wide:true,body:`<div class="grid g2"><div class="col"><label class="f">Body (use {{1}} {{2}} {{3}})<textarea name="body" rows="6" data-in="tplDraw">${esc(t.body)}</textarea></label><p class="muted sm-t">Editing a template re-submits it to Meta in real life; here it stays APPROVED.</p></div><div><div class="b sm-t muted" style="margin-bottom:6px">Preview</div><div id="tpPrev"></div></div></div>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Save',cls:'pri',onClick:()=>{t.body=formData().body;closeModal();touch();toast('Template updated','ok');}}],onMount:()=>{INP.tplDraw=()=>{$('#tpPrev').innerHTML=`<div class="wa-prev"><div class="bub out" style="max-width:100%"><div class="tx">${waFmt(renderTpl(formData().body,sampleFor(t)))}</div></div></div>`;};INP.tplDraw();}});};
+ACT.tplTest=el=>{const t=DB.templates.find(x=>x.id===el.dataset.id),st={t1:'confirmed',t2:'shipped',t3:'out_for_delivery',t4:'delivered'}[t.id];if(!st){toast('Custom templates cannot be tested here','err');return;}
+  const os=DB.orders.filter(o=>o.status!=='draft'&&o.phone);openModal({title:`Send test · ${t.name}`,body:`<label class="f">Order (message goes to its customer)<select name="order">${os.map(o=>`<option>${o.id} — ${esc(o.name)}</option>`).join('')}</select></label>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Send test',cls:'pri',onClick:()=>{const o=DB.orders.find(x=>x.id===formData().order.split(' ')[0]);sendStatusTemplate(o,st);closeModal();toast('Template sent to '+o.name,'ok');}}]});};
+ACT.tplNew=()=>openModal({title:'New template',body:`<div class="grid g2"><label class="f">Name<input name="name" type="text" placeholder="order_cod_confirm_v1"></label><label class="f">Category<select name="cat"><option>UTILITY</option><option>MARKETING</option></select></label></div><label class="f" style="margin-top:12px">Body<textarea name="body" rows="4" placeholder="Hi {{1}}, please confirm your COD order {{2}}."></textarea></label>`,actions:[{label:'Cancel',onClick:closeModal},{label:'Submit',cls:'pri',onClick:()=>{const f=formData(),n=slugify(f.name).replace(/-/g,'_');if(!n||!f.body.trim()){toast('Name and body required','err');return;}const vs=tplVars(f.body);DB.templates.push({id:uid('t'),name:n,language:'en',category:f.cat,status:'PENDING',body:f.body,vars:vs.map(v=>'Variable '+v),trigger:'manual'});closeModal();touch();setTimeout(()=>{const t=DB.templates.find(x=>x.name===n);if(t){t.status='APPROVED';logEvent('template',`Meta approved ${n}`,'ok');touch();}},6000);toast('Submitted — approval simulated in a few seconds','ok');}}]});
+
+/* ============ AUTOMATION RULES ============ */
+function chipsHTML(key,list){return list.map((w,i)=>`<span class="chip tag" style="font-size:12px;padding:2px 8px">${esc(w)} <a href="#" data-act="kwDel" data-k="${key}" data-i="${i}" style="color:inherit;text-decoration:none;margin-left:2px">×</a></span>`).join('');}
+function missedIntent(){
+  const hint=/\?|fabric|material|ship|shipping|colour|color|where|dubai|summer|wash|delivery|exchange|offer|discount|stock|worn|model/i;
+  return DB.comments.filter(c=>!c.buying_intent&&!c.ignored&&hint.test(c.text)).slice(0,6);
+}
+VIEWS.automation={title:'Automation Rules',update(){},render(){
+  const cfg=DB.config;
+  return `<div class="page-h"><h2>Automation rules</h2><span class="muted sm-t">What triggers a DM, and what the WhatsApp order desk understands</span></div>
+  <div class="grid g2" style="align-items:start"><div class="col">
+   <div class="card"><div class="hd">${icon('zap','sm')} Rule tester</div><div class="bd col"><label class="f">Type a comment or WhatsApp message<input id="ruleText" type="text" value="Price kitna hai? size M available?" data-in="ruleTest"></label><div id="ruleOut"></div></div></div>
+   <div class="card"><div class="hd">Buying-intent keywords <span class="sub">Instagram / Facebook comments</span></div><div class="bd col"><div id="kwChips">${chipsHTML('keywords',cfg.keywords)}</div><div class="row"><input id="kwNew" type="text" placeholder="Add keyword or phrase (e.g. kitne ka)" data-enter="kwAdd"><button class="btn" data-act="kwAdd" data-k="keywords">Add</button></div><button class="btn sm" style="align-self:flex-start" data-act="kwReset">Reset to defaults</button></div></div>
+   <div class="card"><div class="hd">WhatsApp intent words</div><div class="bd col"><div class="b sm-t">Track</div><div id="trChips">${chipsHTML('track_words',cfg.track_words)}</div><div class="row"><input id="trNew" type="text" placeholder="Add tracking word" data-enter="kwAdd2" data-k="track_words"><button class="btn" data-act="kwAdd2" data-k="track_words">Add</button></div><div class="b sm-t" style="margin-top:6px">Support</div><div id="spChips">${chipsHTML('support_words',cfg.support_words)}</div><div class="row"><input id="spNew" type="text" placeholder="Add support word" data-enter="kwAdd2" data-k="support_words"><button class="btn" data-act="kwAdd2" data-k="support_words">Add</button></div></div></div>
+  </div><div class="col">
+   <div class="card" id="sec-replies"><div class="hd">Reply texts</div><div class="bd col"><label class="f"><span>Public reply under the comment <span style="font-weight:400">— {name}</span></span><textarea name="public_reply" rows="2">${esc(cfg.public_reply)}</textarea></label><label class="f"><span>Support hand-off reply <span style="font-weight:400">— {name} {ref} {ticket}</span></span><textarea name="support_reply" rows="4">${esc(cfg.support_reply)}</textarea></label><label class="f"><span>Menu reply <span style="font-weight:400">— {name} {brand} {sample}</span></span><textarea name="menu_reply" rows="7">${esc(cfg.menu_reply)}</textarea></label><div><button class="btn pri" data-act="saveReplies">Save replies</button></div></div></div>
+   <div class="card"><div class="hd">Possibly missed buying intent <span class="sub">comments without a keyword that look like questions</span></div><div class="bd" id="missed">${missedIntent().map(c=>`<div class="list-i"><div class="sp"><div class="sm-t">“${esc(c.text)}”</div><div class="xs-t muted">@${esc(c.from_name)} · ${rel(c.at)}</div></div><button class="btn sm" data-act="cmKeywordFrom" data-id="${c.id}">Add keyword</button><button class="btn sm pri" data-act="cmForceFrom" data-id="${c.id}">Send</button></div>`).join('')||'<div class="empty">Nothing suspicious 👍</div>'}</div></div>
+  </div></div>`;
+},mount(){INP.ruleTest($('#ruleText'));}};
+INP.ruleTest=el=>{
+  const t=el.value,it=detectIntent(t),p=parseWA(t);
+  $('#ruleOut').innerHTML=`<div class="hl-box"><div class="b sm-t">As a social comment</div>${it.buyingIntent?`<div class="notice ok" style="margin-top:6px">${icon('check','sm')} Buying intent — keyword <b>${esc(it.matchedKeyword)}</b> → carousel DM would be sent</div>`:`<div class="notice info" style="margin-top:6px">${icon('info','sm')} No keyword → ignored</div>`}</div>
+   <div class="hl-box" style="margin-top:8px"><div class="b sm-t">As a WhatsApp message</div><div class="row wrap" style="margin-top:6px"><span class="badge b-info">intent: ${p.intent}</span>${p.orderId?`<span class="chip">orderId ${p.orderId}</span>`:''}${p.handle?`<span class="chip">product ${esc(p.handle)}</span>`:''}${p.word?`<span class="chip">word “${esc(p.word)}”</span>`:''}</div></div>`;
+};
+function kwList(k){return DB.config[k];}
+ACT.kwDel=(el,e)=>{e.preventDefault();DB.config[el.dataset.k].splice(+el.dataset.i,1);save();render();};
+ACT.kwAdd=()=>{const i=$('#kwNew'),v=i.value.trim().toLowerCase();if(!v)return;if(!DB.config.keywords.includes(v))DB.config.keywords.push(v);save();render();toast('Keyword added','ok');};
+ACT.kwAdd2=el=>{const k=el.dataset.k,i=$(k==='track_words'?'#trNew':'#spNew'),v=i.value.trim().toLowerCase();if(!v)return;if(!DB.config[k].includes(v))DB.config[k].push(v);save();render();};
+ACT.kwReset=()=>confirmBox('Reset keywords to the workflow defaults?',()=>{DB.config.keywords=[...DEF_KEYWORDS];save();render();},'Reset');
+ACT.saveReplies=()=>{const f=formData($('#sec-replies'));Object.assign(DB.config,{public_reply:f.public_reply,support_reply:f.support_reply,menu_reply:f.menu_reply});save();toast('Replies saved','ok');};
+ACT.cmForceFrom=el=>{UI.cmtSel=el.dataset.id;ACT.cmForce({dataset:{id:el.dataset.id}});go('comments');};
+ACT.cmKeywordFrom=el=>ACT.cmKeyword({dataset:{id:el.dataset.id}});
+
+/* ============ WEBHOOKS & LOGS ============ */
+function wbSamples(){
+  const post=DB.posts[0],fbp=DB.posts.find(p=>p.platform==='facebook')||DB.posts[0],cfg=DB.config;
+  const o=DB.orders.find(x=>x.status==='processing'&&x.phone)||DB.orders.find(x=>x.phone),c=custByPhone(o.phone);
+  return {
+    meta_verify:{'hub.mode':'subscribe','hub.verify_token':cfg.verify_token,'hub.challenge':'1158201444'},
+    ig_comment:{object:'instagram',entry:[{id:cfg.ig_account_id,time:Math.floor(Date.now()/1000),changes:[{field:'comments',value:{id:'179'+rnd(1e13,9e13),text:'Price?',from:{id:String(rnd(1e15,9e15)),username:'sana.shaikh'},media:{id:post.id,media_product_type:'FEED'}}}]}]},
+    fb_comment:{object:'page',entry:[{id:cfg.fb_page_id,time:Math.floor(Date.now()/1000),changes:[{field:'feed',value:{item:'comment',verb:'add',comment_id:fbp.id.split('_')[0]+'_'+rnd(1e10,9e10),post_id:fbp.id,message:'kitna hai link bhejo',from:{id:String(rnd(1e15,9e15)),name:'Kriti Sinha'}}}]}]},
+    wa_inbound:{object:'whatsapp_business_account',entry:[{changes:[{field:'messages',value:{metadata:{phone_number_id:cfg.phone_number_id},contacts:[{profile:{name:c.name}}],messages:[{from:c.phone,id:'wamid.'+rnd(1e6,9e6),type:'text',text:{body:'TRACK '+o.id}}]}}]}]},
+    order_status:{status:'shipped',phone:o.phone,customerName:o.name,orderId:o.id,itemTitle:o.items[0].title,courier:'Delhivery',awb:'DLV'+rnd(1e7,9e7),trackingUrl:'https://www.delhivery.com/track/package/DLV12345678',eta:'20 Oct tak',deliveredAt:fmtDay(Date.now())}
+  };
+}
+const WB_EP={meta_verify:'GET /meta-social-commerce',ig_comment:'POST /meta-social-commerce',fb_comment:'POST /meta-social-commerce',wa_inbound:'WhatsApp Message Trigger',order_status:'POST /order-status-update'};
+const WB_PILL={meta_verify:'b-info',meta_comment:'b-pur',wa_inbound:'b-ok',order_status:'b-warn'};
+function waCloudPost(body){
+  const out=[];for(const e of body.entry||[])for(const ch of e.changes||[]){const v=ch.value||{};const m=v.messages&&v.messages[0];if(!m)continue;
+    let text='';if(m.type==='text')text=(m.text&&m.text.body)||'';else if(m.type==='button')text=(m.button&&(m.button.text||m.button.payload))||'';else if(m.type==='interactive'&&m.interactive){const r=m.interactive.button_reply||m.interactive.list_reply||{};text=r.id||r.title||'';}
+    const nm=(v.contacts&&v.contacts[0]&&v.contacts[0].profile&&v.contacts[0].profile.name)||'there';waInbound(String(m.from),nm,text);out.push(`message ${m.id} from ${m.from} → intent ${parseWA(text).intent}`);}
+  return {status:200,json:{ok:true,routed:out}};
+}
+VIEWS.webhooks={title:'Webhooks & Logs',render(){
+  const t=UI.wbType,s=wbSamples();UI._wbBody=JSON.stringify(s[t],null,2);
+  return `<div class="page-h"><h2>Webhooks &amp; event log</h2><span class="muted sm-t">Fire the same calls Meta, WhatsApp and your store send to n8n</span></div>
+  <div class="grid g2" style="align-items:start"><div class="card"><div class="hd">Request</div><div class="bd col"><label class="f">Endpoint<select data-ch="wbType">${[['meta_verify','GET — Meta webhook verification'],['ig_comment','POST — Instagram comment event'],['fb_comment','POST — Facebook page comment event'],['wa_inbound','POST — WhatsApp inbound message'],['order_status','POST — /order-status-update (Shopify / courier)']].map(([k,l])=>`<option value="${k}" ${t===k?'selected':''}>${l}</option>`).join('')}</select></label>
+   <div class="row"><span class="pill">${t==='meta_verify'?'GET':'POST'}</span><span class="mono">${esc(DB.config.base_url||'https://n8n.example.com')}/webhook/${esc(WB_EP[t].replace(/^(GET|POST) \//,'').replace('WhatsApp Message Trigger','whatsapp'))}</span></div>
+   <label class="f">${t==='meta_verify'?'Query parameters':'JSON body'}<textarea id="wbBody" rows="15" class="mono" spellcheck="false">${esc(UI._wbBody)}</textarea></label><div class="row"><button class="btn pri" data-act="wbSend">${icon('send','sm')} Send</button><span class="muted xs-t">${t==='meta_verify'?'Change the token to see the 403.':t==='ig_comment'||t==='fb_comment'?'Comment with a keyword like “price” to get a DM.':''}</span></div></div></div>
+  <div class="col"><div class="card"><div class="hd">Response <span class="sp"></span><span id="wbStatus"></span></div><div class="bd"><pre class="json" id="wbResp">Send a request to see the response…</pre></div></div><div class="card"><div class="hd">Verify-token rule</div><div class="bd sm-t muted">Meta calls <b>GET</b> with <span class="mono">hub.verify_token</span>; if it equals <span class="mono">${esc(DB.config.verify_token)}</span> the challenge is echoed (200), otherwise <b>403 Forbidden</b>.</div></div></div></div>
+  <div class="card" style="margin-top:14px"><div class="hd">Event log <span class="sub">last ${DB.webhooks.length}</span></div><div id="wbLog"></div></div>`;
+},mount(){this.update();},update(){
+  const l=$('#wbLog');if(!l)return;
+  l.innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>Time</th><th>Type</th><th>Status</th><th>Summary</th><th></th></tr></thead><tbody>${DB.webhooks.slice(0,30).map(w=>`<tr><td class="muted" style="white-space:nowrap">${fmtShort(w.at)}</td><td><span class="badge ${WB_PILL[w.type]||''}">${w.type}</span></td><td><span class="pill ${w.status===200?'ok':'bad'}">${w.status}</span></td><td class="sm-t">${esc(w.summary)}</td><td>${w.payload?`<button class="btn sm ghost" data-act="wbView" data-id="${w.id}">View</button>`:''}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No events yet</td></tr>'}</tbody></table></div>`;
+}};
+INP.wbType=el=>{UI.wbType=el.value;render();};
+ACT.wbSend=()=>{
+  let body;try{body=JSON.parse($('#wbBody').value||'{}');}catch(e){toast('Invalid JSON: '+e.message,'err');return;}
+  let r;const t=UI.wbType;
+  if(t==='meta_verify')r=metaVerify(body);
+  else if(t==='ig_comment'||t==='fb_comment')r=metaPost(body);
+  else if(t==='wa_inbound'){r=waCloudPost(body);logWebhook('wa_inbound',200,'WhatsApp Cloud API payload received',body,r.json);}
+  else{r=orderStatusWebhook(body);const w=DB.webhooks[0];if(w&&w.type==='order_status'){w.payload=body;w.response=r.json;}}
+  $('#wbResp').textContent=r.text!=null?r.text:JSON.stringify(r.json,null,2);
+  $('#wbStatus').innerHTML=`<span class="pill ${r.status===200?'ok':'bad'}">HTTP ${r.status}</span>`;
+  VIEWS.webhooks.update();
+};
+ACT.wbView=el=>{const w=DB.webhooks.find(x=>x.id===el.dataset.id);openModal({title:`${w.type} · ${fmtShort(w.at)}`,wide:true,body:`<div class="b sm-t">Payload</div><pre class="json">${esc(JSON.stringify(w.payload,null,2))}</pre><div class="b sm-t" style="margin-top:10px">Response</div><pre class="json">${esc(typeof w.response==='string'?w.response:JSON.stringify(w.response,null,2))}</pre>`,actions:[{label:'Close',onClick:closeModal}]});};
+
+/* ============ SETTINGS ============ */
+VIEWS.settings={title:'Settings',update(){},render(){
+  const c=DB.config;
+  return `<div class="page-h"><h2>Settings</h2><span class="muted sm-t">Mirrors the “Store Config” node and webhook settings</span></div>
+  <div class="grid g2" style="align-items:start"><div class="col">
+   <div class="card" id="sec-store"><div class="hd">Store config <span class="sub">Store Config node</span></div><div class="bd col">
+    <div class="grid g2"><label class="f">Brand name<input name="brand_name" type="text" value="${esc(c.brand_name)}"></label><label class="f">Shopify domain<input name="shop_domain" type="text" value="${esc(c.shop_domain)}"></label></div>
+    <div class="grid g2"><label class="f">WhatsApp number (wa.me)<input name="wa_number" type="text" value="${esc(c.wa_number)}"></label><label class="f">UTM campaign<input name="utm_campaign" type="text" value="${esc(c.utm_campaign)}"></label></div>
+    <label class="chk"><input type="checkbox" name="use_mock" ${c.use_mock?'checked':''}> useMock — read products from the mock catalog instead of live Shopify</label>
+    <div><button class="btn pri" data-act="saveSec" data-sec="store">Save store config</button></div></div></div>
+   <div class="card" id="sec-support"><div class="hd">Support &amp; order desk</div><div class="bd col">
+    <div class="grid g3"><label class="f">Support opens (hour)<input name="support_start" type="number" min="0" max="23" value="${c.support_start}"></label><label class="f">Support closes (hour)<input name="support_end" type="number" min="1" max="24" value="${c.support_end}"></label><label class="f">SLA (hours)<input name="sla_hours" type="number" min="1" value="${c.sla_hours}"></label></div>
+    <label class="chk"><input type="checkbox" name="capture_details" ${c.capture_details?'checked':''}> Capture size &amp; address from the chat into the draft order <span class="chip">CRM extension</span></label>
+    <div><button class="btn pri" data-act="saveSec" data-sec="support">Save</button></div></div></div>
+  </div><div class="col">
+   <div class="card" id="sec-meta"><div class="hd">Meta &amp; WhatsApp <span class="sub">mock values</span></div><div class="bd col">
+    <label class="f">Webhook verify token<input name="verify_token" type="text" value="${esc(c.verify_token)}"></label>
+    <div class="grid g2"><label class="f">Instagram account ID<input name="ig_account_id" type="text" value="${esc(c.ig_account_id)}"></label><label class="f">Facebook page ID<input name="fb_page_id" type="text" value="${esc(c.fb_page_id)}"></label></div>
+    <label class="f">WhatsApp phone number ID<input name="phone_number_id" type="text" value="${esc(c.phone_number_id)}"></label>
+    <div><button class="btn pri" data-act="saveSec" data-sec="meta">Save</button></div></div></div>
+   <div class="card"><div class="hd">Demo controls</div><div class="bd col"><label class="f">Random carousel failure rate (shows the text-DM fallback)<select data-ch="failRate">${[0,0.1,0.25,0.5,1].map(v=>`<option value="${v}" ${DB.settings.fail_rate===v?'selected':''}>${Math.round(v*100)}%</option>`).join('')}</select></label>
+    <div class="sm-t muted">Everything is stored in this browser (localStorage).</div><div class="row wrap"><button class="btn" data-act="exportDb">${icon('download','sm')} Export JSON</button><button class="btn" data-act="importDb">${icon('upload','sm')} Import JSON</button><input type="file" id="importFile" accept="application/json" class="hide" data-ch="importFile"><span class="sp"></span><button class="btn dng" data-act="resetDb">${icon('refresh','sm')} Reset demo data</button><button class="btn dng" data-act="clearDb">${icon('trash','sm')} Clear all</button></div></div></div>
+  </div></div>`;
+}};
+INP.failRate=el=>{DB.settings.fail_rate=+el.value;save();toast('Failure rate '+Math.round(+el.value*100)+'%');};
+ACT.saveSec=el=>{const f=formData($('#sec-'+el.dataset.sec)),c=DB.config,s=el.dataset.sec;
+  if(s==='store')Object.assign(c,{brand_name:f.brand_name,shop_domain:f.shop_domain.trim(),wa_number:digits(f.wa_number),utm_campaign:f.utm_campaign,use_mock:f.use_mock});
+  if(s==='support'){if(+f.support_end<=+f.support_start){toast('Closing hour must be after opening hour','err');return;}Object.assign(c,{support_start:+f.support_start,support_end:+f.support_end,sla_hours:+f.sla_hours||2,capture_details:f.capture_details});}
+  if(s==='meta')Object.assign(c,{verify_token:f.verify_token.trim(),ig_account_id:f.ig_account_id.trim(),fb_page_id:f.fb_page_id.trim(),phone_number_id:f.phone_number_id.trim()});
+  save();toast('Settings saved','ok');};
+ACT.exportDb=()=>{jsonDownload('kurta-kingdom-crm-backup.json',DB);toast('Backup downloaded','ok');};
+ACT.importDb=()=>$('#importFile').click();
+INP.importFile=el=>{const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.orders||!d.config||!d.products)throw new Error('Not a Kurta Kingdom backup');DB=d;save();render();toast('Backup imported','ok');}catch(e){toast('Import failed: '+e.message,'err');}};r.readAsText(f);};
+ACT.resetDb=()=>confirmBox('Reset to the original demo data? Your changes will be lost.',()=>{DB=seedData();UI.chat=null;UI.cmtSel=null;save();render();toast('Demo data restored','ok');},'Reset');
+ACT.clearDb=()=>confirmBox('Delete all comments, customers, orders, tickets and chats? Catalog, posts and settings stay.',()=>{Object.assign(DB,{comments:[],customers:[],messages:[],orders:[],tickets:[],webhooks:[],events:[]});UI.chat=null;UI.cmtSel=null;save();render();toast('Records cleared');},'Clear all');
+
+/* ============ BOOT ============ */
+(function boot(){
+  try{const th=localStorage.getItem('kk_theme');if(th)document.documentElement.dataset.theme=th;}catch(e){}
+  load();
+  ['products','posts','comments','customers','messages','orders','tickets','templates','webhooks','events'].forEach(k=>{if(!Array.isArray(DB[k]))DB[k]=[];});
+  DB.settings=Object.assign({fail_rate:0.1},DB.settings||{});
+  const dark=(document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))==='dark';
+  $('#themeBtn').innerHTML=icon(dark?'sun':'moon');
+  const h=location.hash.slice(1);UI.tab=VIEWS[h]?h:'dashboard';
+  render();
+  setInterval(()=>{if(!document.hidden&&!MODAL)refresh();},30000);
+  window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(VIEWS[t]&&t!==UI.tab){UI.tab=t;render();}});
+  window.__crm={get db(){return DB;},ui:UI,go};
+})();
+
+</script>
+</body>
+</html>
